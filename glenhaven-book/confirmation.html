@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Confirmed — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body style="background:var(--g50);">
+
+<header>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+    </div>
+  </nav>
+</header>
+
+<div class="cfm-wrap">
+
+  <!-- SUCCESS -->
+  <div id="stateSuccess" style="display:none;">
+    <div class="cfm-card">
+      <div class="cfm-icon">✓</div>
+      <h1 style="font-size:1.75rem;margin-bottom:.5rem;">Booking Confirmed!</h1>
+      <p>Payment successful. Your stay at Glenhaven is confirmed. A confirmation email has been sent to <strong id="cfmEmail"></strong>.</p>
+      <span class="badge badge-green" id="cfmRef" style="margin:1.1rem auto;display:inline-block;font-size:.8rem;padding:.3rem .9rem;">REF-LOADING</span>
+      <div class="cfm-grid">
+        <div class="cfm-cell"><div class="cl">Guest</div><div class="cv" id="cfmName">—</div></div>
+        <div class="cfm-cell"><div class="cl">Total paid</div><div class="cv" id="cfmTotal">—</div></div>
+        <div class="cfm-cell"><div class="cl">Check-in</div><div class="cv" id="cfmCI">—</div></div>
+        <div class="cfm-cell"><div class="cl">Check-out</div><div class="cv" id="cfmCO">—</div></div>
+        <div class="cfm-cell"><div class="cl">Guests</div><div class="cv" id="cfmGuests">—</div></div>
+        <div class="cfm-cell"><div class="cl">Property</div><div class="cv">Glenhaven, Katoomba NSW</div></div>
+      </div>
+      <div style="background:var(--g50);border-radius:var(--r);padding:1.25rem;text-align:left;margin-bottom:1.5rem;">
+        <h3 style="font-size:.95rem;margin-bottom:.85rem;">What happens next</h3>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <div style="display:flex;gap:.7rem;"><div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">1</div><p style="font-size:.85rem;"><strong>Confirmation email</strong> — Check your inbox for full booking details.</p></div>
+          <div style="display:flex;gap:.7rem;"><div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">2</div><p style="font-size:.85rem;"><strong>24 hours before arrival</strong> — Your unique smart lock door code will be sent.</p></div>
+          <div style="display:flex;gap:.7rem;"><div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">3</div><p style="font-size:.85rem;"><strong>Check-in from 3:00 pm</strong> — Arrive at your leisure, the address will be in your confirmation.</p></div>
+        </div>
+      </div>
+      <a href="index.html" class="btn btn-primary btn-lg">Back to property</a>
+    </div>
+  </div>
+
+  <!-- CANCELLED -->
+  <div id="stateCancelled" style="display:none;">
+    <div class="cfm-card">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">↩️</div>
+      <h1 style="font-size:1.6rem;margin-bottom:.5rem;">Payment cancelled</h1>
+      <p>No charge was made. Your dates may still be available.</p>
+      <div style="display:flex;gap:.75rem;justify-content:center;margin-top:2rem;flex-wrap:wrap;">
+        <a href="booking.html" class="btn btn-primary btn-lg">Try again</a>
+        <a href="index.html" class="btn btn-white btn-lg">Back to property</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFAULT -->
+  <div id="stateDefault">
+    <div class="cfm-card">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">🏡</div>
+      <h1 style="font-size:1.6rem;margin-bottom:.5rem;">Thank you!</h1>
+      <p>If you've just completed a booking, please check your email for confirmation. Otherwise head back to the property to plan your stay.</p>
+      <a href="index.html" class="btn btn-primary btn-lg" style="margin-top:2rem;">View property</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+<script>
+  const status  = getParam('booking');
+  const pending = JSON.parse(sessionStorage.getItem('gh_pending') || 'null');
+
+  document.getElementById('stateSuccess').style.display   = 'none';
+  document.getElementById('stateCancelled').style.display = 'none';
+  document.getElementById('stateDefault').style.display   = 'none';
+
+  if (status === 'success') {
+    document.getElementById('stateSuccess').style.display = 'block';
+    if (pending) {
+      document.getElementById('cfmEmail').textContent  = pending.email || '';
+      document.getElementById('cfmRef').textContent    = pending.id || ('GH-'+Date.now());
+      document.getElementById('cfmName').textContent   = pending.guestName || '—';
+      document.getElementById('cfmTotal').textContent  = fmtAUD(pending.total || 0);
+      document.getElementById('cfmCI').textContent     = fmtDate(pending.checkIn);
+      document.getElementById('cfmCO').textContent     = fmtDate(pending.checkOut);
+      document.getElementById('cfmGuests').textContent = (pending.guests||1) + ' guest(s)';
+      // Save to local store
+      saveBooking({ id: pending.id, guestName: pending.guestName, email: pending.email, checkIn: pending.checkIn, checkOut: pending.checkOut, guests: pending.guests, total: pending.total, platform: 'Direct', status: 'CONFIRMED' });
+      sessionStorage.removeItem('gh_pending');
+    } else {
+      document.getElementById('cfmRef').textContent  = 'GH-'+Date.now();
+      document.getElementById('cfmName').textContent = 'Guest';
+    }
+  } else if (status === 'cancelled') {
+    document.getElementById('stateCancelled').style.display = 'block';
+  } else {
+    document.getElementById('stateDefault').style.display = 'block';
+  }
+</script>
+</body>
+</html>

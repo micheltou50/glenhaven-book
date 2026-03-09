@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <ul class="nav-links">
+        <li><a href="index.html" target="_blank">View site ↗</a></li>
+        <li><a href="booking.html" target="_blank">Booking page ↗</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div class="adm-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="adm-side">
+    <div style="padding:1.2rem 1.4rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:1.25rem;">
+      <div style="color:#fff;font-weight:700;font-size:.9rem;">Host Dashboard</div>
+      <div style="color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.2rem;" id="admDate"></div>
+    </div>
+    <nav class="adm-nav">
+      <a href="#" class="on" onclick="showTab('bookings',this)">📋 Bookings <span id="bkBadge" style="margin-left:auto;background:var(--green);color:#fff;font-size:.65rem;padding:.12rem .45rem;border-radius:100px;">0</span></a>
+      <a href="#" onclick="showTab('calendar',this)">📅 Calendar</a>
+      <a href="#" onclick="showTab('block',this)">🚫 Block Dates</a>
+      <a href="#" onclick="showTab('ical',this)">🔄 iCal Sync</a>
+      <a href="#" onclick="showTab('pricing',this)">💰 Pricing Rules</a>
+      <a href="index.html" target="_blank">🌐 Live Site</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="adm-main">
+
+    <!-- STATS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h2 style="font-size:1.35rem;">Dashboard</h2>
+        <p style="font-size:.82rem;margin-top:.15rem;" id="admDateSub"></p>
+      </div>
+      <a href="booking.html" target="_blank" class="btn btn-primary btn-sm">+ New Booking</a>
+    </div>
+
+    <div class="adm-stats">
+      <div class="stat-box"><div class="slabel">Total Bookings</div><div class="sval g" id="stTotal">0</div><div class="ssub">All time</div></div>
+      <div class="stat-box"><div class="slabel">Upcoming</div><div class="sval" id="stUpcoming">0</div><div class="ssub">Next 90 days</div></div>
+      <div class="stat-box"><div class="slabel">Nights Booked</div><div class="sval" id="stNights">0</div><div class="ssub">Total</div></div>
+      <div class="stat-box"><div class="slabel">Direct Revenue</div><div class="sval g" id="stRevenue">$0</div><div class="ssub">Estimated</div></div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn on" onclick="showTab('bookings',this)">All Bookings</button>
+      <button class="tab-btn" onclick="showTab('calendar',this)">Calendar</button>
+      <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
+      <button class="tab-btn" onclick="showTab('ical',this)">iCal Sync</button>
+      <button class="tab-btn" onclick="showTab('pricing',this)">Pricing</button>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div class="tab-pane on" id="tab-bookings">
+      <div class="tbl-wrap">
+        <div class="tbl-bar">
+          <div class="tbl-search"><input type="text" placeholder="Search name or email…" oninput="filterTable(this.value)" id="tblSearch"/></div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <select class="form-select" style="width:auto;padding:.48rem .85rem;font-size:.82rem;" onchange="filterStatus(this.value)">
+              <option value="">All status</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="PENDING">Pending</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+            <button class="btn btn-sm btn-white" onclick="exportCSV()">Export CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Nights</th>
+                <th>Guests</th>
+                <th>Total</th>
+                <th>Platform</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bkTable"></tbody>
+          </table>
+        </div>
+        <div id="bkEmpty" style="text-align:center;padding:3rem;color:var(--g400);font-size:.9rem;display:none;">
+          <div style="font-size:2rem;margin-bottom:.6rem;">📋</div>
+          <p>No bookings yet.</p>
+          <a href="booking.html" class="btn btn-primary btn-sm" style="margin-top:.75rem;display:inline-flex;">Create test booking</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR TAB -->
+    <div class="tab-pane" id="tab-calendar">
+      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
+        <h3 style="font-size:1rem;margin-bottom:1.2rem;">Availability Overview</h3>
+        <div id="admCalContainer"></div>
+        <div class="cal-legend" style="margin-top:.85rem;">
+          <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Booked / Blocked</div>
+          <div class="cal-legend-i"><div class="cal-legend-d" style="background:#fff;border:1px solid var(--g200)"></div>Available</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK DATES TAB -->
+    <div class="tab-pane" id="tab-block">
+      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-bottom:.4rem;">Block dates</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.1rem;">Block dates for maintenance, personal stays, or any other reason.</p>
+        <div class="form-row" style="margin-bottom:.85rem;">
+          <div class="form-group"><label class="form-label">From</label><input type="date" id="blkFrom" class="form-input"/></div>
+          <div class="form-group"><label class="form-label">To</label><input type="date" id="blkTo" class="form-input"/></div>
+        </div>
+        <div class="form-group" style="margin-bottom:.85rem;"><label class="form-label">Reason</label><input type="text" id="blkReason" class="form-input" placeholder="Maintenance, owner stay, etc."/></div>
+        <button class="btn btn-black" onclick="addBlock()">Block these dates</button>
+      </div>
+      <div class="tbl-wrap" id="blockListWrap">
+        <div class="tbl-bar"><span style="font-size:.875rem;font-weight:600;">Blocked periods</span></div>
+        <div id="blockList"></div>
+        <div id="blockEmpty" style="text-align:center;padding:2rem;color:var(--g400);font-size:.85rem;">No blocked dates.</div>
+      </div>
+    </div>
+
+    <!-- ICAL TAB -->
+    <div class="tab-pane" id="tab-ical">
+      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
+        <h3 style="font-size:1rem;margin-bottom:.4rem;">🔄 iCal Calendar Sync</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.2rem;">Paste iCal feed URLs from other platforms. Dates imported from these feeds will be blocked automatically.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:1.2rem;">
+          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
+            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">🏠 Airbnb</div>
+            <input type="url" id="icalAirbnb" class="form-input" placeholder="https://www.airbnb.com.au/calendar/ical/..."/>
+            <div id="syncAirbnb" style="font-size:.72rem;margin-top:.3rem;"></div>
+          </div>
+          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
+            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">🏡 VRBO</div>
+            <input type="url" id="icalVrbo" class="form-input" placeholder="https://www.vrbo.com/icalendar/..."/>
+            <div id="syncVrbo" style="font-size:.72rem;margin-top:.3rem;"></div>
+          </div>
+          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
+            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">📅 Other</div>
+            <input type="url" id="icalOther" class="form-input" placeholder="https://..."/>
+            <div id="syncOther" style="font-size:.72rem;margin-top:.3rem;"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="syncICal()">Sync Now</button>
+        <p style="font-size:.75rem;color:var(--g400);margin-top:.6rem;" id="syncLast"></p>
+        <hr style="margin:1.5rem 0;">
+        <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.6rem;">How to get your Airbnb iCal URL</h4>
+        <ol style="padding-left:1.2rem;font-size:.84rem;color:var(--g600);line-height:1.9;">
+          <li>Open your Airbnb listing → <strong>Calendar</strong> → <strong>Availability Settings</strong></li>
+          <li>Scroll to <strong>Sync calendars</strong></li>
+          <li>Copy the <strong>Export calendar</strong> link and paste above</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- PRICING TAB -->
+    <div class="tab-pane" id="tab-pricing">
+      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
+        <h3 style="font-size:1rem;margin-bottom:1.1rem;">💰 Dynamic Pricing Rules</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div>
+            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Base Rates</h4>
+            <table style="width:100%;font-size:.85rem;">
+              <tbody>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekday (Mon–Thu)</td><td style="font-weight:600;text-align:right;">$320/night</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Friday</td><td style="font-weight:600;text-align:right;">$380/night</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Saturday</td><td style="font-weight:600;text-align:right;">$400/night</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Extra guest (3+)</td><td style="font-weight:600;text-align:right;">+$40/night</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Cleaning fee</td><td style="font-weight:600;text-align:right;">$150 flat</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Seasonal Modifiers</h4>
+            <table style="width:100%;font-size:.85rem;">
+              <tbody>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Peak (Dec–Jan)</td><td style="font-weight:600;text-align:right;color:var(--red);">+25%</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Low (May–Aug)</td><td style="font-weight:600;text-align:right;color:var(--green);">−10%</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Christmas Day</td><td style="font-weight:600;text-align:right;">$550</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">New Year's Eve/Day</td><td style="font-weight:600;text-align:right;">$650</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Easter</td><td style="font-weight:600;text-align:right;">$480</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Length-of-Stay Discounts</h4>
+            <table style="width:100%;font-size:.85rem;">
+              <tbody>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">3+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">5% off</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">5+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">10% off</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">7+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">15% off</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Minimum Stay</h4>
+            <table style="width:100%;font-size:.85rem;">
+              <tbody>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekdays</td><td style="font-weight:600;text-align:right;">2 nights</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekends</td><td style="font-weight:600;text-align:right;">3 nights</td></tr>
+                <tr><td style="padding:.5rem 0;color:var(--g600);">Peak season</td><td style="font-weight:600;text-align:right;">4 nights</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-top:1.25rem;font-size:.82rem;color:var(--g500);">
+          To update pricing rules, edit the <code>CONFIG</code> and <code>HOLIDAY_PRICES</code> objects in <code>script.js</code>.
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // ── Init ──
+  let allBK  = getLocalBookings ? getLocalBookings() : getBookings();
+  let blkList = getBlocks();
+  let icalUrls = JSON.parse(localStorage.getItem('gh_ical')||'{}');
+
+  function getLocalBookings() { return getBookings(); }
+
+  // Date
+  const now = new Date();
+  document.getElementById('admDate').textContent = now.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('admDateSub').textContent = now.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('blkFrom').min = todayISO();
+  document.getElementById('blkTo').min   = todayISO();
+
+  // Load iCal
+  if (icalUrls.airbnb) document.getElementById('icalAirbnb').value = icalUrls.airbnb;
+  if (icalUrls.vrbo)   document.getElementById('icalVrbo').value   = icalUrls.vrbo;
+  if (icalUrls.other)  document.getElementById('icalOther').value  = icalUrls.other;
+  const ls = localStorage.getItem('gh_lastsync');
+  if (ls) document.getElementById('syncLast').textContent = 'Last synced: ' + ls;
+
+  // Stats
+  function renderStats() {
+    const n90 = new Date(); n90.setDate(n90.getDate()+90);
+    let up=0, nights=0, rev=0;
+    allBK.forEach(b => {
+      const ci = new Date(b.checkIn);
+      if (ci >= now && ci <= n90) up++;
+      nights += Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
+      rev += (b.total||0);
+    });
+    document.getElementById('stTotal').textContent   = allBK.length;
+    document.getElementById('stUpcoming').textContent = up;
+    document.getElementById('stNights').textContent  = nights;
+    document.getElementById('stRevenue').textContent = fmtAUD(rev);
+    document.getElementById('bkBadge').textContent   = allBK.length;
+  }
+
+  // Table
+  let fText='', fStatus='';
+  function renderTable() {
+    const tbody = document.getElementById('bkTable');
+    const empty = document.getElementById('bkEmpty');
+    let rows = allBK.filter(b => {
+      const matchTxt = !fText || (b.guestName||'').toLowerCase().includes(fText) || (b.email||'').toLowerCase().includes(fText);
+      const matchSt  = !fStatus || (b.status||'CONFIRMED').toUpperCase() === fStatus;
+      return matchTxt && matchSt;
+    });
+    if (!rows.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = rows.map(b => {
+      const n  = Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
+      const st = (b.status||'CONFIRMED').toUpperCase();
+      const stCls = st==='CONFIRMED'?'s-cfm':st==='PENDING'?'s-pen':'s-can';
+      return `<tr>
+        <td><strong>${b.guestName||'—'}</strong><br><span style="font-size:.74rem;color:var(--g400);">${b.email||''}</span></td>
+        <td>${fmtDate(b.checkIn)}</td>
+        <td>${fmtDate(b.checkOut)}</td>
+        <td>${n}</td>
+        <td>${b.guests||'—'}</td>
+        <td style="font-weight:600;">${fmtAUD(b.total||0)}</td>
+        <td><span class="badge badge-green" style="font-size:.7rem;">${b.platform||'Direct'}</span></td>
+        <td><span class="spill ${stCls}">${st}</span></td>
+        <td><button class="t-act" onclick="delBooking('${b.id}')">Delete</button></td>
+      </tr>`;
+    }).join('');
+  }
+  function filterTable(v) { fText=v.toLowerCase(); renderTable(); }
+  function filterStatus(v) { fStatus=v; renderTable(); }
+  function delBooking(id) {
+    if (!confirm('Delete this booking? This cannot be undone.')) return;
+    deleteBooking(id);
+    allBK = getBookings();
+    renderStats(); renderTable(); renderBlockList();
+  }
+
+  // Block dates
+  function renderBlockList() {
+    blkList = getBlocks();
+    const el = document.getElementById('blockList');
+    const em = document.getElementById('blockEmpty');
+    if (!blkList.length) { el.innerHTML=''; em.style.display='block'; return; }
+    em.style.display = 'none';
+    el.innerHTML = blkList.map(b => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.2rem;border-bottom:1px solid var(--g100);font-size:.875rem;">
+        <div>
+          <strong>${fmtDate(b.start)} → ${fmtDate(b.end)}</strong>
+          <div style="font-size:.75rem;color:var(--g400);margin-top:.15rem;">${b.reason||'Blocked'} · Manual</div>
+        </div>
+        <button class="t-act" onclick="removeBlock('${b.id}')">Remove</button>
+      </div>`).join('');
+  }
+  function addBlock() {
+    const from   = document.getElementById('blkFrom').value;
+    const to     = document.getElementById('blkTo').value;
+    const reason = document.getElementById('blkReason').value.trim();
+    if (!from||!to) { alert('Please select both dates.'); return; }
+    if (to <= from) { alert('End date must be after start date.'); return; }
+    const id = 'blk-'+Date.now();
+    saveBlock({ id, start: from, end: to, reason: reason||'Blocked' });
+    blkList = getBlocks();
+    renderBlockList();
+    document.getElementById('blkFrom').value='';
+    document.getElementById('blkTo').value='';
+    document.getElementById('blkReason').value='';
+  }
+  function removeBlock(id) {
+    deleteBlock(id);
+    blkList = getBlocks();
+    renderBlockList();
+  }
+
+  // iCal
+  async function syncICal() {
+    const airbnb = document.getElementById('icalAirbnb').value.trim();
+    const vrbo   = document.getElementById('icalVrbo').value.trim();
+    const other  = document.getElementById('icalOther').value.trim();
+    localStorage.setItem('gh_ical', JSON.stringify({airbnb,vrbo,other}));
+    const platforms = [{key:'airbnb',url:airbnb,el:'syncAirbnb'},{key:'vrbo',url:vrbo,el:'syncVrbo'},{key:'other',url:other,el:'syncOther'}].filter(p=>p.url);
+    if (!platforms.length) { alert('Enter at least one iCal URL.'); return; }
+    for (const p of platforms) {
+      const el = document.getElementById(p.el);
+      el.textContent='Syncing…'; el.style.color=var_g500;
+      await new Promise(r=>setTimeout(r,700));
+      el.textContent='✓ Connected (real sync via Apps Script in production)';
+      el.style.color='var(--green-d)';
+    }
+    const ts = new Date().toLocaleString('en-AU');
+    localStorage.setItem('gh_lastsync',ts);
+    document.getElementById('syncLast').textContent='Last synced: '+ts;
+  }
+  const var_g500 = 'var(--g500)';
+
+  // Tabs
+  let admCal;
+  function showTab(name, el) {
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('.tab-btn,.adm-nav a').forEach(b=>b.classList.remove('on'));
+    document.getElementById('tab-'+name).classList.add('on');
+    if(el) el.classList.add('on');
+    if (name==='calendar' && !admCal) {
+      setTimeout(()=>{ admCal = new MiniCal('admCalContainer',{onSelect:()=>{},showPrice:false}); },50);
+    }
+    if (name==='block') renderBlockList();
+  }
+
+  // Export CSV
+  function exportCSV() {
+    const rows = [['Guest Name','Email','Check-in','Check-out','Nights','Guests','Total','Platform','Status']];
+    getBookings().forEach(b => {
+      const n = Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
+      rows.push([b.guestName,b.email,b.checkIn,b.checkOut,n,b.guests,b.total,b.platform||'Direct',b.status||'CONFIRMED']);
+    });
+    const csv = rows.map(r=>r.map(c=>`"${c||''}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'glenhaven-bookings-' + todayISO() + '.csv';
+    a.click();
+  }
+
+  // Init
+  renderStats();
+  renderTable();
+  renderBlockList();
+</script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book — Glenhaven Blue Mountains</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { background: var(--g50); }
+    .bk-hero { background: #fff; border-bottom: 1px solid var(--g200); padding: 1.5rem 0; }
+    .bk-hero-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between; }
+    .bk-prop { display: flex; align-items: center; gap: 1rem; }
+    .bk-thumb { width: 68px; height: 56px; border-radius: var(--r); object-fit: cover; flex-shrink: 0; }
+    .bk-prop-info h3 { font-size: .95rem; font-weight: 700; margin-bottom: .15rem; }
+    .bk-prop-info p  { font-size: .78rem; color: var(--g500); }
+    .pricing-tag { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .pricing-tag .badge { cursor: default; }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <ul class="nav-links"><li><a href="index.html">← Back to property</a></li></ul>
+      <button class="nav-burger" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    </div>
+  </nav>
+</header>
+
+<!-- PROPERTY HEADER -->
+<div class="bk-hero">
+  <div class="container bk-hero-inner">
+    <div class="bk-prop">
+      <img class="bk-thumb" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven"/>
+      <div class="bk-prop-info">
+        <h3>Glenhaven — Blue Mountains Cottage</h3>
+        <p>Katoomba, NSW · 4 bedrooms · Up to 8 guests</p>
+        <div class="stars" style="font-size:.78rem;margin-top:.2rem;">★★★★★ <span style="color:var(--g500);font-weight:500;">5.0</span></div>
+      </div>
+    </div>
+    <div class="pricing-tag">
+      <span class="badge badge-green">No platform fees</span>
+      <span class="badge badge-black">🔒 Secure checkout</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="bk-layout">
+
+    <!-- LEFT: FORM -->
+    <div>
+      <!-- Steps -->
+      <div class="steps" id="stepsBar">
+        <div class="step on" id="st1"><div class="step-c">1</div> Dates</div>
+        <div class="step-line"></div>
+        <div class="step" id="st2"><div class="step-c">2</div> Guests</div>
+        <div class="step-line"></div>
+        <div class="step" id="st3"><div class="step-c">3</div> Your Details</div>
+        <div class="step-line"></div>
+        <div class="step" id="st4"><div class="step-c">4</div> Payment</div>
+      </div>
+
+      <!-- SECTION 1: DATES -->
+      <div class="bk-card" id="secDates">
+        <h3>📅 Select your dates</h3>
+        <div id="bkCalContainer"></div>
+        <div class="cal-legend" style="margin-top:.75rem;">
+          <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Selected</div>
+          <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--g100);border:1px solid var(--g300);"></div>Unavailable</div>
+        </div>
+        <div id="dateAlert" class="alert alert-err" style="margin-top:1rem;"></div>
+        <div style="margin-top:1.25rem;">
+          <button class="btn btn-primary" onclick="goStep2()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- SECTION 2: GUESTS -->
+      <div class="bk-card" id="secGuests" style="display:none;">
+        <h3>👥 How many guests?</h3>
+        <div id="guestCounters">
+          <div class="gc-row">
+            <div class="gc-label"><h4>Adults</h4><p>Ages 13+</p></div>
+            <div class="gc-ctrl">
+              <button class="gc-btn" onclick="adj('adults',-1)" id="adDn">−</button>
+              <span class="gc-num" id="adNum">2</span>
+              <button class="gc-btn" onclick="adj('adults',1)" id="adUp">+</button>
+            </div>
+          </div>
+          <div class="gc-row">
+            <div class="gc-label"><h4>Children</h4><p>Ages 2–12</p></div>
+            <div class="gc-ctrl">
+              <button class="gc-btn" onclick="adj('children',-1)" id="chDn">−</button>
+              <span class="gc-num" id="chNum">0</span>
+              <button class="gc-btn" onclick="adj('children',1)" id="chUp">+</button>
+            </div>
+          </div>
+          <div class="gc-row">
+            <div class="gc-label"><h4>Infants</h4><p>Under 2</p></div>
+            <div class="gc-ctrl">
+              <button class="gc-btn" onclick="adj('infants',-1)" id="inDn">−</button>
+              <span class="gc-num" id="inNum">0</span>
+              <button class="gc-btn" onclick="adj('infants',1)" id="inUp">+</button>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:.78rem;color:var(--g400);margin-top:.85rem;">Maximum 8 guests (infants don't count). $40/night per guest beyond 2.</p>
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+          <button class="btn btn-white" onclick="goStep1()">← Back</button>
+          <button class="btn btn-primary" onclick="goStep3()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- SECTION 3: DETAILS -->
+      <div class="bk-card" id="secDetails" style="display:none;">
+        <h3>👤 Your details</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First name *</label><input type="text" id="fName" class="form-input" placeholder="Jane"/></div>
+          <div class="form-group"><label class="form-label">Last name *</label><input type="text" id="lName" class="form-input" placeholder="Smith"/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email address *</label><input type="email" id="fEmail" class="form-input" placeholder="jane@example.com"/></div>
+        <div class="form-group"><label class="form-label">Phone number</label><input type="tel" id="fPhone" class="form-input" placeholder="+61 4XX XXX XXX"/></div>
+        <div class="form-group"><label class="form-label">Special requests</label><textarea id="fNotes" class="form-textarea" placeholder="Dietary requirements, early check-in request, special occasions..."></textarea></div>
+        <div id="detailsAlert" class="alert alert-err"></div>
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+          <button class="btn btn-white" onclick="goStep2()">← Back</button>
+          <button class="btn btn-primary" onclick="goStep4()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- SECTION 4: PAYMENT -->
+      <div class="bk-card" id="secPayment" style="display:none;">
+        <h3>💳 Payment</h3>
+        <label class="pay-opt sel" id="payFull" onclick="selPay('full')">
+          <input type="radio" name="pay" value="full" checked/>
+          <div class="pay-opt-info"><h4>Pay full amount — <span id="payFullAmt">$0</span></h4><p>Fully confirmed immediately. Secure Stripe checkout.</p></div>
+        </label>
+        <label class="pay-opt" id="payDep" onclick="selPay('dep')">
+          <input type="radio" name="pay" value="dep"/>
+          <div class="pay-opt-info"><h4>Pay 30% deposit — <span id="payDepAmt">$0</span></h4><p>Remainder due 14 days before check-in.</p></div>
+        </label>
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-top:1rem;font-size:.82rem;color:var(--g500);">
+          <p>🔒 Payment processed securely by Stripe. Your card details are never stored on our servers.</p>
+          <p style="margin-top:.4rem;">After confirming you'll be redirected to Stripe's secure checkout page.</p>
+        </div>
+        <div id="payAlert" class="alert alert-err" style="margin-top:.75rem;"></div>
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+          <button class="btn btn-white" onclick="goStep3()">← Back</button>
+          <button class="btn btn-primary btn-lg" id="payBtn" onclick="submitBooking()">
+            <span id="payBtnText">Confirm & Pay Securely</span>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <!-- RIGHT: PRICE SIDEBAR -->
+    <aside>
+      <div class="bk-sidebar" id="bkSidebar">
+        <div id="sidebarEmpty" style="text-align:center;padding:1.5rem 0;color:var(--g400);font-size:.875rem;">
+          Select dates to see pricing
+        </div>
+        <div id="sidebarContent" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem;">
+            <div style="font-size:1.25rem;font-weight:800;" id="sdPrice">$320</div>
+            <div class="stars">★★★★★</div>
+          </div>
+          <div style="font-size:.8rem;color:var(--g400);margin-bottom:1rem;" id="sdDates"></div>
+          <div class="price-bk" id="sdBK" style="margin-bottom:1rem;"></div>
+          <div id="sdUrgency" class="urgency" style="font-size:.78rem;"></div>
+        </div>
+        <div style="background:var(--g50);border-radius:var(--r);padding:.9rem;margin-top:.75rem;">
+          <div style="font-size:.78rem;color:var(--g500);">
+            <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ No platform fees<span style="color:var(--green-d);font-weight:600;">Save up to 15%</span></div>
+            <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ Free cancellation</div>
+            <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ Secure checkout</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bot">
+      <p>© 2025 Glenhaven · Katoomba, NSW</p>
+      <div class="footer-links"><a href="index.html">Home</a><a href="#">Privacy</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  let bkCI = null, bkCO = null;
+  let adults=2, children=0, infants=0;
+  let payMode = 'full';
+
+  // URL pre-fill
+  const urlCI = getParam('ci'), urlCO = getParam('co'), urlG = getParam('g');
+  if (urlCI) bkCI = urlCI;
+  if (urlCO) bkCO = urlCO;
+  if (urlG)  adults = Math.min(8, Math.max(1, parseInt(urlG)||2));
+
+  // Calendar
+  const bkCal = new MiniCal('bkCalContainer', {
+    onSelect: ({checkIn, checkOut}) => {
+      bkCI = checkIn; bkCO = checkOut;
+      updateSidebar();
+    }
+  });
+  if (bkCI && bkCO) { bkCal.setRange(bkCI, bkCO); updateSidebar(); }
+
+  function updateSidebar() {
+    const total = adults + children;
+    const p = calcPrice(bkCI, bkCO, total);
+    const empty = document.getElementById('sidebarEmpty');
+    const content = document.getElementById('sidebarContent');
+    if (!p) { empty.style.display='block'; content.style.display='none'; return; }
+
+    empty.style.display = 'none'; content.style.display = 'block';
+    document.getElementById('sdPrice').textContent = fmtAUD(p.avgNightly) + '/night avg';
+    document.getElementById('sdDates').textContent = fmtShort(bkCI) + ' → ' + fmtShort(bkCO) + ' · ' + (adults+children) + ' guest' + ((adults+children)>1?'s':'');
+
+    let html = `<div class="price-row"><span>${p.nights} nights × ${fmtAUD(p.avgNightly)}</span><span>${fmtAUD(p.nightlyTotal)}</span></div>`;
+    if (p.extraGuests > 0) html += `<div class="price-row"><span>Extra guest fee (×${p.extraGuests})</span><span>included</span></div>`;
+    if (p.discountAmt > 0) html += `<div class="price-row dep"><span>Stay discount (${Math.round(p.losDiscount*100)}%)</span><span>−${fmtAUD(p.discountAmt)}</span></div>`;
+    html += `<div class="price-row"><span>Cleaning fee</span><span>${fmtAUD(p.cleaningFee)}</span></div>`;
+    html += `<div class="price-row tot"><span>Total AUD</span><span>${fmtAUD(p.total)}</span></div>`;
+    document.getElementById('sdBK').innerHTML = html;
+    document.getElementById('sdUrgency').innerHTML = `<div class="urgency-dot"></div><span>${getUrgencyMsg(bkCI,bkCO)}</span>`;
+
+    // Payment amounts
+    document.getElementById('payFullAmt').textContent = fmtAUD(p.total);
+    document.getElementById('payDepAmt').textContent  = fmtAUD(Math.round(p.total*.3));
+  }
+
+  // Guest counter
+  function updateGC() {
+    document.getElementById('adNum').textContent = adults;
+    document.getElementById('chNum').textContent = children;
+    document.getElementById('inNum').textContent = infants;
+    document.getElementById('adDn').disabled = adults <= 1;
+    document.getElementById('adUp').disabled = (adults+children) >= CONFIG.MAX_GUESTS;
+    document.getElementById('chDn').disabled = children <= 0;
+    document.getElementById('chUp').disabled = (adults+children) >= CONFIG.MAX_GUESTS;
+    document.getElementById('inDn').disabled = infants <= 0;
+    document.getElementById('inUp').disabled = infants >= 4;
+    updateSidebar();
+  }
+  function adj(type, d) {
+    if (type==='adults')   adults   = Math.max(1, adults+d);
+    if (type==='children') children = Math.max(0, children+d);
+    if (type==='infants')  infants  = Math.max(0, infants+d);
+    if (adults+children > CONFIG.MAX_GUESTS) { if(type==='adults') adults-=d; else children-=d; }
+    updateGC();
+  }
+  updateGC();
+
+  // Payment
+  function selPay(mode) {
+    payMode = mode;
+    document.getElementById('payFull').classList.toggle('sel', mode==='full');
+    document.getElementById('payDep').classList.toggle('sel', mode==='dep');
+  }
+
+  // Step nav
+  function setStep(n) {
+    for (let i=1;i<=4;i++) {
+      const el = document.getElementById('st'+i);
+      el.classList.remove('on','done');
+      if (i < n) el.classList.add('done');
+      if (i === n) el.classList.add('on');
+    }
+    ['secDates','secGuests','secDetails','secPayment'].forEach((id,i) => {
+      document.getElementById(id).style.display = (i+1===n) ? 'block' : 'none';
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function goStep1() { setStep(1); }
+  function goStep2() {
+    if (!bkCI||!bkCO) { const a=document.getElementById('dateAlert'); a.textContent='Please select your check-in and check-out dates.'; a.classList.add('show'); return; }
+    const nights = Math.round((new Date(bkCO)-new Date(bkCI))/86400000);
+    const minN   = getMinNights(bkCI);
+    if (nights < minN) { const a=document.getElementById('dateAlert'); a.textContent=`Minimum stay is ${minN} nights for these dates.`; a.classList.add('show'); return; }
+    document.getElementById('dateAlert').classList.remove('show');
+    setStep(2);
+  }
+  function goStep3() { setStep(3); }
+  function goStep4() {
+    const fn=document.getElementById('fName').value.trim(), ln=document.getElementById('lName').value.trim(), em=document.getElementById('fEmail').value.trim();
+    const a = document.getElementById('detailsAlert');
+    a.classList.remove('show');
+    if (!fn||!ln||!em) { a.textContent='Please enter your name and email address.'; a.classList.add('show'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { a.textContent='Please enter a valid email address.'; a.classList.add('show'); return; }
+    setStep(4);
+  }
+
+  // Submit
+  async function submitBooking() {
+    const p = calcPrice(bkCI, bkCO, adults+children);
+    if (!p) { alert('Please go back and select valid dates.'); return; }
+    const amtToPay = payMode==='dep' ? Math.round(p.total*.3) : p.total;
+
+    const btn = document.getElementById('payBtn');
+    const txt = document.getElementById('payBtnText');
+    btn.disabled = true;
+    txt.textContent = 'Processing…';
+
+    const payload = {
+      checkIn    : bkCI,
+      checkOut   : bkCO,
+      nights     : p.nights,
+      guestName  : document.getElementById('fName').value.trim() + ' ' + document.getElementById('lName').value.trim(),
+      email      : document.getElementById('fEmail').value.trim(),
+      phone      : document.getElementById('fPhone').value.trim(),
+      guests     : adults + children,
+      message    : document.getElementById('fNotes').value.trim(),
+      paymentMode: payMode,
+      totalAmount: amtToPay,
+    };
+
+    try {
+      const result = await sendBooking(payload);
+      if (result.success && result.paymentLink) {
+        // Store details for confirmation page, optimistically block dates
+        storePendingBooking(payload, p.total);
+        window.location.href = result.paymentLink;
+      } else {
+        throw new Error(result.error || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      const a = document.getElementById('payAlert');
+      a.textContent = err.message;
+      a.classList.add('show');
+      btn.disabled = false;
+      txt.textContent = 'Confirm & Pay Securely';
+    }
+  }
+
+  // Load live availability from Google Sheet
+  loadAvailability();
+</script>
+</body>
+</html>
