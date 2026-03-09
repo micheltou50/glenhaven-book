@@ -460,9 +460,12 @@
   <button class="lb-arrow lb-next" onclick="lbShift(1)">›</button>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js">
+<script src="script.js"></script>
+<script>
   // Load live availability from Google Sheet
-  loadAvailability();
+  loadAvailability().then(() => {
+    if (typeof homeCal !== 'undefined' && homeCal) homeCal.renderGrid();
+  });
 </script>
 <script>
   const LB_IMGS = [
