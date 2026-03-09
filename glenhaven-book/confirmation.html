@@ -73,7 +73,7 @@
 <script src="script.js"></script>
 <script>
   const status  = getParam('booking');
-  const pending = JSON.parse(sessionStorage.getItem('gh_pending') || 'null');
+  let pending = null; try { pending = JSON.parse(sessionStorage.getItem('gh_pending') || 'null'); } catch(e) {}
 
   document.getElementById('stateSuccess').style.display   = 'none';
   document.getElementById('stateCancelled').style.display = 'none';

@@ -234,7 +234,14 @@
 <script src="script.js"></script>
 <script>
   // ── Init ──
-  let allBK  = getLocalBookings ? getLocalBookings() : getBookings();
+  // Load server bookings first, then render
+  loadAvailability().then(() => {
+    allBK = getBookings();
+    renderBookings();
+    renderCalendar();
+  });
+
+  let allBK  = getBookings();
   let blkList = getBlocks();
   let icalUrls = JSON.parse(localStorage.getItem('gh_ical')||'{}');
 

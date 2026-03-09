@@ -320,7 +320,8 @@
       guests     : adults + children,
       message    : document.getElementById('fNotes').value.trim(),
       paymentMode: payMode,
-      totalAmount: amtToPay,
+      total      : p.total,      // full price (book.js uses this for Stripe)
+      totalAmount: amtToPay,     // may be deposit (30%) or full
     };
 
     try {
@@ -341,8 +342,12 @@
     }
   }
 
-  // Load live availability from Google Sheet
-  loadAvailability();
+
+</script>
+<script>
+  loadAvailability().then(() => {
+    if (typeof bookCal !== "undefined" && bookCal) bookCal.renderDays();
+  });
 </script>
 </body>
 </html>
