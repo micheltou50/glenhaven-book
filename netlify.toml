@@ -6,3 +6,9 @@
   from   = "/api/*"
   to     = "/.netlify/functions/:splat"
   status = 200
+
+# /calendar.ics → iCal feed for Airbnb import
+[[redirects]]
+  from   = "/calendar.ics"
+  to     = "/.netlify/functions/calendar"
+  status = 200
