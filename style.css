@@ -104,6 +104,9 @@ p { line-height: 1.65; color: var(--g600); }
 
 /* CALENDAR */
 .cal-widget { user-select: none; }
+.cal-two-months .cal-month-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.cal-month { min-width: 0; }
+@media (max-width: 640px) { .cal-two-months .cal-month-wrap { grid-template-columns: 1fr; } }
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: .85rem; }
 .cal-nb { width: 32px; height: 32px; border-radius: 50%; background: var(--g100); border: 1px solid var(--g200); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--tr); font-size: 1rem; }
 .cal-nb:hover { background: var(--black); color: #fff; border-color: var(--black); }
@@ -185,7 +188,8 @@ p { line-height: 1.65; color: var(--g600); }
 
 /* STICKY BOOKING CARD */
 .sticky-wrap { position: sticky; top: 86px; }
-.sticky-card { background: #fff; border-radius: var(--r-xl); border: 1px solid var(--g200); box-shadow: var(--sh-lg); padding: 1.4rem; }
+.sticky-card { background: #fff; border-radius: var(--r-xl); border: 1px solid var(--g200); box-shadow: var(--sh-lg); padding: 1.4rem; transition: transform .25s ease, box-shadow .25s ease; }
+.sticky-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,.13); }
 .sticky-price { font-size: 1.35rem; font-weight: 800; margin-bottom: .15rem; }
 .sticky-price span { font-size: .95rem; font-weight: 400; color: var(--g500); }
 .s-dates { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--g200); border-radius: var(--r); overflow: hidden; margin-bottom: .65rem; }

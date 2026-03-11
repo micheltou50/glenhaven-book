@@ -187,39 +187,51 @@ function isRangeBlocked(ci, co) {
 // ── MINI CALENDAR ─────────────────────────────────────────────
 class MiniCal {
   constructor(containerId, opts = {}) {
-    this.el       = document.getElementById(containerId);
-    this.onSelect = opts.onSelect || (() => {});
+    this.el        = document.getElementById(containerId);
+    this.onSelect  = opts.onSelect || (() => {});
     this.showPrice = opts.showPrice !== false;
-    this.adminMode = opts.adminMode || false; // view-only with blocked highlight
-    this.ci   = null; this.co   = null; this.hov = null;
-    this.cur  = new Date(); this.cur.setDate(1);
+    this.adminMode = opts.adminMode || false;
+    this.ci  = null; this.co  = null; this.hov = null;
+    this.cur = new Date(); this.cur.setDate(1);
     this.render();
   }
 
   render() {
     if (!this.el) return;
+    const dow = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<span>${d}</span>`).join('');
     this.el.innerHTML = `
-      <div class="cal-widget">
-        <div class="cal-nav">
-          <button class="cal-nb" id="${this.el.id}-prev">&#8249;</button>
-          <div class="cal-title"></div>
-          <button class="cal-nb" id="${this.el.id}-next">&#8250;</button>
+      <div class="cal-widget cal-two-months">
+        <div class="cal-month-wrap">
+          <div class="cal-month">
+            <div class="cal-nav">
+              <button class="cal-nb" id="${this.el.id}-prev">&#8249;</button>
+              <div class="cal-title" id="${this.el.id}-title0"></div>
+              <button class="cal-nb" style="visibility:hidden;">&#8250;</button>
+            </div>
+            <div class="cal-dow">${dow}</div>
+            <div class="cal-grid" id="${this.el.id}-grid0"></div>
+          </div>
+          <div class="cal-month">
+            <div class="cal-nav">
+              <button class="cal-nb" style="visibility:hidden;">&#8249;</button>
+              <div class="cal-title" id="${this.el.id}-title1"></div>
+              <button class="cal-nb" id="${this.el.id}-next">&#8250;</button>
+            </div>
+            <div class="cal-dow">${dow}</div>
+            <div class="cal-grid" id="${this.el.id}-grid1"></div>
+          </div>
         </div>
-        <div class="cal-dow">
-          ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<span>${d}</span>`).join('')}
-        </div>
-        <div class="cal-grid" id="${this.el.id}-grid"></div>
       </div>`;
     this.el.querySelector(`#${this.el.id}-prev`).onclick = () => { this.cur.setMonth(this.cur.getMonth()-1); this.renderDays(); };
     this.el.querySelector(`#${this.el.id}-next`).onclick = () => { this.cur.setMonth(this.cur.getMonth()+1); this.renderDays(); };
     this.renderDays();
   }
 
-  renderDays() {
-    const grid = this.el.querySelector(`#${this.el.id}-grid`);
-    const title = this.el.querySelector('.cal-title');
-    const y = this.cur.getFullYear(), m = this.cur.getMonth();
-    title.textContent = this.cur.toLocaleString('default', { month:'long', year:'numeric' });
+  renderMonth(monthDate, gridId, titleId) {
+    const title = this.el.querySelector(`#${titleId}`);
+    const grid  = this.el.querySelector(`#${gridId}`);
+    const y = monthDate.getFullYear(), m = monthDate.getMonth();
+    title.textContent = monthDate.toLocaleString('default', { month:'long', year:'numeric' });
 
     const today = new Date(); today.setHours(0,0,0,0);
     const first = new Date(y, m, 1).getDay();
@@ -238,42 +250,45 @@ class MiniCal {
       const inHover   = this.ci && !this.co && this.hov && iso > this.ci && iso <= this.hov;
 
       let cls = 'cal-day';
-      if (isPast)                   cls += ' past';
-      else if (isBlocked)           cls += ' blocked';
-      else                          cls += ' avail';
-      if (isStart)                  cls += ' sel-s';
-      if (isEnd)                    cls += ' sel-e';
-      if (inRange)                  cls += ' in-r';
-      if (inHover)                  cls += ' in-h';
+      if (isPast)         cls += ' past';
+      else if (isBlocked) cls += ' blocked';
+      else                cls += ' avail';
+      if (isStart) cls += ' sel-s';
+      if (isEnd)   cls += ' sel-e';
+      if (inRange) cls += ' in-r';
+      if (inHover) cls += ' in-h';
 
       let priceHtml = '';
       if (this.showPrice && !isPast && !isBlocked) {
         const rate = getNightlyRate(dt, 0);
         priceHtml = `<div class="cal-day-p">$${rate}</div>`;
       }
-
       html += `<div class="${cls}" data-iso="${iso}">${d}${priceHtml}</div>`;
     }
     grid.innerHTML = html;
 
     grid.querySelectorAll('.cal-day.avail').forEach(el => {
-      el.addEventListener('click', () => this.selectDay(el.dataset.iso));
+      el.addEventListener('click',      () => this.selectDay(el.dataset.iso));
       el.addEventListener('mouseenter', () => { this.hov = el.dataset.iso; this.renderDays(); });
     });
     grid.addEventListener('mouseleave', () => { this.hov = null; requestAnimationFrame(() => this.renderDays()); });
   }
 
+  renderDays() {
+    const m0 = new Date(this.cur.getFullYear(), this.cur.getMonth(), 1);
+    const m1 = new Date(this.cur.getFullYear(), this.cur.getMonth()+1, 1);
+    this.renderMonth(m0, `${this.el.id}-grid0`, `${this.el.id}-title0`);
+    this.renderMonth(m1, `${this.el.id}-grid1`, `${this.el.id}-title1`);
+  }
+
   selectDay(iso) {
     if (!this.ci || (this.ci && this.co)) {
-      // Starting fresh — set check-in, keep calendar open for checkout
       this.ci = iso; this.co = null;
       this.onSelect({ checkIn: this.ci, checkOut: null });
     } else if (iso <= this.ci) {
-      // Clicked before check-in — reset to new check-in
       this.ci = iso; this.co = null;
       this.onSelect({ checkIn: this.ci, checkOut: null });
     } else {
-      // Setting check-out
       if (isRangeBlocked(this.ci, iso)) {
         alert('Some dates in that range are unavailable. Please choose a shorter stay or different dates.');
         return;
@@ -285,7 +300,7 @@ class MiniCal {
   }
 
   setRange(ci, co) { this.ci = ci; this.co = co; this.renderDays(); }
-  reset() { this.ci = null; this.co = null; this.renderDays(); }
+  reset()          { this.ci = null; this.co = null; this.renderDays(); }
 }
 
 // ── NAVBAR MOBILE ─────────────────────────────────────────────

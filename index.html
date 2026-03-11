@@ -7,12 +7,13 @@
   <meta name="description" content="A peaceful 4-bedroom timber cottage in Katoomba near the Three Sisters. Book direct and save — no platform fees."/>
   <link rel="stylesheet" href="style.css"/>
   <style>
+    /* ── HERO ── */
     .hero{position:relative;height:95vh;min-height:600px;display:flex;align-items:center;}
     .hero-bg{position:absolute;inset:0;overflow:hidden;z-index:0;}
     .hero-bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 10s ease-out;}
     .hero:hover .hero-bg img{transform:scale(1);}
     .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%);}
-    .hero-content{position:relative;z-index:2;max-width:700px;padding:0 1.5rem;}
+    .hero-content{position:relative;z-index:2;max-width:720px;padding:0 1.5rem;}
     .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.35rem .9rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.9);margin-bottom:1.1rem;}
     .hero h1{color:#fff;margin-bottom:.85rem;}
     .hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.75);line-height:1.6;max-width:500px;margin-bottom:2.2rem;}
@@ -29,58 +30,48 @@
     .hero-tag{animation-delay:.2s;}.hero h1{animation-delay:.4s;}.hero-sub{animation-delay:.55s;}.hero-stats{animation-delay:.7s;}#heroSearch{animation-delay:.85s;}
     @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
-    /* SEARCH BOX */
-    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.25rem;display:flex;align-items:flex-end;gap:.75rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:680px;}
+    /* ── HERO SEARCH BOX ── */
+    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.25rem;display:flex;align-items:flex-end;gap:.75rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:700px;}
     .s-field{flex:1;min-width:130px;}
     .s-field label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111;margin-bottom:.3rem;}
-    .s-btn{display:flex;align-items:center;background:var(--g100);border:1.5px solid var(--g200);border-radius:10px;padding:.42rem .8rem;cursor:pointer;transition:border-color .18s;min-height:2.25rem;user-select:none;}
-    .s-btn:hover,.s-btn.active{border-color:var(--green);background:#fff;}
-    .s-btn-txt{font-size:.88rem;color:var(--g400);}
-    .s-btn-txt.set{color:#111;font-weight:500;}
-    .nights-pill{background:var(--green);color:#fff;font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;display:none;margin-left:.4rem;}
+    /* Read-only display buttons */
+    .s-display{display:flex;align-items:center;justify-content:space-between;background:var(--g100);border:1.5px solid var(--g200);border-radius:10px;padding:.42rem .8rem;cursor:pointer;transition:border-color .18s;min-height:2.25rem;user-select:none;}
+    .s-display:hover,.s-display.active{border-color:var(--green);background:#fff;}
+    .s-display-txt{font-size:.88rem;color:var(--g400);}
+    .s-display-txt.set{color:#111;font-weight:600;}
+    .nights-pill{background:var(--green);color:#fff;font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;display:none;}
     .s-divider{width:1px;background:var(--g200);align-self:stretch;margin:.2rem 0;flex-shrink:0;}
 
-    /* DROPDOWN — position:fixed so NO parent can clip it */
-    #drpCal{position:fixed;z-index:99999;background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;width:660px;max-height:90vh;overflow-y:auto;}
-    #drpCal.open{display:block;}
-    .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
-    .drp-mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
-    .drp-mt{font-weight:700;font-size:.92rem;}
-    .drp-nav{width:28px;height:28px;border-radius:50%;background:var(--g100);border:1px solid var(--g200);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-    .drp-nav:hover{background:var(--black);color:#fff;}
-    .drp-nav.inv{visibility:hidden;}
-    .drp-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
-    .drp-dow span{text-align:center;font-size:.65rem;font-weight:600;color:var(--g400);padding:.2rem 0;}
-    .drp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
-    .drp-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:.82rem;user-select:none;transition:background .1s,color .1s;}
-    .drp-d.av{cursor:pointer;}
-    .drp-d.past,.drp-d.bk{color:var(--g300);}
-    .drp-d.bk{text-decoration:line-through;background:var(--g100);}
-    .drp-d.av:hover:not(.ss):not(.se){background:var(--green-p);}
-    .drp-d.ss,.drp-d.se{background:var(--green)!important;color:#fff!important;font-weight:700;}
-    .drp-d.ss{border-radius:6px 0 0 6px!important;}
-    .drp-d.se{border-radius:0 6px 6px 0!important;}
-    .drp-d.ir,.drp-d.ih{background:var(--green-p);color:var(--green-d);border-radius:0;}
-    .drp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--g100);}
-    .drp-hint{font-size:.82rem;color:var(--g500);}
-    .drp-clr{background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--g400);text-decoration:underline;}
-    .drp-clr:hover{color:var(--black);}
+    /* ── FLOATING CALENDAR PANEL (MiniCal-powered, position:fixed) ── */
+    #heroCal{
+      position:fixed;z-index:99999;
+      background:#fff;border-radius:16px;
+      box-shadow:0 24px 80px rgba(0,0,0,.22);
+      padding:1.5rem;display:none;
+      max-width:760px;width:calc(100vw - 2rem);
+    }
+    #heroCal.open{display:block;}
+    .hero-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .hero-cal-hint{font-size:.85rem;font-weight:600;color:var(--g700);}
+    .hero-cal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--g400);line-height:1;padding:.1rem .4rem;}
+    .hero-cal-close:hover{color:var(--black);}
+    .hero-cal-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--g100);}
+    .hero-cal-summary{font-size:.85rem;color:var(--g600);font-weight:500;}
+    .hero-cal-actions{display:flex;gap:.6rem;}
 
-    /* SECTION HEADERS */
-    .sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
-
-    /* STORY */
+    /* ── STORY ── */
     #story{background:#fff;}
     .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
     .story-img{border-radius:var(--r-xl);overflow:hidden;height:420px;box-shadow:var(--sh-lg);}
     .story-img img{width:100%;height:100%;object-fit:cover;}
-    .story-text blockquote{font-size:1.1rem;font-style:italic;line-height:1.75;color:var(--g700);border-left:3px solid var(--green);padding-left:1.2rem;margin:1.25rem 0;}
+    blockquote{font-size:1.1rem;font-style:italic;line-height:1.75;color:var(--g700);border-left:3px solid var(--green);padding-left:1.2rem;margin:1.25rem 0;}
     .story-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;}
+    .sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
 
-    /* AVAILABILITY LAYOUT */
+    /* ── AVAILABILITY ── */
     .avail-layout{display:grid;grid-template-columns:1fr 360px;gap:2.5rem;align-items:start;}
 
-    /* STICKY CARD DATE INPUTS */
+    /* ── STICKY CARD DATE INPUTS ── */
     .s-dates{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--g200);border-radius:10px;overflow:hidden;margin-bottom:.85rem;}
     .s-df{padding:.6rem .75rem;}
     .s-df:first-child{border-right:1px solid var(--g200);}
@@ -94,11 +85,7 @@
       .story-grid{grid-template-columns:1fr;}.story-img{height:300px;}
       .avail-layout{grid-template-columns:1fr;}.sticky-wrap{position:static!important;}
     }
-    @media(max-width:768px){
-      .search-box{flex-direction:column;}.s-divider{display:none;}
-      #drpCal{width:calc(100vw - 2rem);padding:1rem;}
-      .drp-months{grid-template-columns:1fr;}
-    }
+    @media(max-width:768px){.search-box{flex-direction:column;}.s-divider{display:none;}}
   </style>
 </head>
 <body>
@@ -123,7 +110,7 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg">
-    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven"/>
+    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven cottage exterior"/>
   </div>
   <div class="hero-overlay"></div>
   <div class="container hero-content">
@@ -136,15 +123,21 @@
       <div class="hero-stat"><strong>2.5</strong><span>Bathrooms</span></div>
       <div class="hero-stat"><strong>5.0★</strong><span>Rating</span></div>
     </div>
+
+    <!-- SEARCH BOX — display only, clicking opens the MiniCal panel -->
     <div class="search-box" id="heroSearch">
       <div class="s-field">
         <label>Check-in</label>
-        <div class="s-btn" id="btnCI"><span class="s-btn-txt" id="valCI">Add date</span></div>
+        <div class="s-display" id="dispCI" onclick="heroCalOpen()">
+          <span class="s-display-txt" id="txtCI">Add date</span>
+        </div>
       </div>
       <div class="s-divider"></div>
       <div class="s-field">
         <label>Check-out <span class="nights-pill" id="nightsPill"></span></label>
-        <div class="s-btn" id="btnCO"><span class="s-btn-txt" id="valCO">Add date</span></div>
+        <div class="s-display" id="dispCO" onclick="heroCalOpen()">
+          <span class="s-display-txt" id="txtCO">Add date</span>
+        </div>
       </div>
       <div class="s-divider"></div>
       <div class="s-field" style="min-width:110px;">
@@ -162,31 +155,20 @@
   <div class="hero-scroll"><span>Scroll</span><div class="hero-scroll-line"></div></div>
 </section>
 
-<!-- DROPDOWN CALENDAR: lives at body level so no parent clips it -->
-<div id="drpCal">
-  <div class="drp-months">
-    <div>
-      <div class="drp-mh">
-        <button class="drp-nav" id="drpPrev">‹</button>
-        <span class="drp-mt" id="drpT0"></span>
-        <button class="drp-nav inv">›</button>
-      </div>
-      <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-      <div class="drp-grid" id="drpG0"></div>
-    </div>
-    <div>
-      <div class="drp-mh">
-        <button class="drp-nav inv">‹</button>
-        <span class="drp-mt" id="drpT1"></span>
-        <button class="drp-nav" id="drpNext">›</button>
-      </div>
-      <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-      <div class="drp-grid" id="drpG1"></div>
-    </div>
+<!-- FLOATING CALENDAR PANEL — single MiniCal instance, position:fixed -->
+<div id="heroCal">
+  <div class="hero-cal-header">
+    <span class="hero-cal-hint" id="heroCalHint">Select your check-in date</span>
+    <button class="hero-cal-close" id="heroCalClose">×</button>
   </div>
-  <div class="drp-foot">
-    <span class="drp-hint" id="drpHint">Select your check-in date</span>
-    <button class="drp-clr" id="drpClr">Clear</button>
+  <!-- MiniCal mounts here -->
+  <div id="heroCalMount"></div>
+  <div class="hero-cal-footer">
+    <span class="hero-cal-summary" id="heroCalSummary"></span>
+    <div class="hero-cal-actions">
+      <button class="btn btn-white btn-sm" id="heroCalClear">Clear</button>
+      <button class="btn btn-primary btn-sm" id="heroCalDone">Done</button>
+    </div>
   </div>
 </div>
 
@@ -208,7 +190,7 @@
         <a href="booking.html" class="btn btn-primary btn-lg" style="margin-top:1.5rem;">Book your stay</a>
       </div>
       <div class="story-img reveal">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Glenhaven interior"/>
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Glenhaven living room"/>
       </div>
     </div>
   </div>
@@ -243,8 +225,9 @@
         <div style="margin-bottom:1.5rem;">
           <span class="eyebrow">Availability</span>
           <h2>Check open dates</h2>
-          <p style="margin-top:.4rem;color:var(--g500);font-size:.88rem;">Click a check-in date, then a check-out. Crossed-out dates are booked.</p>
+          <p style="margin-top:.4rem;color:var(--g500);font-size:.88rem;">Click a check-in date then a check-out. Crossed-out dates are booked.</p>
         </div>
+        <!-- SINGLE shared MiniCal instance renders here -->
         <div id="homeCalContainer"></div>
         <div class="cal-legend" style="margin-top:.75rem;">
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Selected</div>
@@ -350,7 +333,7 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="/cdn-cgi/l/email-protection#d9b4b0bab1bcb5adb6acece999beb4b8b0b5f7bab6b4"><span class="__cf_email__" data-cfemail="6805010b000d041c071d5d58280f05090104460b0705">[email&#160;protected]</span></a></li>
+          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
@@ -362,258 +345,230 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
+<script src="script.js"></script>
 <script>
-// NO 'use strict' — inline handlers and let variables must share same scope
+// ═══════════════════════════════════════════════════════════════
+//  SINGLE CALENDAR SYSTEM
+//  One MiniCal instance. Three views of the same state:
+//  1. Hero floating panel  2. Availability section  3. Sticky card
+// ═══════════════════════════════════════════════════════════════
 
-// ── DROPDOWN CALENDAR ─────────────────────────────────────────────
-var drpBase  = new Date(); drpBase.setDate(1);
-var drpCI    = null;
-var drpCO    = null;
-var drpHov   = null;
-var drpOpen  = false;
-var TODAY    = todayISO();
+// ── Shared state ─────────────────────────────────────────────
+var sharedCI = null;  // ISO string or null
+var sharedCO = null;  // ISO string or null
 
-function pad2(n) { return String(n).padStart(2,'0'); }
-function mkISO(y,m,d) { return y+'-'+pad2(m+1)+'-'+pad2(d); }
+// ── The one MiniCal, lives in the availability section ────────
+var mainCal = null;
 
-// Attach button listeners — no inline handlers, no scope issues
-document.getElementById('btnCI').addEventListener('click', function(e) {
-  e.stopPropagation();
-  toggleDrp();
-});
-document.getElementById('btnCO').addEventListener('click', function(e) {
-  e.stopPropagation();
-  toggleDrp();
-});
-document.getElementById('btnCheck').addEventListener('click', heroCheck);
-document.getElementById('drpPrev').addEventListener('click', function(e) { e.stopPropagation(); drpShift(-1); });
-document.getElementById('drpNext').addEventListener('click', function(e) { e.stopPropagation(); drpShift(1); });
-document.getElementById('drpClr').addEventListener('click',  function(e) { e.stopPropagation(); drpClear(); });
+// ── Hero floating calendar panel ──────────────────────────────
+var heroCalOpen = false;
 
-// Close on outside click
-document.addEventListener('click', function(e) {
-  var cal = document.getElementById('drpCal');
-  if (!drpOpen) return;
-  if (!cal.contains(e.target)) closeDrp();
-});
+function heroCalOpen_fn() {
+  var panel = document.getElementById('heroCal');
+  var box   = document.getElementById('heroSearch').getBoundingClientRect();
+  panel.style.top  = (box.bottom + 10) + 'px';
+  panel.style.left = Math.max(8, Math.min(box.left, window.innerWidth - 770)) + 'px';
+  panel.classList.add('open');
+  heroCalOpen = true;
 
-// Close on Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeDrp();
-});
-
-function toggleDrp() {
-  if (drpOpen) { closeDrp(); } else { openDrp(); }
+  // Teleport mainCal el into the panel
+  var mount = document.getElementById('heroCalMount');
+  mount.appendChild(mainCal.el);
+  updateHeroCalHint();
 }
 
-function openDrp() {
-  var cal = document.getElementById('drpCal');
-  var box = document.getElementById('heroSearch').getBoundingClientRect();
-  var top = box.bottom + window.scrollY + 10;
-  var left = Math.max(8, Math.min(box.left + window.scrollX, window.innerWidth - 670));
-  cal.style.top  = top + 'px';
-  cal.style.left = left + 'px';
-  cal.classList.add('open');
-  drpOpen = true;
-  document.getElementById('btnCI').classList.add('active');
-  document.getElementById('btnCO').classList.add('active');
-  drpRender();
+function heroCalClose() {
+  var panel = document.getElementById('heroCal');
+  panel.classList.remove('open');
+  heroCalOpen = false;
+
+  // Teleport mainCal el back to the availability section
+  var home = document.getElementById('homeCalContainer');
+  home.appendChild(mainCal.el);
 }
 
-function closeDrp() {
-  document.getElementById('drpCal').classList.remove('open');
-  drpOpen = false;
-  document.getElementById('btnCI').classList.remove('active');
-  document.getElementById('btnCO').classList.remove('active');
-}
+function updateHeroCalHint() {
+  var hint    = document.getElementById('heroCalHint');
+  var summary = document.getElementById('heroCalSummary');
+  var pill    = document.getElementById('nightsPill');
 
-function drpShift(n) {
-  drpBase = new Date(drpBase.getFullYear(), drpBase.getMonth()+n, 1);
-  drpRender();
-}
-
-function drpRender() {
-  for (var i = 0; i < 2; i++) {
-    var m = new Date(drpBase.getFullYear(), drpBase.getMonth()+i, 1);
-    document.getElementById('drpT'+i).textContent = m.toLocaleString('default',{month:'long',year:'numeric'});
-    drpBuildGrid(m, i);
-  }
-  var hint = document.getElementById('drpHint');
-  if (!drpCI)      hint.textContent = 'Select your check-in date';
-  else if (!drpCO) hint.textContent = 'Now select your check-out date';
-  else {
-    var n = Math.round((new Date(drpCO)-new Date(drpCI))/864e5);
-    hint.textContent = n + ' night' + (n!==1?'s':'') + ' selected';
-  }
-}
-
-function drpBuildGrid(month, idx) {
-  var g = document.getElementById('drpG'+idx);
-  var y = month.getFullYear(), m = month.getMonth();
-  var fd = new Date(y,m,1).getDay();
-  var nd = new Date(y,m+1,0).getDate();
-  var html = '';
-  for (var i=0; i<fd; i++) html += '<div class="drp-d"></div>';
-  for (var d=1; d<=nd; d++) {
-    var iso = mkISO(y,m,d);
-    var isPast = iso < TODAY;
-    var isBlk  = isDateBlocked(iso);
-    var cls = 'drp-d';
-    if      (isPast) cls += ' past';
-    else if (isBlk)  cls += ' bk';
-    else             cls += ' av';
-    if (drpCI && iso===drpCI) cls += ' ss';
-    if (drpCO && iso===drpCO) cls += ' se';
-    if (drpCI && drpCO && iso>drpCI && iso<drpCO) cls += ' ir';
-    if (drpCI && !drpCO && drpHov && iso>drpCI && iso<=drpHov) cls += ' ih';
-    html += '<div class="'+cls+'" data-iso="'+iso+'">'+d+'</div>';
-  }
-  g.innerHTML = html;
-  // Attach events properly — no inline handlers
-  var days = g.querySelectorAll('.drp-d.av');
-  days.forEach(function(el) {
-    el.addEventListener('click', function(e) {
-      e.stopPropagation();
-      drpClickDay(el.dataset.iso);
-    });
-    el.addEventListener('mouseenter', function() {
-      drpHov = el.dataset.iso;
-      drpRender();
-    });
-  });
-  g.addEventListener('mouseleave', function() {
-    drpHov = null;
-    drpRender();
-  });
-}
-
-function drpClickDay(iso) {
-  if (iso < TODAY || isDateBlocked(iso)) return;
-  if (!drpCI || (drpCI && drpCO)) {
-    drpCI = iso; drpCO = null;
-  } else if (iso <= drpCI) {
-    drpCI = iso; drpCO = null;
+  if (!sharedCI) {
+    hint.textContent    = 'Select your check-in date';
+    summary.textContent = '';
+    pill.style.display  = 'none';
+  } else if (!sharedCO) {
+    hint.textContent    = 'Now select your check-out date';
+    summary.textContent = fmtShort(sharedCI) + ' → ?';
+    pill.style.display  = 'none';
   } else {
-    if (isRangeBlocked(drpCI, iso)) {
-      alert('A booked date falls in this range. Please choose different dates.');
-      return;
-    }
-    drpCO = iso;
-  }
-  drpSyncDisplay();
-  drpRender();
-  if (drpCI && drpCO) {
-    setTimeout(closeDrp, 400);
-  }
-}
-
-function drpClear() {
-  drpCI = null; drpCO = null; drpHov = null;
-  drpSyncDisplay();
-  drpRender();
-}
-
-function drpSyncDisplay() {
-  var ciEl  = document.getElementById('valCI');
-  var coEl  = document.getElementById('valCO');
-  var pill  = document.getElementById('nightsPill');
-  ciEl.textContent = drpCI ? fmtShort(drpCI) : 'Add date';
-  ciEl.className   = 's-btn-txt' + (drpCI ? ' set' : '');
-  coEl.textContent = drpCO ? fmtShort(drpCO) : 'Add date';
-  coEl.className   = 's-btn-txt' + (drpCO ? ' set' : '');
-  if (drpCI && drpCO) {
-    var n = Math.round((new Date(drpCO)-new Date(drpCI))/864e5);
-    pill.textContent    = n + ' night' + (n!==1?'s':'');
+    var n = Math.round((new Date(sharedCO) - new Date(sharedCI)) / 864e5);
+    hint.textContent    = n + ' night' + (n !== 1 ? 's' : '') + ' selected';
+    summary.textContent = fmtShort(sharedCI) + ' → ' + fmtShort(sharedCO);
+    pill.textContent    = n + ' night' + (n !== 1 ? 's' : '');
     pill.style.display  = 'inline-block';
-    // Sync to sticky card inputs
-    document.getElementById('s-ci').value = drpCI;
-    document.getElementById('s-co').value = drpCO;
-    updateStickyCard();
+  }
+}
+
+// ── Called every time either date changes ─────────────────────
+function onDateChange(checkIn, checkOut) {
+  sharedCI = checkIn  || sharedCI;
+  sharedCO = checkOut || null;   // reset CO if only CI given
+
+  // When both are set, overwrite with actual values
+  if (checkIn && checkOut) {
+    sharedCI = checkIn;
+    sharedCO = checkOut;
+  }
+
+  // Update hero display buttons
+  var txtCI = document.getElementById('txtCI');
+  var txtCO = document.getElementById('txtCO');
+  txtCI.textContent = sharedCI ? fmtShort(sharedCI) : 'Add date';
+  txtCI.className   = 's-display-txt' + (sharedCI ? ' set' : '');
+  txtCO.textContent = sharedCO ? fmtShort(sharedCO) : 'Add date';
+  txtCO.className   = 's-display-txt' + (sharedCO ? ' set' : '');
+
+  // Update sticky card inputs
+  var sciEl = document.getElementById('s-ci');
+  var scoEl = document.getElementById('s-co');
+  if (sharedCI) sciEl.value = sharedCI;
+  if (sharedCO) {
+    scoEl.value = sharedCO;
   } else {
-    pill.style.display = 'none';
+    scoEl.value = '';
+    // Enforce min = day after CI
+    if (sharedCI) {
+      var nx = new Date(sharedCI); nx.setDate(nx.getDate() + 1);
+      scoEl.min = nx.toISOString().split('T')[0];
+    }
+  }
+
+  // Update hint in hero panel if open
+  updateHeroCalHint();
+
+  // Update pricing sidebar
+  updateStickyCard();
+
+  // Close panel after both dates selected
+  if (sharedCI && sharedCO && heroCalOpen) {
+    setTimeout(heroCalClose, 500);
   }
 }
 
-function heroCheck() {
-  if (!drpCI || !drpCO) { openDrp(); return; }
-  var g = document.getElementById('hg').value;
-  window.location.href = 'booking.html?ci='+drpCI+'&co='+drpCO+'&g='+g;
+// ── Sticky card pricing ───────────────────────────────────────
+function updateStickyCard() {
+  var ci = document.getElementById('s-ci').value || sharedCI;
+  var co = document.getElementById('s-co').value || sharedCO;
+  var g  = document.getElementById('s-g').value;
+
+  // Enforce co cannot be on or before ci
+  if (ci && co && co <= ci) {
+    document.getElementById('s-co').value = '';
+    co = '';
+    sharedCO = null;
+  }
+
+  var p   = calcPrice(ci, co, g);
+  var bk  = document.getElementById('stickyBreakdown');
+  var btn = document.getElementById('stickyBtn');
+
+  document.getElementById('stickyUrgency').querySelector('span').textContent = getUrgencyMsg(ci, co);
+
+  if (p) {
+    var h = '<div class="price-row"><span>' + p.nights + ' nights × ' + fmtAUD(p.avgNightly) + '</span><span>' + fmtAUD(p.nightlyTotal) + '</span></div>';
+    if (p.discountAmt > 0) h += '<div class="price-row" style="color:var(--green-d)"><span>Discount (' + Math.round(p.losDiscount * 100) + '%)</span><span>−' + fmtAUD(p.discountAmt) + '</span></div>';
+    h += '<div class="price-row"><span>Cleaning fee</span><span>' + fmtAUD(p.cleaningFee) + '</span></div>';
+    h += '<div class="price-row tot"><span>Total AUD</span><span>' + fmtAUD(p.total) + '</span></div>';
+    document.getElementById('stickyBK').innerHTML = h;
+    bk.style.display = 'block';
+    btn.href = 'booking.html?ci=' + ci + '&co=' + co + '&g=' + g;
+  } else {
+    bk.style.display = 'none';
+    // Still pass dates even without valid pricing
+    if (ci && co) {
+      btn.href = 'booking.html?ci=' + ci + '&co=' + co + '&g=' + g;
+    } else {
+      btn.href = 'booking.html';
+    }
+  }
+
+  // Sync mainCal selection highlight
+  if (mainCal) mainCal.setRange(ci, co);
 }
 
-// ── AVAILABILITY CALENDAR ─────────────────────────────────────
-var homeCal = new MiniCal('homeCalContainer', {
-  onSelect: function(sel) {
-    if (sel.checkIn) {
-      document.getElementById('s-ci').value = sel.checkIn;
-      // Enforce min checkout = next day
-      var nx = new Date(sel.checkIn); nx.setDate(nx.getDate()+1);
-      document.getElementById('s-co').min = nx.toISOString().split('T')[0];
-      var co = document.getElementById('s-co').value;
-      if (co && co <= sel.checkIn) document.getElementById('s-co').value = '';
-    }
-    if (sel.checkOut) {
-      document.getElementById('s-co').value = sel.checkOut;
-    }
-    updateStickyCard();
-  }
-});
-
-// ── STICKY CARD ───────────────────────────────────────────────
+// ── Sticky card input listeners ───────────────────────────────
 document.getElementById('s-ci').addEventListener('change', function() {
   var ci = this.value;
   if (ci) {
-    var nx = new Date(ci); nx.setDate(nx.getDate()+1);
+    sharedCI = ci;
+    sharedCO = null;
+    document.getElementById('s-co').value = '';
+    var nx = new Date(ci); nx.setDate(nx.getDate() + 1);
     document.getElementById('s-co').min = nx.toISOString().split('T')[0];
-    var co = document.getElementById('s-co').value;
-    if (co && co <= ci) document.getElementById('s-co').value = '';
-    // Sync big calendar to show selection
-    homeCal.ci = ci; homeCal.co = null; homeCal.renderDays();
+    if (mainCal) { mainCal.ci = ci; mainCal.co = null; mainCal.renderDays(); }
+    onDateChange(ci, null);
   }
   updateStickyCard();
 });
 
-document.getElementById('s-co').addEventListener('change', updateStickyCard);
+document.getElementById('s-co').addEventListener('change', function() {
+  var co = this.value;
+  if (co) {
+    sharedCO = co;
+    if (mainCal) { mainCal.co = co; mainCal.renderDays(); }
+    onDateChange(sharedCI, co);
+  }
+  updateStickyCard();
+});
+
 document.getElementById('s-g').addEventListener('change', updateStickyCard);
 
-function updateStickyCard() {
-  var ci = document.getElementById('s-ci').value;
-  var co = document.getElementById('s-co').value;
-  // Never allow checkout on or before checkin
-  if (ci && co && co <= ci) {
-    document.getElementById('s-co').value = '';
-    co = '';
+// ── Hero panel buttons ────────────────────────────────────────
+document.getElementById('dispCI').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen_fn(); });
+document.getElementById('dispCO').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen_fn(); });
+document.getElementById('heroCalClose').addEventListener('click', heroCalClose);
+document.getElementById('heroCalClear').addEventListener('click', function() {
+  sharedCI = null; sharedCO = null;
+  if (mainCal) { mainCal.ci = null; mainCal.co = null; mainCal.renderDays(); }
+  onDateChange(null, null);
+});
+document.getElementById('heroCalDone').addEventListener('click', heroCalClose);
+document.getElementById('btnCheck').addEventListener('click', function() {
+  if (!sharedCI || !sharedCO) { heroCalOpen_fn(); return; }
+  var g = document.getElementById('hg').value;
+  window.location.href = 'booking.html?ci=' + sharedCI + '&co=' + sharedCO + '&g=' + g;
+});
+document.getElementById('hg').addEventListener('change', updateStickyCard);
+
+// Close floating panel on outside click
+document.addEventListener('click', function(e) {
+  var panel  = document.getElementById('heroCal');
+  var search = document.getElementById('heroSearch');
+  if (heroCalOpen && !panel.contains(e.target) && !search.contains(e.target)) {
+    heroCalClose();
   }
-  var g  = document.getElementById('s-g').value;
-  var p  = calcPrice(ci, co, g);
-  var urgEl = document.getElementById('stickyUrgency').querySelector('span');
-  urgEl.textContent = getUrgencyMsg(ci, co);
-  var bk = document.getElementById('stickyBreakdown');
-  if (p) {
-    var h = '<div class="price-row"><span>'+p.nights+' nights × '+fmtAUD(p.avgNightly)+'</span><span>'+fmtAUD(p.nightlyTotal)+'</span></div>';
-    if (p.discountAmt > 0) h += '<div class="price-row" style="color:var(--green-d)"><span>Discount ('+Math.round(p.losDiscount*100)+'%)</span><span>−'+fmtAUD(p.discountAmt)+'</span></div>';
-    h += '<div class="price-row"><span>Cleaning fee</span><span>'+fmtAUD(p.cleaningFee)+'</span></div>';
-    h += '<div class="price-row tot"><span>Total</span><span>'+fmtAUD(p.total)+'</span></div>';
-    document.getElementById('stickyBK').innerHTML = h;
-    bk.style.display = 'block';
-    document.getElementById('stickyBtn').href = 'booking.html?ci='+ci+'&co='+co+'&g='+g;
-  } else {
-    bk.style.display = 'none';
-    if (ci && co) {
-      document.getElementById('stickyBtn').href = 'booking.html?ci='+ci+'&co='+co+'&g='+g;
-    } else {
-      document.getElementById('stickyBtn').href = 'booking.html';
+});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && heroCalOpen) heroCalClose(); });
+
+// ── Init: load availability THEN build calendar ───────────────
+document.getElementById('s-ci').min = todayISO();
+document.getElementById('s-co').min = todayISO();
+
+loadAvailability().then(function() {
+  // Build the ONE calendar — it lives in #homeCalContainer by default
+  mainCal = new MiniCal('homeCalContainer', {
+    onSelect: function(sel) {
+      onDateChange(sel.checkIn, sel.checkOut);
     }
-  }
-  if (ci || co) homeCal.setRange(ci, co);
-}
+  });
 
-// ── PRE-FILL FROM URL & INIT ──────────────────────────────────
-var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-if (pci) { document.getElementById('s-ci').value = pci; drpCI = pci; }
-if (pco) { document.getElementById('s-co').value = pco; drpCO = pco; }
-if (pg)  { document.getElementById('s-g').value  = pg; }
-if (pci || pco) { drpSyncDisplay(); updateStickyCard(); }
-
-// Set today as minimum for check-in
-docum
+  // Pre-fill from URL params
+  var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
+  if (pci) { sharedCI = pci; mainCal.ci = pci; document.getElementById('s-ci').value = pci; }
+  if (pco) { sharedCO = pco; mainCal.co = pco; document.getElementById('s-co').value = pco; }
+  if (pg)  { document.getElementById('s-g').value = pg; document.getElementById('hg').value = pg; }
+  if (pci || pco) { mainCal.renderDays(); onDateChange(sharedCI, sharedCO); }
+});
+</script>
+</body>
+</html>
