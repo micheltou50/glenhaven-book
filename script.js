@@ -227,28 +227,23 @@ class MiniCal {
     this.renderDays();
   }
 
-  renderMonth(monthDate, gridId, titleId) {
-    const title = this.el.querySelector(`#${titleId}`);
-    const grid  = this.el.querySelector(`#${gridId}`);
+  // ── buildMonthHTML: pure HTML string, no listeners ──────────
+  buildMonthHTML(monthDate) {
     const y = monthDate.getFullYear(), m = monthDate.getMonth();
-    title.textContent = monthDate.toLocaleString('default', { month:'long', year:'numeric' });
-
     const today = new Date(); today.setHours(0,0,0,0);
     const first = new Date(y, m, 1).getDay();
     const days  = new Date(y, m+1, 0).getDate();
-
     let html = '';
     for (let i = 0; i < first; i++) html += '<div class="cal-day empty"></div>';
     for (let d = 1; d <= days; d++) {
-      const dt  = new Date(y, m, d);
-      const iso = toISO(dt);
+      const dt        = new Date(y, m, d);
+      const iso       = toISO(dt);
       const isPast    = dt < today;
       const isBlocked = isDateBlocked(iso);
       const isStart   = this.ci === iso;
       const isEnd     = this.co === iso;
       const inRange   = this.ci && this.co && iso > this.ci && iso < this.co;
       const inHover   = this.ci && !this.co && this.hov && iso > this.ci && iso <= this.hov;
-
       let cls = 'cal-day';
       if (isPast)         cls += ' past';
       else if (isBlocked) cls += ' blocked';
@@ -257,7 +252,6 @@ class MiniCal {
       if (isEnd)   cls += ' sel-e';
       if (inRange) cls += ' in-r';
       if (inHover) cls += ' in-h';
-
       let priceHtml = '';
       if (this.showPrice && !isPast && !isBlocked) {
         const rate = getNightlyRate(dt, 0);
@@ -265,20 +259,86 @@ class MiniCal {
       }
       html += `<div class="${cls}" data-iso="${iso}">${d}${priceHtml}</div>`;
     }
-    grid.innerHTML = html;
-
-    grid.querySelectorAll('.cal-day.avail').forEach(el => {
-      el.addEventListener('click',      () => this.selectDay(el.dataset.iso));
-      el.addEventListener('mouseenter', () => { this.hov = el.dataset.iso; this.renderDays(); });
-    });
-    grid.addEventListener('mouseleave', () => { this.hov = null; requestAnimationFrame(() => this.renderDays()); });
+    return html;
   }
 
+  // ── updateClasses: hover/selection update WITHOUT rebuilding DOM ──
+  // Only updates className on existing cells — click listeners survive.
+  updateClasses(gridId) {
+    const grid = this.el.querySelector(`#${gridId}`);
+    if (!grid) return;
+    grid.querySelectorAll('.cal-day[data-iso]').forEach(el => {
+      const iso       = el.dataset.iso;
+      const isPast    = iso < toISO(new Date());
+      const isBlocked = isDateBlocked(iso);
+      const isStart   = this.ci === iso;
+      const isEnd     = this.co === iso;
+      const inRange   = this.ci && this.co && iso > this.ci && iso < this.co;
+      const inHover   = this.ci && !this.co && this.hov && iso > this.ci && iso <= this.hov;
+      let cls = 'cal-day';
+      if (isPast)         cls += ' past';
+      else if (isBlocked) cls += ' blocked';
+      else                cls += ' avail';
+      if (isStart) cls += ' sel-s';
+      if (isEnd)   cls += ' sel-e';
+      if (inRange) cls += ' in-r';
+      if (inHover) cls += ' in-h';
+      el.className = cls;
+    });
+  }
+
+  // ── renderMonth: builds HTML + attaches DELEGATED listeners once ──
+  renderMonth(monthDate, gridId, titleId) {
+    const title = this.el.querySelector(`#${titleId}`);
+    const grid  = this.el.querySelector(`#${gridId}`);
+    title.textContent = monthDate.toLocaleString('default', { month:'long', year:'numeric' });
+
+    // Rebuild HTML (full render — only called on month change or init)
+    grid.innerHTML = this.buildMonthHTML(monthDate);
+
+    // ── Event delegation on grid — survives any future innerHTML changes ──
+    // Remove old delegated listeners by replacing with a clone
+    const freshGrid = grid.cloneNode(true);
+    grid.parentNode.replaceChild(freshGrid, grid);
+
+    // Click delegation — one listener on the container, never on cells
+    freshGrid.addEventListener('click', (e) => {
+      const day = e.target.closest('.cal-day.avail');
+      if (!day) return;
+      this.selectDay(day.dataset.iso);
+    });
+
+    // Hover delegation — updates classes only, no innerHTML rebuild
+    freshGrid.addEventListener('mouseover', (e) => {
+      const day = e.target.closest('.cal-day.avail');
+      if (!day) return;
+      if (this.hov === day.dataset.iso) return; // no change
+      this.hov = day.dataset.iso;
+      this.updateClasses(`${this.el.id}-grid0`);
+      this.updateClasses(`${this.el.id}-grid1`);
+    });
+
+    freshGrid.addEventListener('mouseleave', () => {
+      if (this.hov === null) return; // no change
+      this.hov = null;
+      this.updateClasses(`${this.el.id}-grid0`);
+      this.updateClasses(`${this.el.id}-grid1`);
+    });
+  }
+
+  // ── renderDays: full rebuild of both months (init + month nav only) ──
   renderDays() {
     const m0 = new Date(this.cur.getFullYear(), this.cur.getMonth(), 1);
     const m1 = new Date(this.cur.getFullYear(), this.cur.getMonth()+1, 1);
     this.renderMonth(m0, `${this.el.id}-grid0`, `${this.el.id}-title0`);
     this.renderMonth(m1, `${this.el.id}-grid1`, `${this.el.id}-title1`);
+  }
+
+  // ── refreshClasses: update selection/hover classes without rebuilding ──
+  // Called after selectDay so clicks don't rebuild innerHTML
+  refreshClasses() {
+    this.updateClasses(`${this.el.id}-grid0`);
+    this.updateClasses(`${this.el.id}-grid1`);
   }
 
   selectDay(iso) {
@@ -296,10 +356,12 @@ class MiniCal {
       this.co = iso;
       this.onSelect({ checkIn: this.ci, checkOut: this.co });
     }
-    this.renderDays();
+    // Use refreshClasses instead of renderDays — updates visuals without
+    // rebuilding innerHTML, so delegated click listeners are never destroyed
+    this.refreshClasses();
   }
 
-  setRange(ci, co) { this.ci = ci; this.co = co; this.renderDays(); }
+  setRange(ci, co) { this.ci = ci; this.co = co; this.refreshClasses(); }
   reset()          { this.ci = null; this.co = null; this.renderDays(); }
 }
 
