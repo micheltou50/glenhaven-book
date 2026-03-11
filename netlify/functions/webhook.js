@@ -96,6 +96,16 @@ exports.handler = async (event) => {
   };
 
   try {
+    // ── Idempotency: check if this Stripe session was already processed ──
+    // Stripe can retry webhooks — this prevents double-writing to the Sheet
+    const checkUrl = process.env.APPS_SCRIPT_URL + '?action=checkSession&sessionId=' + encodeURIComponent(session.id);
+    const checkRes = await fetch(checkUrl);
+    const checkData = await checkRes.json();
+    if (checkData.exists) {
+      console.log('Duplicate webhook ignored — session already processed:', session.id);
+      return { statusCode: 200, body: JSON.stringify({ received: true, duplicate: true }) };
+    }
+
     const url = process.env.APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(confirmPayload));
     const res = await fetch(url);
     if (!res.ok) throw new Error('Apps Script returned ' + res.status);
