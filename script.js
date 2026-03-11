@@ -265,18 +265,23 @@ class MiniCal {
 
   selectDay(iso) {
     if (!this.ci || (this.ci && this.co)) {
+      // Starting fresh — set check-in, keep calendar open for checkout
       this.ci = iso; this.co = null;
+      this.onSelect({ checkIn: this.ci, checkOut: null });
     } else if (iso <= this.ci) {
+      // Clicked before check-in — reset to new check-in
       this.ci = iso; this.co = null;
+      this.onSelect({ checkIn: this.ci, checkOut: null });
     } else {
+      // Setting check-out
       if (isRangeBlocked(this.ci, iso)) {
         alert('Some dates in that range are unavailable. Please choose a shorter stay or different dates.');
         return;
       }
       this.co = iso;
+      this.onSelect({ checkIn: this.ci, checkOut: this.co });
     }
     this.renderDays();
-    this.onSelect({ checkIn: this.ci, checkOut: this.co });
   }
 
   setRange(ci, co) { this.ci = ci; this.co = co; this.renderDays(); }

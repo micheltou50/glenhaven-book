@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     /* HERO */
-    .hero{position:relative;height:95vh;min-height:600px;display:flex;align-items:center;overflow:hidden}
-    .hero-bg{position:absolute;inset:0;background:url('https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg') center/cover no-repeat;transform:scale(1.04);transition:transform 10s ease-out}
+    .hero{position:relative;height:95vh;min-height:600px;display:flex;align-items:center;}
+    .hero-bg{position:absolute;inset:0;overflow:hidden;background:url('https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg') center/cover no-repeat;transform:scale(1.04);transition:transform 10s ease-out}
     .hero:hover .hero-bg{transform:scale(1)}
-    .hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%)}
-    .hero-content{position:relative;z-index:2;max-width:700px;padding:0 1.5rem}
+    .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%)}
+    .hero-content{position:relative;z-index:10;max-width:700px;padding:0 1.5rem}
     .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.35rem .9rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.9);margin-bottom:1.1rem}
     .hero h1{color:#fff;margin-bottom:.85rem}
     .hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.75);line-height:1.6;max-width:500px;margin-bottom:2.2rem}
@@ -30,7 +30,7 @@
     @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
     /* DATE RANGE PICKER */
-    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.2rem;display:flex;align-items:flex-end;gap:.8rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:660px;position:relative}
+    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.2rem;display:flex;align-items:flex-end;gap:.8rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:660px;position:relative;overflow:visible}
     .s-field{flex:1;min-width:130px;position:relative}
     .s-field label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111;margin-bottom:.3rem}
     .s-field .s-val{padding:.35rem 0;font-size:.9rem;color:#111;border:none;border-bottom:1.5px solid var(--g200);cursor:pointer;background:transparent;min-height:2rem;transition:border-color .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -40,7 +40,7 @@
     .nights-badge{background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;margin-left:.4rem;display:none}
 
     /* CALENDAR DROPDOWN */
-    .drp-wrap{position:absolute;top:calc(100% + 8px);left:0;z-index:200;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:1.25rem 1.5rem;display:none;min-width:620px}
+    .drp-wrap{position:absolute;top:calc(100% + 8px);left:0;z-index:9999;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;min-width:640px;max-height:80vh;overflow-y:auto}
     .drp-wrap.open{display:block}
     .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
     .drp-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
@@ -240,8 +240,8 @@
           <h2>Check open dates</h2>
           <p style="margin-top:.4rem;color:var(--g500);font-size:.9rem;">Booked dates are crossed out. Select dates to see pricing.</p>
         </div>
-        <div id="homeCalContainer" class="reveal"></div>
-        <div class="cal-legend reveal" style="margin-top:.75rem;">
+        <div id="homeCalContainer"></div>
+        <div class="cal-legend" style="margin-top:.75rem;">
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Selected</div>
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--g100);border:1px solid var(--g300)"></div>Booked</div>
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green-p)"></div>In range</div>
@@ -340,7 +340,7 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
+          <li><a href="/cdn-cgi/l/email-protection#1e73777d767b726a716b2b2e5e79737f7772307d7173"><span class="__cf_email__" data-cfemail="a3cecac0cbc6cfd7ccd69693e3c4cec2cacf8dc0ccce">[email&#160;protected]</span></a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
@@ -356,7 +356,7 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
 <script>
   // ── Load availability ──────────────────────────────────────
   loadAvailability().then(() => {
@@ -511,12 +511,38 @@
   // ── HOME CALENDAR ─────────────────────────────────────────
   const homeCal = new MiniCal('homeCalContainer', {
     onSelect: ({ checkIn, checkOut }) => {
-      if (checkIn) document.getElementById('s-ci').value = checkIn;
-      if (checkOut) { document.getElementById('s-co').value = checkOut; updateStickyCard(); }
+      if (checkIn) {
+        document.getElementById('s-ci').value = checkIn;
+        // Set min checkout to day after checkin
+        const minCO = new Date(checkIn);
+        minCO.setDate(minCO.getDate() + 1);
+        document.getElementById('s-co').min = minCO.toISOString().split('T')[0];
+        // Clear checkout if now invalid
+        const co = document.getElementById('s-co').value;
+        if (co && co <= checkIn) document.getElementById('s-co').value = '';
+      }
+      if (checkOut) {
+        document.getElementById('s-co').value = checkOut;
+        updateStickyCard();
+      }
     }
   });
 
   // ── STICKY CARD ───────────────────────────────────────────
+  function stickyCIChanged() {
+    const ci = document.getElementById('s-ci').value;
+    if (ci) {
+      // Set min checkout to day after checkin
+      const minCO = new Date(ci);
+      minCO.setDate(minCO.getDate() + 1);
+      document.getElementById('s-co').min = minCO.toISOString().split('T')[0];
+      // Clear checkout if it's before new checkin
+      const co = document.getElementById('s-co').value;
+      if (co && co <= ci) document.getElementById('s-co').value = '';
+    }
+    updateStickyCard();
+  }
+
   function updateStickyCard() {
     const ci = document.getElementById('s-ci').value;
     const co = document.getElementById('s-co').value;
@@ -540,10 +566,4 @@
 
   // Pre-fill from URL params
   const pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-  if (pci) { document.getElementById('s-ci').value = pci; drpCI = pci; }
-  if (pco) { document.getElementById('s-co').value = pco; drpCO = pco; }
-  if (pg)  document.getElementById('s-g').value = pg;
-  if (pci || pco) { drpUpdateDisplay(); updateStickyCard(); }
-</script>
-</body>
-</html>
+  if (pci) { document.getElementById('s-c
