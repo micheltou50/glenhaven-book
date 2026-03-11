@@ -333,7 +333,7 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
+          <li><a href="/cdn-cgi/l/email-protection#dfb2b6bcb7bab3abb0aaeaef9fb8b2beb6b3f1bcb0b2"><span class="__cf_email__" data-cfemail="4924202a212c253d263c7c79092e24282025672a2624">[email&#160;protected]</span></a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
@@ -345,7 +345,7 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  SINGLE CALENDAR SYSTEM
@@ -354,37 +354,38 @@
 // ═══════════════════════════════════════════════════════════════
 
 // ── Shared state ─────────────────────────────────────────────
-var sharedCI = null;  // ISO string or null
-var sharedCO = null;  // ISO string or null
+var sharedCI = null;      // ISO string or null
+var sharedCO = null;      // ISO string or null
 
-// ── The one MiniCal, lives in the availability section ────────
-var mainCal = null;
+// ── Two MiniCal instances, permanently mounted in their containers
+var mainCal     = null;   // availability section
+var heroCalInst = null;   // hero floating panel
 
-// ── Hero floating calendar panel ──────────────────────────────
-var heroCalOpen = false;
+// ── Hero floating panel open/closed ──────────────────────────
+var heroCalIsOpen = false;
 
-function heroCalOpen_fn() {
+function heroCalOpen() {
   var panel = document.getElementById('heroCal');
   var box   = document.getElementById('heroSearch').getBoundingClientRect();
-  panel.style.top  = (box.bottom + 10) + 'px';
+  // position:fixed — viewport coords only, NO scrollY added
+  var topPos = box.bottom + 8;
+  // If hero is scrolled and panel would go offscreen top, pin to 8px
+  if (topPos < 8) topPos = 8;
+  // If panel would go offscreen bottom, flip it above the search box
+  if (topPos + 500 > window.innerHeight) topPos = Math.max(8, box.top - 510);
+  panel.style.top  = topPos + 'px';
   panel.style.left = Math.max(8, Math.min(box.left, window.innerWidth - 770)) + 'px';
   panel.classList.add('open');
-  heroCalOpen = true;
-
-  // Teleport mainCal el into the panel
-  var mount = document.getElementById('heroCalMount');
-  mount.appendChild(mainCal.el);
+  heroCalIsOpen = true;
   updateHeroCalHint();
+  // heroCalInst lives permanently in #heroCalMount — no DOM moving
 }
 
 function heroCalClose() {
   var panel = document.getElementById('heroCal');
   panel.classList.remove('open');
-  heroCalOpen = false;
-
-  // Teleport mainCal el back to the availability section
-  var home = document.getElementById('homeCalContainer');
-  home.appendChild(mainCal.el);
+  heroCalIsOpen = false;
+  // heroCalInst stays in #heroCalMount — no DOM moving
 }
 
 function updateHeroCalHint() {
@@ -450,7 +451,7 @@ function onDateChange(checkIn, checkOut) {
   updateStickyCard();
 
   // Close panel after both dates selected
-  if (sharedCI && sharedCO && heroCalOpen) {
+  if (sharedCI && sharedCO && heroCalIsOpen) {
     setTimeout(heroCalClose, 500);
   }
 }
@@ -492,8 +493,9 @@ function updateStickyCard() {
     }
   }
 
-  // Sync mainCal selection highlight
-  if (mainCal) mainCal.setRange(ci, co);
+  // Sync both calendar highlights
+  if (mainCal)     mainCal.setRange(ci || sharedCI, co || sharedCO);
+  if (heroCalInst) heroCalInst.setRange(ci || sharedCI, co || sharedCO);
 }
 
 // ── Sticky card input listeners ───────────────────────────────
@@ -524,17 +526,18 @@ document.getElementById('s-co').addEventListener('change', function() {
 document.getElementById('s-g').addEventListener('change', updateStickyCard);
 
 // ── Hero panel buttons ────────────────────────────────────────
-document.getElementById('dispCI').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen_fn(); });
-document.getElementById('dispCO').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen_fn(); });
+document.getElementById('dispCI').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen(); });
+document.getElementById('dispCO').addEventListener('click', function(e) { e.stopPropagation(); heroCalOpen(); });
 document.getElementById('heroCalClose').addEventListener('click', heroCalClose);
 document.getElementById('heroCalClear').addEventListener('click', function() {
   sharedCI = null; sharedCO = null;
-  if (mainCal) { mainCal.ci = null; mainCal.co = null; mainCal.renderDays(); }
+  if (mainCal)     { mainCal.ci = null;     mainCal.co = null;     mainCal.renderDays(); }
+  if (heroCalInst) { heroCalInst.ci = null; heroCalInst.co = null; heroCalInst.renderDays(); }
   onDateChange(null, null);
 });
 document.getElementById('heroCalDone').addEventListener('click', heroCalClose);
 document.getElementById('btnCheck').addEventListener('click', function() {
-  if (!sharedCI || !sharedCO) { heroCalOpen_fn(); return; }
+  if (!sharedCI || !sharedCO) { heroCalOpen(); return; }
   var g = document.getElementById('hg').value;
   window.location.href = 'booking.html?ci=' + sharedCI + '&co=' + sharedCO + '&g=' + g;
 });
@@ -544,30 +547,65 @@ document.getElementById('hg').addEventListener('change', updateStickyCard);
 document.addEventListener('click', function(e) {
   var panel  = document.getElementById('heroCal');
   var search = document.getElementById('heroSearch');
-  if (heroCalOpen && !panel.contains(e.target) && !search.contains(e.target)) {
+  if (heroCalIsOpen && !panel.contains(e.target) && !search.contains(e.target)) {
     heroCalClose();
   }
 });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && heroCalOpen) heroCalClose(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && heroCalIsOpen) heroCalClose(); });
 
 // ── Init: load availability THEN build calendar ───────────────
 document.getElementById('s-ci').min = todayISO();
 document.getElementById('s-co').min = todayISO();
 
 loadAvailability().then(function() {
-  // Build the ONE calendar — it lives in #homeCalContainer by default
+
+  // ── TWO permanent MiniCal instances, shared state ─────────
+  // mainCal     → always mounted in #homeCalContainer (availability section)
+  // heroCalInst → always mounted in #heroCalMount (hero floating panel)
+  // Neither is ever moved. Both sync via sharedCI / sharedCO.
+
   mainCal = new MiniCal('homeCalContainer', {
     onSelect: function(sel) {
+      sharedCI = sel.checkIn  ? sel.checkIn  : sharedCI;
+      sharedCO = sel.checkOut ? sel.checkOut : null;
+      if (sel.checkIn && sel.checkOut) { sharedCI = sel.checkIn; sharedCO = sel.checkOut; }
+      // Sync the hero panel calendar
+      if (heroCalInst) heroCalInst.setRange(sharedCI, sharedCO);
       onDateChange(sel.checkIn, sel.checkOut);
     }
   });
 
-  // Pre-fill from URL params
+  heroCalInst = new MiniCal('heroCalMount', {
+    onSelect: function(sel) {
+      sharedCI = sel.checkIn  ? sel.checkIn  : sharedCI;
+      sharedCO = sel.checkOut ? sel.checkOut : null;
+      if (sel.checkIn && sel.checkOut) { sharedCI = sel.checkIn; sharedCO = sel.checkOut; }
+      // Sync the availability section calendar
+      if (mainCal) mainCal.setRange(sharedCI, sharedCO);
+      onDateChange(sel.checkIn, sel.checkOut);
+    }
+  });
+
+  // Pre-fill from URL params (e.g. arriving from a promo link)
   var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-  if (pci) { sharedCI = pci; mainCal.ci = pci; document.getElementById('s-ci').value = pci; }
-  if (pco) { sharedCO = pco; mainCal.co = pco; document.getElementById('s-co').value = pco; }
-  if (pg)  { document.getElementById('s-g').value = pg; document.getElementById('hg').value = pg; }
-  if (pci || pco) { mainCal.renderDays(); onDateChange(sharedCI, sharedCO); }
+  if (pci) {
+    sharedCI = pci;
+    mainCal.ci = pci; mainCal.renderDays();
+    heroCalInst.ci = pci; heroCalInst.renderDays();
+    document.getElementById('s-ci').value = pci;
+  }
+  if (pco) {
+    sharedCO = pco;
+    mainCal.co = pco; mainCal.renderDays();
+    heroCalInst.co = pco; heroCalInst.renderDays();
+    document.getElementById('s-co').value = pco;
+  }
+  if (pg) {
+    document.getElementById('s-g').value = pg;
+    document.getElementById('hg').value  = pg;
+  }
+  if (pci || pco) onDateChange(sharedCI, sharedCO);
+
 });
 </script>
 </body>
