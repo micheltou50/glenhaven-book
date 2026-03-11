@@ -205,6 +205,13 @@
   if (urlCO) bkCO = urlCO;
   if (urlG)  adults = Math.min(8, Math.max(1, parseInt(urlG)||2));
 
+  // Guard: show banner if page loaded without dates
+  if (!bkCI || !bkCO) {
+    const alert = document.getElementById('dateAlert');
+    alert.textContent = 'No dates selected — please pick your check-in and check-out from the calendar below.';
+    alert.classList.add('show');
+  }
+
   // Calendar
   const bkCal = new MiniCal('bkCalContainer', {
     onSelect: ({checkIn, checkOut}) => {
@@ -346,7 +353,7 @@
 </script>
 <script>
   loadAvailability().then(() => {
-    if (typeof bookCal !== "undefined" && bookCal) bookCal.renderDays();
+    if (typeof bkCal !== "undefined" && bkCal) bkCal.renderDays();
   });
 </script>
 </body>

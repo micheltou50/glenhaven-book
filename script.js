@@ -260,7 +260,7 @@ class MiniCal {
       el.addEventListener('click', () => this.selectDay(el.dataset.iso));
       el.addEventListener('mouseenter', () => { this.hov = el.dataset.iso; this.renderDays(); });
     });
-    grid.addEventListener('mouseleave', () => { this.hov = null; this.renderDays(); });
+    grid.addEventListener('mouseleave', () => { this.hov = null; requestAnimationFrame(() => this.renderDays()); });
   }
 
   selectDay(iso) {
@@ -402,7 +402,8 @@ async function loadAvailability() {
       rebuildBlockedRanges();
     }
   } catch (err) {
-    console.warn('Availability fetch failed, using cached data:', err.message);
+    console.error('Availability API failed:', err.message);
+    // Graceful degradation — calendar still works from cached localStorage data
   }
 }
 

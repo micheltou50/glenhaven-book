@@ -37,17 +37,19 @@ exports.handler = async (event) => {
       }
     }
   } catch (err) {
-    // If availability check fails, proceed — better to let the booking through
-    console.warn('Availability check failed:', err.message);
+    // Availability check failed — block booking to prevent double-bookings
+    // Better to show an error than allow a double booking
+    console.error('Availability check failed:', err.message);
+    return respond(200, { success: false, error: 'Could not verify availability. Please try again in a moment.' });
   }
 
   // ── 2. Create Stripe Checkout session ─────────────────────
   const params = new URLSearchParams({
     'payment_method_types[]'                                : 'card',
     'line_items[0][price_data][currency]'                   : 'aud',
-    'line_items[0][price_data][unit_amount]'                : String(Math.round(total * 100)),
+    'line_items[0][price_data][unit_amount]'                : String(Math.round(chargeAmount * 100)),
     'line_items[0][price_data][product_data][name]'         : 'Glenhaven — Blue Mountains Cottage',
-    'line_items[0][price_data][product_data][description]'  : `${nights} night${nights>1?'s':''} · ${checkIn} → ${checkOut} · ${guests} guest${guests>1?'s':''}`,
+    'line_items[0][price_data][product_data][description]'  : `${chargeAmount < total ? '30% deposit — ' : ''}${nights} night${nights>1?'s':''} · ${checkIn} → ${checkOut} · ${guests} guest${guests>1?'s':''}`,
     'line_items[0][quantity]'                               : '1',
     'mode'                                                  : 'payment',
     'customer_email'                                        : email,

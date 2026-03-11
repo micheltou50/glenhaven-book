@@ -350,7 +350,7 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
+          <li><a href="/cdn-cgi/l/email-protection#d9b4b0bab1bcb5adb6acece999beb4b8b0b5f7bab6b4"><span class="__cf_email__" data-cfemail="6805010b000d041c071d5d58280f05090104460b0705">[email&#160;protected]</span></a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
@@ -362,7 +362,7 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
 <script>
 // NO 'use strict' — inline handlers and let variables must share same scope
 
@@ -579,6 +579,11 @@ document.getElementById('s-g').addEventListener('change', updateStickyCard);
 function updateStickyCard() {
   var ci = document.getElementById('s-ci').value;
   var co = document.getElementById('s-co').value;
+  // Never allow checkout on or before checkin
+  if (ci && co && co <= ci) {
+    document.getElementById('s-co').value = '';
+    co = '';
+  }
   var g  = document.getElementById('s-g').value;
   var p  = calcPrice(ci, co, g);
   var urgEl = document.getElementById('stickyUrgency').querySelector('span');
@@ -594,7 +599,11 @@ function updateStickyCard() {
     document.getElementById('stickyBtn').href = 'booking.html?ci='+ci+'&co='+co+'&g='+g;
   } else {
     bk.style.display = 'none';
-    document.getElementById('stickyBtn').href = 'booking.html';
+    if (ci && co) {
+      document.getElementById('stickyBtn').href = 'booking.html?ci='+ci+'&co='+co+'&g='+g;
+    } else {
+      document.getElementById('stickyBtn').href = 'booking.html';
+    }
   }
   if (ci || co) homeCal.setRange(ci, co);
 }
@@ -607,14 +616,4 @@ if (pg)  { document.getElementById('s-g').value  = pg; }
 if (pci || pco) { drpSyncDisplay(); updateStickyCard(); }
 
 // Set today as minimum for check-in
-document.getElementById('s-ci').min = TODAY;
-document.getElementById('s-co').min = TODAY;
-
-// Load server availability AFTER everything is set up
-loadAvailability().then(function() {
-  homeCal.renderDays();
-  drpRender();
-});
-</script>
-</body>
-</html>
+docum
