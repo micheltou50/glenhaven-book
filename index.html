@@ -7,85 +7,97 @@
   <meta name="description" content="A peaceful 4-bedroom timber cottage in Katoomba near the Three Sisters. Book direct and save — no platform fees."/>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    /* HERO */
     .hero{position:relative;height:95vh;min-height:600px;display:flex;align-items:center;}
-    .hero-bg{position:absolute;inset:0;overflow:hidden;background:url('https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg') center/cover no-repeat;transform:scale(1.04);transition:transform 10s ease-out}
-    .hero:hover .hero-bg{transform:scale(1)}
-    .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%)}
-    .hero-content{position:relative;z-index:10;max-width:700px;padding:0 1.5rem}
-    .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.35rem .9rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.9);margin-bottom:1.1rem}
-    .hero h1{color:#fff;margin-bottom:.85rem}
-    .hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.75);line-height:1.6;max-width:500px;margin-bottom:2.2rem}
-    .hero-stats{display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:2.5rem}
-    .hero-stat{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.55rem 1rem;text-align:center}
-    .hero-stat strong{display:block;font-size:1.1rem;font-weight:700;color:#fff}
-    .hero-stat span{font-size:.68rem;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase}
-    .hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.35rem;z-index:2;opacity:0;animation:fadeIn 1s 1.5s forwards}
-    .hero-scroll span{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45)}
-    .hero-scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,rgba(255,255,255,.45),transparent);animation:scrollPulse 2s 2s infinite}
+    .hero-bg{position:absolute;inset:0;overflow:hidden;z-index:0;}
+    .hero-bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 10s ease-out;}
+    .hero:hover .hero-bg img{transform:scale(1);}
+    .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%);}
+    .hero-content{position:relative;z-index:2;max-width:700px;padding:0 1.5rem;}
+    .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.35rem .9rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.9);margin-bottom:1.1rem;}
+    .hero h1{color:#fff;margin-bottom:.85rem;}
+    .hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.75);line-height:1.6;max-width:500px;margin-bottom:2.2rem;}
+    .hero-stats{display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+    .hero-stat{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.55rem 1rem;text-align:center;}
+    .hero-stat strong{display:block;font-size:1.1rem;font-weight:700;color:#fff;}
+    .hero-stat span{font-size:.68rem;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase;}
+    .hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.35rem;z-index:2;opacity:0;animation:fadeIn 1s 1.5s forwards;}
+    .hero-scroll span{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+    .hero-scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,rgba(255,255,255,.45),transparent);animation:scrollPulse 2s 2s infinite;}
     @keyframes scrollPulse{0%,100%{opacity:.4}50%{opacity:1}}
     @keyframes fadeIn{to{opacity:1}}
-    .hero-content>*{animation:heroUp .7s ease both}
-    .hero-tag{animation-delay:.2s}.hero h1{animation-delay:.4s}.hero-sub{animation-delay:.55s}.hero-stats{animation-delay:.7s}#heroSearch{animation-delay:.85s}
+    .hero-content>*{animation:heroUp .7s ease both;}
+    .hero-tag{animation-delay:.2s;}.hero h1{animation-delay:.4s;}.hero-sub{animation-delay:.55s;}.hero-stats{animation-delay:.7s;}#heroSearch{animation-delay:.85s;}
     @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
-    /* DATE RANGE PICKER */
-    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.2rem;display:flex;align-items:flex-end;gap:.8rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:660px;position:relative;overflow:visible}
-    .s-field{flex:1;min-width:130px;position:relative}
-    .s-field label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111;margin-bottom:.3rem}
-    .s-field .s-val{padding:.35rem 0;font-size:.9rem;color:#111;border:none;border-bottom:1.5px solid var(--g200);cursor:pointer;background:transparent;min-height:2rem;transition:border-color .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .s-field .s-val:hover,.s-field .s-val.active{border-color:var(--green)}
-    .s-field .s-placeholder{color:var(--g400)}
-    .s-divider{width:1px;background:var(--g200);align-self:stretch;margin:.2rem 0;flex-shrink:0}
-    .nights-badge{background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;margin-left:.4rem;display:none}
+    /* SEARCH BOX */
+    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.25rem;display:flex;align-items:flex-end;gap:.75rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:680px;}
+    .s-field{flex:1;min-width:130px;}
+    .s-field label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111;margin-bottom:.3rem;}
+    .s-btn{display:flex;align-items:center;background:var(--g100);border:1.5px solid var(--g200);border-radius:10px;padding:.42rem .8rem;cursor:pointer;transition:border-color .18s;min-height:2.25rem;user-select:none;}
+    .s-btn:hover,.s-btn.active{border-color:var(--green);background:#fff;}
+    .s-btn-txt{font-size:.88rem;color:var(--g400);}
+    .s-btn-txt.set{color:#111;font-weight:500;}
+    .nights-pill{background:var(--green);color:#fff;font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;display:none;margin-left:.4rem;}
+    .s-divider{width:1px;background:var(--g200);align-self:stretch;margin:.2rem 0;flex-shrink:0;}
 
-    /* CALENDAR DROPDOWN */
-    .drp-wrap{position:fixed;top:auto;left:auto;z-index:9999;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;min-width:640px;max-height:80vh;overflow-y:auto}
-    .drp-wrap.open{display:block}
-    .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
-    .drp-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
-    .drp-month-title{font-weight:700;font-size:.95rem}
-    .drp-nav{width:28px;height:28px;border-radius:50%;background:var(--g100);border:1px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .15s}
-    .drp-nav:hover{background:var(--black);color:#fff}
-    .drp-nav.hidden{visibility:hidden}
-    .drp-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
-    .drp-dow span{text-align:center;font-size:.65rem;font-weight:600;color:var(--g400);padding:.2rem 0}
-    .drp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-    .drp-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r-sm);font-size:.82rem;cursor:pointer;transition:background .1s,color .1s;position:relative;user-select:none}
-    .drp-day.empty{cursor:default}
-    .drp-day.past,.drp-day.blocked{color:var(--g300);cursor:not-allowed}
-    .drp-day.blocked{text-decoration:line-through;background:var(--g100)}
-    .drp-day.avail:hover:not(.sel-s):not(.sel-e){background:var(--green-p)}
-    .drp-day.sel-s,.drp-day.sel-e{background:var(--green)!important;color:#fff!important;font-weight:700;border-radius:var(--r-sm)}
-    .drp-day.in-r,.drp-day.in-h{background:var(--green-p);color:var(--green-d);border-radius:0}
-    .drp-day.sel-s.in-r,.drp-day.sel-e.in-r{background:var(--green)!important;color:#fff!important}
-    .drp-footer{margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--g500)}
-    .drp-hint{font-size:.8rem;color:var(--g500)}
-    .drp-clear{background:none;border:none;cursor:pointer;color:var(--g400);text-decoration:underline;font-size:.8rem}
-    .drp-clear:hover{color:var(--black)}
+    /* DROPDOWN — position:fixed so NO parent can clip it */
+    #drpCal{position:fixed;z-index:99999;background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;width:660px;max-height:90vh;overflow-y:auto;}
+    #drpCal.open{display:block;}
+    .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+    .drp-mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
+    .drp-mt{font-weight:700;font-size:.92rem;}
+    .drp-nav{width:28px;height:28px;border-radius:50%;background:var(--g100);border:1px solid var(--g200);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .drp-nav:hover{background:var(--black);color:#fff;}
+    .drp-nav.inv{visibility:hidden;}
+    .drp-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
+    .drp-dow span{text-align:center;font-size:.65rem;font-weight:600;color:var(--g400);padding:.2rem 0;}
+    .drp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+    .drp-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:.82rem;user-select:none;transition:background .1s,color .1s;}
+    .drp-d.av{cursor:pointer;}
+    .drp-d.past,.drp-d.bk{color:var(--g300);}
+    .drp-d.bk{text-decoration:line-through;background:var(--g100);}
+    .drp-d.av:hover:not(.ss):not(.se){background:var(--green-p);}
+    .drp-d.ss,.drp-d.se{background:var(--green)!important;color:#fff!important;font-weight:700;}
+    .drp-d.ss{border-radius:6px 0 0 6px!important;}
+    .drp-d.se{border-radius:0 6px 6px 0!important;}
+    .drp-d.ir,.drp-d.ih{background:var(--green-p);color:var(--green-d);border-radius:0;}
+    .drp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--g100);}
+    .drp-hint{font-size:.82rem;color:var(--g500);}
+    .drp-clr{background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--g400);text-decoration:underline;}
+    .drp-clr:hover{color:var(--black);}
 
     /* SECTION HEADERS */
-    .sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+    .sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
 
     /* STORY */
-    #story{background:#fff}
-    .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-    .story-img{border-radius:var(--r-xl);overflow:hidden;height:420px;box-shadow:var(--sh-lg)}
-    .story-img img{width:100%;height:100%;object-fit:cover}
-    .story-text blockquote{font-size:1.1rem;font-style:italic;line-height:1.75;color:var(--g700);border-left:3px solid var(--green);padding-left:1.2rem;margin:1.25rem 0}
-    .story-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+    #story{background:#fff;}
+    .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+    .story-img{border-radius:var(--r-xl);overflow:hidden;height:420px;box-shadow:var(--sh-lg);}
+    .story-img img{width:100%;height:100%;object-fit:cover;}
+    .story-text blockquote{font-size:1.1rem;font-style:italic;line-height:1.75;color:var(--g700);border-left:3px solid var(--green);padding-left:1.2rem;margin:1.25rem 0;}
+    .story-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;}
 
-    /* AVAILABILITY + SIDEBAR */
-    .avail-layout{display:grid;grid-template-columns:1fr 360px;gap:2.5rem;align-items:start}
+    /* AVAILABILITY LAYOUT */
+    .avail-layout{display:grid;grid-template-columns:1fr 360px;gap:2.5rem;align-items:start;}
+
+    /* STICKY CARD DATE INPUTS */
+    .s-dates{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--g200);border-radius:10px;overflow:hidden;margin-bottom:.85rem;}
+    .s-df{padding:.6rem .75rem;}
+    .s-df:first-child{border-right:1px solid var(--g200);}
+    .s-df label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-bottom:.2rem;}
+    .s-df input[type=date]{width:100%;border:none;font-size:.85rem;outline:none;background:transparent;color:#111;cursor:pointer;}
+    .s-guests{border:1.5px solid var(--g200);border-radius:10px;padding:.6rem .75rem;margin-bottom:.85rem;}
+    .s-guests label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-bottom:.2rem;}
+    .s-guests select{width:100%;border:none;font-size:.85rem;outline:none;background:transparent;}
 
     @media(max-width:1024px){
-      .story-grid{grid-template-columns:1fr}.story-img{height:300px}
-      .avail-layout{grid-template-columns:1fr}.sticky-wrap{position:static}
-      .drp-wrap{min-width:320px}.drp-months{grid-template-columns:1fr}
+      .story-grid{grid-template-columns:1fr;}.story-img{height:300px;}
+      .avail-layout{grid-template-columns:1fr;}.sticky-wrap{position:static!important;}
     }
     @media(max-width:768px){
-      .search-box{flex-direction:column}.s-divider{display:none}
-      .drp-wrap{min-width:calc(100vw - 3rem);left:0}
+      .search-box{flex-direction:column;}.s-divider{display:none;}
+      #drpCal{width:calc(100vw - 2rem);padding:1rem;}
+      .drp-months{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -110,7 +122,9 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
+  <div class="hero-bg">
+    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven"/>
+  </div>
   <div class="hero-overlay"></div>
   <div class="container hero-content">
     <div class="hero-tag">📍 Katoomba · Blue Mountains · NSW Australia</div>
@@ -122,70 +136,61 @@
       <div class="hero-stat"><strong>2.5</strong><span>Bathrooms</span></div>
       <div class="hero-stat"><strong>5.0★</strong><span>Rating</span></div>
     </div>
-
-    <!-- DATE RANGE PICKER -->
     <div class="search-box" id="heroSearch">
-      <div class="s-field" id="sfCI">
+      <div class="s-field">
         <label>Check-in</label>
-        <div class="s-val s-placeholder" id="ciVal" onclick="drpOpen('ci')">Add date</div>
+        <div class="s-btn" id="btnCI"><span class="s-btn-txt" id="valCI">Add date</span></div>
       </div>
       <div class="s-divider"></div>
-      <div class="s-field" id="sfCO">
-        <label>Check-out <span class="nights-badge" id="nightsBadge"></span></label>
-        <div class="s-val s-placeholder" id="coVal" onclick="drpOpen('co')">Add date</div>
+      <div class="s-field">
+        <label>Check-out <span class="nights-pill" id="nightsPill"></span></label>
+        <div class="s-btn" id="btnCO"><span class="s-btn-txt" id="valCO">Add date</span></div>
       </div>
       <div class="s-divider"></div>
       <div class="s-field" style="min-width:110px;">
         <label>Guests</label>
-        <select id="hg" style="width:100%;border:none;border-bottom:1.5px solid var(--g200);padding:.35rem 0;font-size:.9rem;background:transparent;color:#111;outline:none;">
-          <option value="1">1 guest</option>
-          <option value="2" selected>2 guests</option>
-          <option value="3">3 guests</option>
-          <option value="4">4 guests</option>
-          <option value="5">5 guests</option>
-          <option value="6">6 guests</option>
-          <option value="7">7 guests</option>
-          <option value="8">8 guests</option>
+        <select id="hg" style="width:100%;border:1.5px solid var(--g200);border-radius:10px;padding:.45rem .6rem;font-size:.88rem;background:var(--g100);outline:none;cursor:pointer;">
+          <option value="1">1 guest</option><option value="2" selected>2 guests</option>
+          <option value="3">3 guests</option><option value="4">4 guests</option>
+          <option value="5">5 guests</option><option value="6">6 guests</option>
+          <option value="7">7 guests</option><option value="8">8 guests</option>
         </select>
       </div>
-      <button class="btn btn-black" onclick="heroCheck()">Check Availability</button>
-
-      <!-- DROPDOWN CALENDAR -->
-      <div class="drp-wrap" id="drpWrap">
-        <div class="drp-months">
-          <div>
-            <div class="drp-month-head">
-              <button class="drp-nav" id="drpPrev" onclick="drpShift(-1)">‹</button>
-              <span class="drp-month-title" id="drpTitle0"></span>
-              <button class="drp-nav hidden"></button>
-            </div>
-            <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-            <div class="drp-grid" id="drpGrid0"></div>
-          </div>
-          <div>
-            <div class="drp-month-head">
-              <button class="drp-nav hidden"></button>
-              <span class="drp-month-title" id="drpTitle1"></span>
-              <button class="drp-nav" id="drpNext" onclick="drpShift(1)">›</button>
-            </div>
-            <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-            <div class="drp-grid" id="drpGrid1"></div>
-          </div>
-        </div>
-        <div class="drp-footer">
-          <span class="drp-hint" id="drpHint">Select check-in date</span>
-          <button class="drp-clear" onclick="drpClear()">Clear dates</button>
-        </div>
-      </div>
+      <button class="btn btn-black" id="btnCheck">Check Availability</button>
     </div>
   </div>
-  <div class="hero-scroll">
-    <span>Scroll</span>
-    <div class="hero-scroll-line"></div>
-  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="hero-scroll-line"></div></div>
 </section>
 
-<!-- PROPERTY STORY -->
+<!-- DROPDOWN CALENDAR: lives at body level so no parent clips it -->
+<div id="drpCal">
+  <div class="drp-months">
+    <div>
+      <div class="drp-mh">
+        <button class="drp-nav" id="drpPrev">‹</button>
+        <span class="drp-mt" id="drpT0"></span>
+        <button class="drp-nav inv">›</button>
+      </div>
+      <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+      <div class="drp-grid" id="drpG0"></div>
+    </div>
+    <div>
+      <div class="drp-mh">
+        <button class="drp-nav inv">‹</button>
+        <span class="drp-mt" id="drpT1"></span>
+        <button class="drp-nav" id="drpNext">›</button>
+      </div>
+      <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+      <div class="drp-grid" id="drpG1"></div>
+    </div>
+  </div>
+  <div class="drp-foot">
+    <span class="drp-hint" id="drpHint">Select your check-in date</span>
+    <button class="drp-clr" id="drpClr">Clear</button>
+  </div>
+</div>
+
+<!-- STORY -->
 <section id="story" class="section">
   <div class="container">
     <div class="story-grid">
@@ -235,10 +240,10 @@
   <div class="container">
     <div class="avail-layout">
       <div>
-        <div class="reveal" style="margin-bottom:2rem;">
+        <div style="margin-bottom:1.5rem;">
           <span class="eyebrow">Availability</span>
           <h2>Check open dates</h2>
-          <p style="margin-top:.4rem;color:var(--g500);font-size:.9rem;">Booked dates are crossed out. Select dates to see pricing.</p>
+          <p style="margin-top:.4rem;color:var(--g500);font-size:.88rem;">Click a check-in date, then a check-out. Crossed-out dates are booked.</p>
         </div>
         <div id="homeCalContainer"></div>
         <div class="cal-legend" style="margin-top:.75rem;">
@@ -254,11 +259,18 @@
             <div class="stars" style="margin-bottom:.9rem;">★★★★★ <span style="font-size:.8rem;font-weight:500;color:var(--g500);">5.0</span></div>
             <div id="stickyUrgency" class="urgency"><div class="urgency-dot"></div><span>Popular dates are filling fast</span></div>
             <div class="s-dates">
-              <div class="s-df"><label>Check-in</label><input type="date" id="s-ci" onchange="updateStickyCard()"/></div>
-              <div class="s-df"><label>Check-out</label><input type="date" id="s-co" onchange="updateStickyCard()"/></div>
+              <div class="s-df">
+                <label>Check-in</label>
+                <input type="date" id="s-ci"/>
+              </div>
+              <div class="s-df">
+                <label>Check-out</label>
+                <input type="date" id="s-co"/>
+              </div>
             </div>
-            <div class="s-guests"><label>Guests</label>
-              <select id="s-g" onchange="updateStickyCard()">
+            <div class="s-guests">
+              <label>Guests</label>
+              <select id="s-g">
                 <option value="1">1 guest</option><option value="2" selected>2 guests</option>
                 <option value="3">3 guests</option><option value="4">4 guests</option>
                 <option value="5">5 guests</option><option value="6">6 guests</option>
@@ -309,9 +321,7 @@
         <div class="footer-logo">Glen<em>haven</em></div>
         <p>A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.</p>
         <div class="social-row">
-          <a href="#" class="soc-btn">📘</a>
-          <a href="#" class="soc-btn">📸</a>
-          <a href="#" class="soc-btn">🐦</a>
+          <a href="#" class="soc-btn">📘</a><a href="#" class="soc-btn">📸</a><a href="#" class="soc-btn">🐦</a>
         </div>
       </div>
       <div class="footer-col">
@@ -340,249 +350,271 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="/cdn-cgi/l/email-protection#1e73777d767b726a716b2b2e5e79737f7772307d7173"><span class="__cf_email__" data-cfemail="a3cecac0cbc6cfd7ccd69693e3c4cec2cacf8dc0ccce">[email&#160;protected]</span></a></li>
+          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bot">
       <p>© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
-      <div class="footer-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Sitemap</a>
-      </div>
+      <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div>
     </div>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
+<script src="script.js"></script>
 <script>
-  // ── Load availability ──────────────────────────────────────
-  loadAvailability().then(() => {
-    if (typeof homeCal !== 'undefined' && homeCal) homeCal.renderDays();
-    drpRender();
-  });
+// NO 'use strict' — inline handlers and let variables must share same scope
 
-  // ── DATE RANGE PICKER ─────────────────────────────────────
-  let drpBase = new Date();
-  drpBase.setDate(1);
-  let drpCI = null, drpCO = null, drpHov = null, drpMode = null;
-  const TODAY = todayISO();
+// ── DROPDOWN CALENDAR ─────────────────────────────────────────────
+var drpBase  = new Date(); drpBase.setDate(1);
+var drpCI    = null;
+var drpCO    = null;
+var drpHov   = null;
+var drpOpen  = false;
+var TODAY    = todayISO();
 
-  function drpISO(y, m, d) {
-    return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+function pad2(n) { return String(n).padStart(2,'0'); }
+function mkISO(y,m,d) { return y+'-'+pad2(m+1)+'-'+pad2(d); }
+
+// Attach button listeners — no inline handlers, no scope issues
+document.getElementById('btnCI').addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleDrp();
+});
+document.getElementById('btnCO').addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleDrp();
+});
+document.getElementById('btnCheck').addEventListener('click', heroCheck);
+document.getElementById('drpPrev').addEventListener('click', function(e) { e.stopPropagation(); drpShift(-1); });
+document.getElementById('drpNext').addEventListener('click', function(e) { e.stopPropagation(); drpShift(1); });
+document.getElementById('drpClr').addEventListener('click',  function(e) { e.stopPropagation(); drpClear(); });
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+  var cal = document.getElementById('drpCal');
+  if (!drpOpen) return;
+  if (!cal.contains(e.target)) closeDrp();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDrp();
+});
+
+function toggleDrp() {
+  if (drpOpen) { closeDrp(); } else { openDrp(); }
+}
+
+function openDrp() {
+  var cal = document.getElementById('drpCal');
+  var box = document.getElementById('heroSearch').getBoundingClientRect();
+  var top = box.bottom + window.scrollY + 10;
+  var left = Math.max(8, Math.min(box.left + window.scrollX, window.innerWidth - 670));
+  cal.style.top  = top + 'px';
+  cal.style.left = left + 'px';
+  cal.classList.add('open');
+  drpOpen = true;
+  document.getElementById('btnCI').classList.add('active');
+  document.getElementById('btnCO').classList.add('active');
+  drpRender();
+}
+
+function closeDrp() {
+  document.getElementById('drpCal').classList.remove('open');
+  drpOpen = false;
+  document.getElementById('btnCI').classList.remove('active');
+  document.getElementById('btnCO').classList.remove('active');
+}
+
+function drpShift(n) {
+  drpBase = new Date(drpBase.getFullYear(), drpBase.getMonth()+n, 1);
+  drpRender();
+}
+
+function drpRender() {
+  for (var i = 0; i < 2; i++) {
+    var m = new Date(drpBase.getFullYear(), drpBase.getMonth()+i, 1);
+    document.getElementById('drpT'+i).textContent = m.toLocaleString('default',{month:'long',year:'numeric'});
+    drpBuildGrid(m, i);
   }
-
-  function drpOpen(mode) {
-    drpMode = mode;
-    const wrap = document.getElementById('drpWrap');
-    const box  = document.getElementById('heroSearch').getBoundingClientRect();
-    wrap.style.top  = (box.bottom + window.scrollY + 8) + 'px';
-    wrap.style.left = box.left + 'px';
-    // Keep within viewport width
-    const maxLeft = window.innerWidth - 660;
-    if (box.left > maxLeft) wrap.style.left = Math.max(8, maxLeft) + 'px';
-    wrap.classList.add('open');
-    document.getElementById('sfCI').querySelector('.s-val').classList.add('active');
-    document.getElementById('sfCO').querySelector('.s-val').classList.add('active');
-    drpUpdateHint();
-    drpRender();
+  var hint = document.getElementById('drpHint');
+  if (!drpCI)      hint.textContent = 'Select your check-in date';
+  else if (!drpCO) hint.textContent = 'Now select your check-out date';
+  else {
+    var n = Math.round((new Date(drpCO)-new Date(drpCI))/864e5);
+    hint.textContent = n + ' night' + (n!==1?'s':'') + ' selected';
   }
+}
 
-  function drpClose() {
-    document.getElementById('drpWrap').classList.remove('open');
-    document.getElementById('sfCI').querySelector('.s-val').classList.remove('active');
-    document.getElementById('sfCO').querySelector('.s-val').classList.remove('active');
+function drpBuildGrid(month, idx) {
+  var g = document.getElementById('drpG'+idx);
+  var y = month.getFullYear(), m = month.getMonth();
+  var fd = new Date(y,m,1).getDay();
+  var nd = new Date(y,m+1,0).getDate();
+  var html = '';
+  for (var i=0; i<fd; i++) html += '<div class="drp-d"></div>';
+  for (var d=1; d<=nd; d++) {
+    var iso = mkISO(y,m,d);
+    var isPast = iso < TODAY;
+    var isBlk  = isDateBlocked(iso);
+    var cls = 'drp-d';
+    if      (isPast) cls += ' past';
+    else if (isBlk)  cls += ' bk';
+    else             cls += ' av';
+    if (drpCI && iso===drpCI) cls += ' ss';
+    if (drpCO && iso===drpCO) cls += ' se';
+    if (drpCI && drpCO && iso>drpCI && iso<drpCO) cls += ' ir';
+    if (drpCI && !drpCO && drpHov && iso>drpCI && iso<=drpHov) cls += ' ih';
+    html += '<div class="'+cls+'" data-iso="'+iso+'">'+d+'</div>';
   }
-
-  document.addEventListener('click', e => {
-    if (!document.getElementById('heroSearch').contains(e.target)) drpClose();
-  });
-
-  function drpShift(d) {
-    drpBase.setMonth(drpBase.getMonth() + d);
-    drpRender();
-  }
-
-  function drpRender() {
-    const months = [new Date(drpBase), new Date(drpBase.getFullYear(), drpBase.getMonth()+1, 1)];
-    months.forEach((m, idx) => {
-      document.getElementById('drpTitle'+idx).textContent =
-        m.toLocaleString('default', {month:'long', year:'numeric'});
-      drpRenderGrid(m, idx);
+  g.innerHTML = html;
+  // Attach events properly — no inline handlers
+  var days = g.querySelectorAll('.drp-d.av');
+  days.forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      drpClickDay(el.dataset.iso);
     });
-  }
-
-  function drpRenderGrid(monthDate, idx) {
-    const grid = document.getElementById('drpGrid'+idx);
-    const y = monthDate.getFullYear(), m = monthDate.getMonth();
-    const firstDay = new Date(y, m, 1).getDay();
-    const daysIn = new Date(y, m+1, 0).getDate();
-    let html = '';
-    for (let i = 0; i < firstDay; i++) html += '<div class="drp-day empty"></div>';
-    for (let d = 1; d <= daysIn; d++) {
-      const iso = drpISO(y, m, d);
-      const isPast = iso < TODAY;
-      const isBlocked = isDateBlocked(iso);
-      let cls = 'drp-day';
-      if (isPast || isBlocked) cls += isPast ? ' past' : ' blocked';
-      else cls += ' avail';
-      if (drpCI && iso === drpCI) cls += ' sel-s';
-      if (drpCO && iso === drpCO) cls += ' sel-e';
-      if (drpCI && !drpCO && drpHov && iso > drpCI && iso <= drpHov) cls += ' in-h';
-      if (drpCI && drpCO && iso > drpCI && iso < drpCO) cls += ' in-r';
-      html += `<div class="${cls}" data-iso="${iso}" onclick="drpClick('${iso}')" onmouseenter="drpHover('${iso}')">${d}</div>`;
-    }
-    grid.innerHTML = html;
-  }
-
-  function drpClick(iso) {
-    if (iso < TODAY || isDateBlocked(iso)) return;
-    if (!drpCI || (drpCI && drpCO)) {
-      // Start fresh — set check-in, keep open for check-out
-      drpCI = iso; drpCO = null; drpMode = 'co';
-    } else if (iso <= drpCI) {
-      // Clicked earlier than check-in — reset
-      drpCI = iso; drpCO = null; drpMode = 'co';
-    } else {
-      // Setting check-out
-      if (isRangeBlocked(drpCI, iso)) {
-        alert('A booked date falls within this range. Please choose different dates.');
-        return;
-      }
-      drpCO = iso;
-      drpMode = null;
-    }
-    drpUpdateDisplay();  // always update display
+    el.addEventListener('mouseenter', function() {
+      drpHov = el.dataset.iso;
+      drpRender();
+    });
+  });
+  g.addEventListener('mouseleave', function() {
+    drpHov = null;
     drpRender();
-    drpUpdateHint();
-    // Only close once both dates selected
-    if (drpCI && drpCO) setTimeout(drpClose, 400);
-  }
+  });
+}
 
-  function drpHover(iso) {
-    if (drpCI && !drpCO) { drpHov = iso; drpRender(); }
-  }
-
-  function drpClear() {
-    drpCI = null; drpCO = null; drpHov = null; drpMode = 'ci';
-    drpUpdateDisplay();
-    drpRender();
-    drpUpdateHint();
-  }
-
-  function drpUpdateDisplay() {
-    const ciEl = document.getElementById('ciVal');
-    const coEl = document.getElementById('coVal');
-    const badge = document.getElementById('nightsBadge');
-    if (drpCI) {
-      ciEl.textContent = fmtShort(drpCI);
-      ciEl.classList.remove('s-placeholder');
-    } else {
-      ciEl.textContent = 'Add date';
-      ciEl.classList.add('s-placeholder');
-    }
-    if (drpCO) {
-      coEl.textContent = fmtShort(drpCO);
-      coEl.classList.remove('s-placeholder');
-      const n = Math.round((new Date(drpCO) - new Date(drpCI)) / 86400000);
-      badge.textContent = n + ' night' + (n !== 1 ? 's' : '');
-      badge.style.display = 'inline-block';
-    } else {
-      coEl.textContent = 'Add date';
-      coEl.classList.add('s-placeholder');
-      badge.style.display = 'none';
-    }
-    // Sync to sticky card
-    if (drpCI) document.getElementById('s-ci').value = drpCI;
-    if (drpCO) { document.getElementById('s-co').value = drpCO; updateStickyCard(); }
-  }
-
-  function drpUpdateHint() {
-    const hint = document.getElementById('drpHint');
-    if (!drpCI) hint.textContent = 'Select check-in date';
-    else if (!drpCO) hint.textContent = 'Now select your check-out date';
-    else {
-      const n = Math.round((new Date(drpCO) - new Date(drpCI)) / 86400000);
-      hint.textContent = n + ' night' + (n!==1?'s':'') + ' selected';
-    }
-  }
-
-  function heroCheck() {
-    if (!drpCI || !drpCO) {
-      drpOpen('ci');
-      document.getElementById('drpHint').textContent = '👆 Select your check-in date to get started';
+function drpClickDay(iso) {
+  if (iso < TODAY || isDateBlocked(iso)) return;
+  if (!drpCI || (drpCI && drpCO)) {
+    drpCI = iso; drpCO = null;
+  } else if (iso <= drpCI) {
+    drpCI = iso; drpCO = null;
+  } else {
+    if (isRangeBlocked(drpCI, iso)) {
+      alert('A booked date falls in this range. Please choose different dates.');
       return;
     }
-    const g = document.getElementById('hg').value;
-    window.location.href = `booking.html?ci=${drpCI}&co=${drpCO}&g=${g}`;
+    drpCO = iso;
   }
+  drpSyncDisplay();
+  drpRender();
+  if (drpCI && drpCO) {
+    setTimeout(closeDrp, 400);
+  }
+}
 
-  // ── HOME CALENDAR ─────────────────────────────────────────
-  const homeCal = new MiniCal('homeCalContainer', {
-    onSelect: ({ checkIn, checkOut }) => {
-      if (checkIn) {
-        document.getElementById('s-ci').value = checkIn;
-        // Update checkout minimum
-        const minCO = new Date(checkIn);
-        minCO.setDate(minCO.getDate() + 1);
-        const minCOStr = minCO.toISOString().split('T')[0];
-        document.getElementById('s-co').min = minCOStr;
-        const co = document.getElementById('s-co').value;
-        if (co && co <= checkIn) document.getElementById('s-co').value = '';
-      }
-      if (checkOut) {
-        document.getElementById('s-co').value = checkOut;
-      }
-      // Always update sidebar pricing
-      updateStickyCard();
-      // If both dates selected, update Reserve button href
-      const ci = document.getElementById('s-ci').value;
-      const co = document.getElementById('s-co').value;
-      if (ci && co) {
-        const g = document.getElementById('s-g').value;
-        document.getElementById('stickyBtn').href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
-      }
+function drpClear() {
+  drpCI = null; drpCO = null; drpHov = null;
+  drpSyncDisplay();
+  drpRender();
+}
+
+function drpSyncDisplay() {
+  var ciEl  = document.getElementById('valCI');
+  var coEl  = document.getElementById('valCO');
+  var pill  = document.getElementById('nightsPill');
+  ciEl.textContent = drpCI ? fmtShort(drpCI) : 'Add date';
+  ciEl.className   = 's-btn-txt' + (drpCI ? ' set' : '');
+  coEl.textContent = drpCO ? fmtShort(drpCO) : 'Add date';
+  coEl.className   = 's-btn-txt' + (drpCO ? ' set' : '');
+  if (drpCI && drpCO) {
+    var n = Math.round((new Date(drpCO)-new Date(drpCI))/864e5);
+    pill.textContent    = n + ' night' + (n!==1?'s':'');
+    pill.style.display  = 'inline-block';
+    // Sync to sticky card inputs
+    document.getElementById('s-ci').value = drpCI;
+    document.getElementById('s-co').value = drpCO;
+    updateStickyCard();
+  } else {
+    pill.style.display = 'none';
+  }
+}
+
+function heroCheck() {
+  if (!drpCI || !drpCO) { openDrp(); return; }
+  var g = document.getElementById('hg').value;
+  window.location.href = 'booking.html?ci='+drpCI+'&co='+drpCO+'&g='+g;
+}
+
+// ── AVAILABILITY CALENDAR ─────────────────────────────────────
+var homeCal = new MiniCal('homeCalContainer', {
+  onSelect: function(sel) {
+    if (sel.checkIn) {
+      document.getElementById('s-ci').value = sel.checkIn;
+      // Enforce min checkout = next day
+      var nx = new Date(sel.checkIn); nx.setDate(nx.getDate()+1);
+      document.getElementById('s-co').min = nx.toISOString().split('T')[0];
+      var co = document.getElementById('s-co').value;
+      if (co && co <= sel.checkIn) document.getElementById('s-co').value = '';
     }
-  });
-
-  // ── STICKY CARD ───────────────────────────────────────────
-  function stickyCIChanged() {
-    const ci = document.getElementById('s-ci').value;
-    if (ci) {
-      // Set min checkout to day after checkin
-      const minCO = new Date(ci);
-      minCO.setDate(minCO.getDate() + 1);
-      document.getElementById('s-co').min = minCO.toISOString().split('T')[0];
-      // Clear checkout if it's before new checkin
-      const co = document.getElementById('s-co').value;
-      if (co && co <= ci) document.getElementById('s-co').value = '';
+    if (sel.checkOut) {
+      document.getElementById('s-co').value = sel.checkOut;
     }
     updateStickyCard();
   }
+});
 
-  function updateStickyCard() {
-    const ci = document.getElementById('s-ci').value;
-    const co = document.getElementById('s-co').value;
-    const g  = document.getElementById('s-g').value;
-    const p  = calcPrice(ci, co, g);
-    const bk = document.getElementById('stickyBreakdown');
-    document.getElementById('stickyUrgency').querySelector('span').textContent = getUrgencyMsg(ci, co);
-    if (p) {
-      let html = `<div class="price-row"><span>${p.nights} nights × ${fmtAUD(p.avgNightly)}</span><span>${fmtAUD(p.nightlyTotal)}</span></div>`;
-      if (p.discountAmt > 0) html += `<div class="price-row" style="color:var(--green-d)"><span>Discount (${Math.round(p.losDiscount*100)}%)</span><span>−${fmtAUD(p.discountAmt)}</span></div>`;
-      html += `<div class="price-row"><span>Cleaning fee</span><span>${fmtAUD(p.cleaningFee)}</span></div>`;
-      html += `<div class="price-row tot"><span>Total</span><span>${fmtAUD(p.total)}</span></div>`;
-      document.getElementById('stickyBK').innerHTML = html;
-      bk.style.display = 'block';
-      document.getElementById('stickyBtn').href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
-    } else {
-      bk.style.display = 'none';
-    }
-    homeCal.setRange(ci, co);
+// ── STICKY CARD ───────────────────────────────────────────────
+document.getElementById('s-ci').addEventListener('change', function() {
+  var ci = this.value;
+  if (ci) {
+    var nx = new Date(ci); nx.setDate(nx.getDate()+1);
+    document.getElementById('s-co').min = nx.toISOString().split('T')[0];
+    var co = document.getElementById('s-co').value;
+    if (co && co <= ci) document.getElementById('s-co').value = '';
+    // Sync big calendar to show selection
+    homeCal.ci = ci; homeCal.co = null; homeCal.renderDays();
   }
+  updateStickyCard();
+});
 
-  // Pre-fill from URL params
-  const pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-  if (pci) { document.getElementById('s-c
+document.getElementById('s-co').addEventListener('change', updateStickyCard);
+document.getElementById('s-g').addEventListener('change', updateStickyCard);
+
+function updateStickyCard() {
+  var ci = document.getElementById('s-ci').value;
+  var co = document.getElementById('s-co').value;
+  var g  = document.getElementById('s-g').value;
+  var p  = calcPrice(ci, co, g);
+  var urgEl = document.getElementById('stickyUrgency').querySelector('span');
+  urgEl.textContent = getUrgencyMsg(ci, co);
+  var bk = document.getElementById('stickyBreakdown');
+  if (p) {
+    var h = '<div class="price-row"><span>'+p.nights+' nights × '+fmtAUD(p.avgNightly)+'</span><span>'+fmtAUD(p.nightlyTotal)+'</span></div>';
+    if (p.discountAmt > 0) h += '<div class="price-row" style="color:var(--green-d)"><span>Discount ('+Math.round(p.losDiscount*100)+'%)</span><span>−'+fmtAUD(p.discountAmt)+'</span></div>';
+    h += '<div class="price-row"><span>Cleaning fee</span><span>'+fmtAUD(p.cleaningFee)+'</span></div>';
+    h += '<div class="price-row tot"><span>Total</span><span>'+fmtAUD(p.total)+'</span></div>';
+    document.getElementById('stickyBK').innerHTML = h;
+    bk.style.display = 'block';
+    document.getElementById('stickyBtn').href = 'booking.html?ci='+ci+'&co='+co+'&g='+g;
+  } else {
+    bk.style.display = 'none';
+    document.getElementById('stickyBtn').href = 'booking.html';
+  }
+  if (ci || co) homeCal.setRange(ci, co);
+}
+
+// ── PRE-FILL FROM URL & INIT ──────────────────────────────────
+var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
+if (pci) { document.getElementById('s-ci').value = pci; drpCI = pci; }
+if (pco) { document.getElementById('s-co').value = pco; drpCO = pco; }
+if (pg)  { document.getElementById('s-g').value  = pg; }
+if (pci || pco) { drpSyncDisplay(); updateStickyCard(); }
+
+// Set today as minimum for check-in
+document.getElementById('s-ci').min = TODAY;
+document.getElementById('s-co').min = TODAY;
+
+// Load server availability AFTER everything is set up
+loadAvailability().then(function() {
+  homeCal.renderDays();
+  drpRender();
+});
+</script>
+</body>
+</html>
