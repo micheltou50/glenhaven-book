@@ -40,7 +40,7 @@
     .nights-badge{background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;margin-left:.4rem;display:none}
 
     /* CALENDAR DROPDOWN */
-    .drp-wrap{position:absolute;top:calc(100% + 8px);left:0;z-index:9999;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;min-width:640px;max-height:80vh;overflow-y:auto}
+    .drp-wrap{position:fixed;top:auto;left:auto;z-index:9999;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:1.25rem 1.5rem;display:none;min-width:640px;max-height:80vh;overflow-y:auto}
     .drp-wrap.open{display:block}
     .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
     .drp-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
@@ -376,7 +376,14 @@
 
   function drpOpen(mode) {
     drpMode = mode;
-    document.getElementById('drpWrap').classList.add('open');
+    const wrap = document.getElementById('drpWrap');
+    const box  = document.getElementById('heroSearch').getBoundingClientRect();
+    wrap.style.top  = (box.bottom + window.scrollY + 8) + 'px';
+    wrap.style.left = box.left + 'px';
+    // Keep within viewport width
+    const maxLeft = window.innerWidth - 660;
+    if (box.left > maxLeft) wrap.style.left = Math.max(8, maxLeft) + 'px';
+    wrap.classList.add('open');
     document.getElementById('sfCI').querySelector('.s-val').classList.add('active');
     document.getElementById('sfCO').querySelector('.s-val').classList.add('active');
     drpUpdateHint();
@@ -433,21 +440,25 @@
   function drpClick(iso) {
     if (iso < TODAY || isDateBlocked(iso)) return;
     if (!drpCI || (drpCI && drpCO)) {
+      // Start fresh — set check-in, keep open for check-out
+      drpCI = iso; drpCO = null; drpMode = 'co';
+    } else if (iso <= drpCI) {
+      // Clicked earlier than check-in — reset
       drpCI = iso; drpCO = null; drpMode = 'co';
     } else {
-      if (iso <= drpCI) { drpCI = iso; drpCO = null; drpMode = 'co'; }
-      else {
-        // Check no blocked dates in range
-        const blocked = isRangeBlocked(drpCI, iso);
-        if (blocked) { alert('A booked date falls within this range. Please choose different dates.'); return; }
-        drpCO = iso;
-        drpMode = null;
-        drpUpdateDisplay();
-        setTimeout(drpClose, 300);
+      // Setting check-out
+      if (isRangeBlocked(drpCI, iso)) {
+        alert('A booked date falls within this range. Please choose different dates.');
+        return;
       }
+      drpCO = iso;
+      drpMode = null;
     }
+    drpUpdateDisplay();  // always update display
     drpRender();
     drpUpdateHint();
+    // Only close once both dates selected
+    if (drpCI && drpCO) setTimeout(drpClose, 400);
   }
 
   function drpHover(iso) {
@@ -513,17 +524,25 @@
     onSelect: ({ checkIn, checkOut }) => {
       if (checkIn) {
         document.getElementById('s-ci').value = checkIn;
-        // Set min checkout to day after checkin
+        // Update checkout minimum
         const minCO = new Date(checkIn);
         minCO.setDate(minCO.getDate() + 1);
-        document.getElementById('s-co').min = minCO.toISOString().split('T')[0];
-        // Clear checkout if now invalid
+        const minCOStr = minCO.toISOString().split('T')[0];
+        document.getElementById('s-co').min = minCOStr;
         const co = document.getElementById('s-co').value;
         if (co && co <= checkIn) document.getElementById('s-co').value = '';
       }
       if (checkOut) {
         document.getElementById('s-co').value = checkOut;
-        updateStickyCard();
+      }
+      // Always update sidebar pricing
+      updateStickyCard();
+      // If both dates selected, update Reserve button href
+      const ci = document.getElementById('s-ci').value;
+      const co = document.getElementById('s-co').value;
+      if (ci && co) {
+        const g = document.getElementById('s-g').value;
+        document.getElementById('stickyBtn').href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
       }
     }
   });
