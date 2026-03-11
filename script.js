@@ -132,41 +132,22 @@ function fmtAUD(n) { return '$' + Number(n).toLocaleString('en-AU', { minimumFra
 function getParam(k) { return new URLSearchParams(window.location.search).get(k); }
 
 // ── BOOKING STORE ─────────────────────────────────────────────
-function getBookings() { return JSON.parse(localStorage.getItem('gh_bookings') || '[]'); }
-function saveBooking(b) {
-  const arr = getBookings();
-  arr.push(b);
-  localStorage.setItem('gh_bookings', JSON.stringify(arr));
-  rebuildBlockedRanges();
-}
-function deleteBooking(id) {
-  const arr = getBookings().filter(b => b.id !== id);
-  localStorage.setItem('gh_bookings', JSON.stringify(arr));
-  rebuildBlockedRanges();
-}
-
-// Blocked ranges = bookings + manual blocks
-function getBlocks() { return JSON.parse(localStorage.getItem('gh_blocks') || '[]'); }
-function saveBlock(b) {
-  const arr = getBlocks();
-  arr.push(b);
-  localStorage.setItem('gh_blocks', JSON.stringify(arr));
-  rebuildBlockedRanges();
-}
-function deleteBlock(id) {
-  const arr = getBlocks().filter(b => b.id !== id);
-  localStorage.setItem('gh_blocks', JSON.stringify(arr));
-  rebuildBlockedRanges();
-}
+// No localStorage caching — always fetched fresh from server.
+// This ensures deletions from the Sheet are reflected immediately.
 
 let _blockedRanges = [];
+
 function rebuildBlockedRanges() {
-  _blockedRanges = [];
-  getBookings().forEach(b => _blockedRanges.push({ start: b.checkIn, end: b.checkOut, id: b.id }));
-  getBlocks().forEach(b   => _blockedRanges.push({ start: b.start,   end: b.end,      id: b.id }));
-  localStorage.setItem('gh_blocked', JSON.stringify(_blockedRanges));
+  // _blockedRanges is populated entirely from server — no local state
 }
-rebuildBlockedRanges();
+
+// Kept for admin.html compatibility — returns empty, admin reads from server
+function getBookings() { return []; }
+function getBlocks()   { return []; }
+function saveBooking(b) {}
+function deleteBooking(id) {}
+function saveBlock(b) {}
+function deleteBlock(id) {}
 
 function isDateBlocked(iso) {
   const d = new Date(iso); d.setHours(0,0,0,0);
@@ -457,30 +438,18 @@ function getUrgencyMsg(checkIn, checkOut) {
 }
 
 // ── AVAILABILITY — fetch real booked dates from Google Sheet ──
-// Merges server-confirmed bookings with local admin blocks
+// Fetches blocked ranges fresh from server every page load — no caching.
+// Deletions from the Sheet are reflected immediately on next page load.
 async function loadAvailability() {
   try {
-    const url  = CONFIG.AVAIL_URL;
-    const res  = await fetch(url);
+    const res  = await fetch(CONFIG.AVAIL_URL);
     const data = await res.json();
-    if (data.success && Array.isArray(data.ranges) && data.ranges.length > 0) {
-      // Add any server-confirmed ranges not already in local storage
-      const existing = getBookings().map(b => b.checkIn + b.checkOut);
-      for (const r of data.ranges) {
-        const key = r.start + r.end;
-        if (!existing.includes(key)) {
-          // Add as a synthetic confirmed booking so rebuildBlockedRanges picks it up
-          const arr = getBookings();
-          arr.push({ id: 'srv-' + key, checkIn: r.start, checkOut: r.end, source: 'server' });
-          localStorage.setItem('gh_bookings', JSON.stringify(arr));
-          existing.push(key);
-        }
-      }
-      rebuildBlockedRanges();
+    if (data.success && Array.isArray(data.ranges)) {
+      _blockedRanges = data.ranges.map(r => ({ start: r.start, end: r.end }));
     }
   } catch (err) {
     console.error('Availability API failed:', err.message);
-    // Graceful degradation — calendar still works from cached localStorage data
+    _blockedRanges = []; // fail open — show all dates as available
   }
 }
 
@@ -508,9 +477,9 @@ function storePendingBooking(payload, total) {
 
 // ── COMPATIBILITY ALIASES ─────────────────────────────────────
 // Some HTML pages use older function names — these bridge the gap
-function getLocalBookings()            { return getBookings(); }
+function getLocalBookings()            { return []; }
 function addLocalBooking(b)            { saveBooking(b); }
 function deleteLocalBooking(id)        { deleteBooking(id); }
 function isRangeAvailable(ci, co)      { return !isRangeBlocked(ci, co); }
 function getBookedRanges()             { return _blockedRanges; }
-function setBookedRanges(r)            { localStorage.setItem('gh_bookings', JSON.stringify(r)); rebuildBlockedRanges(); }
+function setBookedRanges(r)            { _blockedRanges = r.map(b => ({ start: b.checkIn || b.start, end: b.checkOut || b.end })); }
