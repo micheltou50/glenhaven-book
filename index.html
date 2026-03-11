@@ -8,62 +8,84 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     /* HERO */
-    .hero { position: relative; height: 95vh; min-height: 600px; display: flex; align-items: center; overflow: hidden; }
-    .hero-bg { position: absolute; inset: 0; background: url('https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg') center/cover no-repeat; transform: scale(1.04); transition: transform 10s ease-out; will-change: transform; }
-    .hero:hover .hero-bg { transform: scale(1); }
-    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(105deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.3) 55%, rgba(0,0,0,.52) 100%); }
-    .hero-content { position: relative; z-index: 2; max-width: 680px; padding: 0 1.5rem; }
-    .hero-tag { display: inline-flex; align-items: center; gap: .4rem; background: rgba(255,255,255,.14); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.22); border-radius: 100px; padding: .35rem .9rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; color: rgba(255,255,255,.9); margin-bottom: 1.1rem; }
-    .hero h1 { color: #fff; margin-bottom: .85rem; }
-    .hero-sub { font-size: clamp(.95rem,2vw,1.1rem); color: rgba(255,255,255,.75); line-height: 1.6; max-width: 500px; margin-bottom: 2.2rem; }
-    .hero-stats { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-    .hero-stat { background: rgba(255,255,255,.12); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.18); border-radius: 10px; padding: .55rem 1rem; text-align: center; }
-    .hero-stat strong { display: block; font-size: 1.1rem; font-weight: 700; color: #fff; }
-    .hero-stat span { font-size: .68rem; color: rgba(255,255,255,.6); letter-spacing: .08em; text-transform: uppercase; }
-    .hero-scroll { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .35rem; z-index: 2; opacity: 0; animation: fadeIn 1s 1.5s forwards; }
-    .hero-scroll span { font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.45); }
-    .hero-scroll-line { width: 1px; height: 38px; background: linear-gradient(to bottom, rgba(255,255,255,.45), transparent); animation: scrollPulse 2s 2s infinite; }
-    @keyframes scrollPulse { 0%,100%{opacity:.4}50%{opacity:1} }
-    @keyframes fadeIn { to { opacity: 1; } }
-    .hero-content > * { animation: heroUp .7s ease both; }
-    .hero-tag    { animation-delay: .2s; }
-    .hero h1     { animation-delay: .4s; }
-    .hero-sub    { animation-delay: .55s; }
-    .hero-stats  { animation-delay: .7s; }
-    #heroSearch  { animation-delay: .85s; }
-    @keyframes heroUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+    .hero{position:relative;height:95vh;min-height:600px;display:flex;align-items:center;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background:url('https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg') center/cover no-repeat;transform:scale(1.04);transition:transform 10s ease-out}
+    .hero:hover .hero-bg{transform:scale(1)}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.5) 100%)}
+    .hero-content{position:relative;z-index:2;max-width:700px;padding:0 1.5rem}
+    .hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:.35rem .9rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.9);margin-bottom:1.1rem}
+    .hero h1{color:#fff;margin-bottom:.85rem}
+    .hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:rgba(255,255,255,.75);line-height:1.6;max-width:500px;margin-bottom:2.2rem}
+    .hero-stats{display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:2.5rem}
+    .hero-stat{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.55rem 1rem;text-align:center}
+    .hero-stat strong{display:block;font-size:1.1rem;font-weight:700;color:#fff}
+    .hero-stat span{font-size:.68rem;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase}
+    .hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.35rem;z-index:2;opacity:0;animation:fadeIn 1s 1.5s forwards}
+    .hero-scroll span{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+    .hero-scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,rgba(255,255,255,.45),transparent);animation:scrollPulse 2s 2s infinite}
+    @keyframes scrollPulse{0%,100%{opacity:.4}50%{opacity:1}}
+    @keyframes fadeIn{to{opacity:1}}
+    .hero-content>*{animation:heroUp .7s ease both}
+    .hero-tag{animation-delay:.2s}.hero h1{animation-delay:.4s}.hero-sub{animation-delay:.55s}.hero-stats{animation-delay:.7s}#heroSearch{animation-delay:.85s}
+    @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
-    /* SEARCH BOX */
-    .search-box { background: rgba(255,255,255,.96); backdrop-filter: blur(12px); border-radius: 16px; padding: 1rem 1.2rem; display: flex; align-items: flex-end; gap: .8rem; flex-wrap: wrap; box-shadow: 0 20px 60px rgba(0,0,0,.3); max-width: 620px; }
-    .s-field { flex: 1; min-width: 120px; }
-    .s-field label { display: block; font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #111; margin-bottom: .3rem; }
-    .s-field input, .s-field select { width: 100%; border: none; border-bottom: 1.5px solid var(--g200); padding: .35rem 0; font-size: .9rem; background: transparent; color: #111; outline: none; transition: border-color .18s; }
-    .s-field input:focus, .s-field select:focus { border-color: var(--green); }
-    .s-divider { width: 1px; background: var(--g200); align-self: stretch; margin: .2rem 0; flex-shrink: 0; }
+    /* DATE RANGE PICKER */
+    .search-box{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:16px;padding:1rem 1.2rem;display:flex;align-items:flex-end;gap:.8rem;flex-wrap:wrap;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:660px;position:relative}
+    .s-field{flex:1;min-width:130px;position:relative}
+    .s-field label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111;margin-bottom:.3rem}
+    .s-field .s-val{padding:.35rem 0;font-size:.9rem;color:#111;border:none;border-bottom:1.5px solid var(--g200);cursor:pointer;background:transparent;min-height:2rem;transition:border-color .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .s-field .s-val:hover,.s-field .s-val.active{border-color:var(--green)}
+    .s-field .s-placeholder{color:var(--g400)}
+    .s-divider{width:1px;background:var(--g200);align-self:stretch;margin:.2rem 0;flex-shrink:0}
+    .nights-badge{background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;margin-left:.4rem;display:none}
+
+    /* CALENDAR DROPDOWN */
+    .drp-wrap{position:absolute;top:calc(100% + 8px);left:0;z-index:200;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:1.25rem 1.5rem;display:none;min-width:620px}
+    .drp-wrap.open{display:block}
+    .drp-months{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+    .drp-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+    .drp-month-title{font-weight:700;font-size:.95rem}
+    .drp-nav{width:28px;height:28px;border-radius:50%;background:var(--g100);border:1px solid var(--g200);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .15s}
+    .drp-nav:hover{background:var(--black);color:#fff}
+    .drp-nav.hidden{visibility:hidden}
+    .drp-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+    .drp-dow span{text-align:center;font-size:.65rem;font-weight:600;color:var(--g400);padding:.2rem 0}
+    .drp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+    .drp-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r-sm);font-size:.82rem;cursor:pointer;transition:background .1s,color .1s;position:relative;user-select:none}
+    .drp-day.empty{cursor:default}
+    .drp-day.past,.drp-day.blocked{color:var(--g300);cursor:not-allowed}
+    .drp-day.blocked{text-decoration:line-through;background:var(--g100)}
+    .drp-day.avail:hover:not(.sel-s):not(.sel-e){background:var(--green-p)}
+    .drp-day.sel-s,.drp-day.sel-e{background:var(--green)!important;color:#fff!important;font-weight:700;border-radius:var(--r-sm)}
+    .drp-day.in-r,.drp-day.in-h{background:var(--green-p);color:var(--green-d);border-radius:0}
+    .drp-day.sel-s.in-r,.drp-day.sel-e.in-r{background:var(--green)!important;color:#fff!important}
+    .drp-footer{margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--g500)}
+    .drp-hint{font-size:.8rem;color:var(--g500)}
+    .drp-clear{background:none;border:none;cursor:pointer;color:var(--g400);text-decoration:underline;font-size:.8rem}
+    .drp-clear:hover{color:var(--black)}
 
     /* SECTION HEADERS */
-    .sec-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
 
-    /* PROPERTY STORY */
-    #story { background: #fff; }
-    .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-    .story-img { border-radius: var(--r-xl); overflow: hidden; height: 420px; box-shadow: var(--sh-lg); }
-    .story-img img { width: 100%; height: 100%; object-fit: cover; }
-    .story-text blockquote { font-size: 1.1rem; font-style: italic; line-height: 1.75; color: var(--g700); border-left: 3px solid var(--green); padding-left: 1.2rem; margin: 1.25rem 0; }
-    .story-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+    /* STORY */
+    #story{background:#fff}
+    .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .story-img{border-radius:var(--r-xl);overflow:hidden;height:420px;box-shadow:var(--sh-lg)}
+    .story-img img{width:100%;height:100%;object-fit:cover}
+    .story-text blockquote{font-size:1.1rem;font-style:italic;line-height:1.75;color:var(--g700);border-left:3px solid var(--green);padding-left:1.2rem;margin:1.25rem 0}
+    .story-badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
 
     /* AVAILABILITY + SIDEBAR */
-    .avail-layout { display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start; }
+    .avail-layout{display:grid;grid-template-columns:1fr 360px;gap:2.5rem;align-items:start}
 
-    @media (max-width: 1024px) {
-      .story-grid { grid-template-columns: 1fr; }
-      .story-img { height: 300px; }
-      .avail-layout { grid-template-columns: 1fr; }
-      .sticky-wrap { position: static; }
+    @media(max-width:1024px){
+      .story-grid{grid-template-columns:1fr}.story-img{height:300px}
+      .avail-layout{grid-template-columns:1fr}.sticky-wrap{position:static}
+      .drp-wrap{min-width:320px}.drp-months{grid-template-columns:1fr}
     }
-    @media (max-width: 768px) {
-      .search-box { flex-direction: column; }
-      .s-divider { display: none; }
+    @media(max-width:768px){
+      .search-box{flex-direction:column}.s-divider{display:none}
+      .drp-wrap{min-width:calc(100vw - 3rem);left:0}
     }
   </style>
 </head>
@@ -75,10 +97,10 @@
     <div class="container nav-inner">
       <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="#photos">Gallery</a></li>
-        <li><a href="#amenities">Amenities</a></li>
-        <li><a href="#location">Location</a></li>
-        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="amenities.html">Amenities</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="reviews.html">Reviews</a></li>
         <li><a href="booking.html" class="nav-cta">Book Now</a></li>
       </ul>
       <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
@@ -100,20 +122,22 @@
       <div class="hero-stat"><strong>2.5</strong><span>Bathrooms</span></div>
       <div class="hero-stat"><strong>5.0★</strong><span>Rating</span></div>
     </div>
+
+    <!-- DATE RANGE PICKER -->
     <div class="search-box" id="heroSearch">
-      <div class="s-field">
-        <label for="hci">Check-in</label>
-        <input type="date" id="hci"/>
+      <div class="s-field" id="sfCI">
+        <label>Check-in</label>
+        <div class="s-val s-placeholder" id="ciVal" onclick="drpOpen('ci')">Add date</div>
       </div>
       <div class="s-divider"></div>
-      <div class="s-field">
-        <label for="hco">Check-out</label>
-        <input type="date" id="hco"/>
+      <div class="s-field" id="sfCO">
+        <label>Check-out <span class="nights-badge" id="nightsBadge"></span></label>
+        <div class="s-val s-placeholder" id="coVal" onclick="drpOpen('co')">Add date</div>
       </div>
       <div class="s-divider"></div>
-      <div class="s-field">
-        <label for="hg">Guests</label>
-        <select id="hg">
+      <div class="s-field" style="min-width:110px;">
+        <label>Guests</label>
+        <select id="hg" style="width:100%;border:none;border-bottom:1.5px solid var(--g200);padding:.35rem 0;font-size:.9rem;background:transparent;color:#111;outline:none;">
           <option value="1">1 guest</option>
           <option value="2" selected>2 guests</option>
           <option value="3">3 guests</option>
@@ -125,39 +149,39 @@
         </select>
       </div>
       <button class="btn btn-black" onclick="heroCheck()">Check Availability</button>
+
+      <!-- DROPDOWN CALENDAR -->
+      <div class="drp-wrap" id="drpWrap">
+        <div class="drp-months">
+          <div>
+            <div class="drp-month-head">
+              <button class="drp-nav" id="drpPrev" onclick="drpShift(-1)">‹</button>
+              <span class="drp-month-title" id="drpTitle0"></span>
+              <button class="drp-nav hidden"></button>
+            </div>
+            <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+            <div class="drp-grid" id="drpGrid0"></div>
+          </div>
+          <div>
+            <div class="drp-month-head">
+              <button class="drp-nav hidden"></button>
+              <span class="drp-month-title" id="drpTitle1"></span>
+              <button class="drp-nav" id="drpNext" onclick="drpShift(1)">›</button>
+            </div>
+            <div class="drp-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+            <div class="drp-grid" id="drpGrid1"></div>
+          </div>
+        </div>
+        <div class="drp-footer">
+          <span class="drp-hint" id="drpHint">Select check-in date</span>
+          <button class="drp-clear" onclick="drpClear()">Clear dates</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="hero-scroll">
     <span>Scroll</span>
     <div class="hero-scroll-line"></div>
-  </div>
-</section>
-
-<!-- PHOTO STRIP -->
-<section id="photos" class="section-sm" style="background:#fff;">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div>
-        <span class="eyebrow">The Space</span>
-        <h2>Experience Glenhaven</h2>
-      </div>
-      <a href="booking.html" class="btn btn-outline btn-sm">Book your stay</a>
-    </div>
-    <div class="photo-strip-outer">
-      <div class="photo-strip" id="photoStrip">
-        <div class="ps-item" onclick="openLightbox(0)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven exterior"/></div>
-        <div class="ps-item" onclick="openLightbox(1)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Living room"/></div>
-        <div class="ps-item" onclick="openLightbox(2)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg" alt="Kitchen"/></div>
-        <div class="ps-item" onclick="openLightbox(3)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg" alt="Bedroom"/></div>
-        <div class="ps-item" onclick="openLightbox(4)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg" alt="Garden"/></div>
-        <div class="ps-item" onclick="openLightbox(0)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Cottage evening"/></div>
-        <div class="ps-item" onclick="openLightbox(1)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Dining area"/></div>
-        <div class="ps-item" onclick="openLightbox(2)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg" alt="Conservatory"/></div>
-        <div class="ps-item" onclick="openLightbox(3)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg" alt="Master bedroom"/></div>
-        <div class="ps-item" onclick="openLightbox(4)"><img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg" alt="Outdoor space"/></div>
-      </div>
-      <div class="ps-fade"></div>
-    </div>
   </div>
 </section>
 
@@ -196,58 +220,30 @@
       <div class="hl-card reveal"><span class="hl-icon">🔥</span><h3>Wood Fireplace</h3><p>Cosy up beside a crackling real wood fire after a day in the mountains.</p></div>
       <div class="hl-card reveal"><span class="hl-icon">🌿</span><h3>Conservatory</h3><p>Sun-drenched glass room perfect for morning coffee surrounded by greenery.</p></div>
       <div class="hl-card reveal"><span class="hl-icon">🌲</span><h3>Quiet Location</h3><p>Peaceful street away from traffic — just birdsong and mountain air.</p></div>
-      <div class="hl-card reveal"><span class="hl-icon">🏡</span><h3>Private Garden</h3><p>Expansive outdoor space and entertaning area for the whole group.</p></div>
+      <div class="hl-card reveal"><span class="hl-icon">🏡</span><h3>Private Garden</h3><p>Expansive outdoor space and entertaining area for the whole group.</p></div>
       <div class="hl-card reveal"><span class="hl-icon">🏔️</span><h3>Iconic Views</h3><p>10 minutes from the Three Sisters, Echo Point and all the best lookouts.</p></div>
-      <div class="hl-card reveal" style="grid-column: span 1;"><span class="hl-icon">🔐</span><h3>Smart Lock</h3><p>Self check-in any time — a door code is sent before your arrival.</p></div>
+      <div class="hl-card reveal"><span class="hl-icon">🔐</span><h3>Smart Lock</h3><p>Self check-in any time — a door code is sent before your arrival.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- AMENITIES -->
-<section id="amenities" class="section">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div>
-        <span class="eyebrow">What's included</span>
-        <h2>Amenities</h2>
-      </div>
-      <p style="font-size:.85rem;color:var(--g400);">59 amenities total</p>
+    <div class="text-center reveal" style="margin-top:2rem;">
+      <a href="amenities.html" class="btn btn-outline">View all 59 amenities →</a>
     </div>
-    <div class="am-grid reveal">
-      <div class="am-item"><span class="am-icon">📶</span>Fast WiFi</div>
-      <div class="am-item"><span class="am-icon">🍳</span>Full kitchen</div>
-      <div class="am-item"><span class="am-icon">🔥</span>Fireplace</div>
-      <div class="am-item"><span class="am-icon">🌡️</span>Heating</div>
-      <div class="am-item"><span class="am-icon">🚗</span>Free parking</div>
-      <div class="am-item"><span class="am-icon">🏡</span>Outdoor area</div>
-      <div class="am-item"><span class="am-icon">📺</span>Smart TV</div>
-      <div class="am-item"><span class="am-icon">🫧</span>Washer/dryer</div>
-      <div class="am-item"><span class="am-icon">🛁</span>Bath</div>
-      <div class="am-item"><span class="am-icon">☕</span>Coffee maker</div>
-      <div class="am-item"><span class="am-icon">🍷</span>Wine glasses</div>
-      <div class="am-item"><span class="am-icon">🌿</span>Conservatory</div>
-      <div class="am-item"><span class="am-icon">🛏️</span>4 bedrooms</div>
-      <div class="am-item"><span class="am-icon">🚿</span>2.5 bathrooms</div>
-      <div class="am-item"><span class="am-icon">🎲</span>Board games</div>
-      <div class="am-item"><span class="am-icon">📚</span>Book library</div>
-    </div>
-    <p class="reveal" style="margin-top:1rem;font-size:.82rem;color:var(--g400);">Check-in from 3:00 pm · Check-out by 10:00 am</p>
   </div>
 </section>
 
 <!-- AVAILABILITY + STICKY CARD -->
-<section id="availability" class="section-sm" style="background:#fff;">
+<section id="availability" class="section-sm" style="background:#f7f7f7;">
   <div class="container">
     <div class="avail-layout">
       <div>
         <div class="reveal" style="margin-bottom:2rem;">
           <span class="eyebrow">Availability</span>
           <h2>Check open dates</h2>
+          <p style="margin-top:.4rem;color:var(--g500);font-size:.9rem;">Booked dates are crossed out. Select dates to see pricing.</p>
         </div>
         <div id="homeCalContainer" class="reveal"></div>
-        <div id="homeCalLegend" class="cal-legend reveal">
+        <div class="cal-legend reveal" style="margin-top:.75rem;">
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Selected</div>
-          <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--g100);border:1px solid var(--g300)"></div>Unavailable</div>
+          <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--g100);border:1px solid var(--g300)"></div>Booked</div>
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green-p)"></div>In range</div>
         </div>
       </div>
@@ -269,7 +265,7 @@
                 <option value="7">7 guests</option><option value="8">8 guests</option>
               </select>
             </div>
-            <div id="stickyBreakdown" style="display:none; margin-bottom:.75rem;">
+            <div id="stickyBreakdown" style="display:none;margin-bottom:.75rem;">
               <div class="price-bk" id="stickyBK"></div>
             </div>
             <a href="booking.html" class="btn btn-primary btn-full btn-lg" id="stickyBtn">Reserve</a>
@@ -282,98 +278,6 @@
             </ul>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- REVIEWS -->
-<section id="reviews" class="section">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div>
-        <span class="eyebrow">Guest Reviews</span>
-        <h2>What guests say</h2>
-      </div>
-      <div style="display:flex;align-items:center;gap:1.5rem;">
-        <div style="text-align:center;">
-          <div style="font-size:2.5rem;font-weight:800;letter-spacing:-.04em;">5.0</div>
-          <div class="stars">★★★★★</div>
-          <div style="font-size:.75rem;color:var(--g400);margin-top:.2rem;">Guest favourite</div>
-        </div>
-        <div class="car-arrows">
-          <button class="car-arrow" id="revPrev">‹</button>
-          <button class="car-arrow" id="revNext">›</button>
-        </div>
-      </div>
-    </div>
-    <div class="review-carousel reveal">
-      <div class="review-track" id="revTrack">
-        <div class="review-slide">
-          <div class="review-card">
-            <div class="reviewer-row">
-              <div class="rv-avatar">SM</div>
-              <div><div class="rv-name">Sarah M.</div><div class="rv-date">February 2025 · 4 nights</div></div>
-              <div class="stars" style="margin-left:auto;">★★★★★</div>
-            </div>
-            <p class="review-text">"Glenhaven exceeded every expectation. The fireplace, the conservatory, the garden — it felt like a luxury escape without the price tag. We arrived stressed from Sydney and left completely rejuvenated. The beds are incredibly comfortable and the kitchen has everything you need. We'll absolutely be back."</p>
-          </div>
-        </div>
-        <div class="review-slide">
-          <div class="review-card">
-            <div class="reviewer-row">
-              <div class="rv-avatar">TR</div>
-              <div><div class="rv-name">Tom & Rebecca</div><div class="rv-date">January 2025 · 5 nights</div></div>
-              <div class="stars" style="margin-left:auto;">★★★★★</div>
-            </div>
-            <p class="review-text">"Perfect family getaway for 6 of us. The kids loved the garden and board games, the adults loved the fireplace and wine. 10 minutes from the Three Sisters — couldn't ask for a better base. The smart lock made check-in effortless. Host was incredibly responsive. Highly recommend."</p>
-          </div>
-        </div>
-        <div class="review-slide">
-          <div class="review-card">
-            <div class="reviewer-row">
-              <div class="rv-avatar">PK</div>
-              <div><div class="rv-name">Priya K.</div><div class="rv-date">March 2025 · 3 nights</div></div>
-              <div class="stars" style="margin-left:auto;">★★★★★</div>
-            </div>
-            <p class="review-text">"The conservatory in the morning with coffee is something I'll never forget. Incredibly peaceful, beautifully maintained, and Chaddy was so responsive. We did day trips to Echo Point and the Scenic Railway then came back to a warm cottage each evening. Pure bliss."</p>
-          </div>
-        </div>
-        <div class="review-slide">
-          <div class="review-card">
-            <div class="reviewer-row">
-              <div class="rv-avatar">JW</div>
-              <div><div class="rv-name">James W.</div><div class="rv-date">December 2024 · 7 nights</div></div>
-              <div class="stars" style="margin-left:auto;">★★★★★</div>
-            </div>
-            <p class="review-text">"Spent Christmas week here with extended family — 8 of us — and it was absolutely perfect. Plenty of room, a stunning garden for the kids, and the fireplace made Christmas morning magical. The property is even better in person than the photos suggest. Will be booking again for next year."</p>
-          </div>
-        </div>
-      </div>
-      <div class="car-dots" id="revDots"></div>
-    </div>
-  </div>
-</section>
-
-<!-- LOCATION -->
-<section id="location" class="section-sm" style="background:#fff;">
-  <div class="container">
-    <div class="loc-grid">
-      <div class="reveal">
-        <span class="eyebrow">Getting around</span>
-        <h2>Heart of the<br>Blue Mountains</h2>
-        <p style="margin-top:.6rem;">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
-        <div class="location-places" style="margin-top:1.5rem;">
-          <div class="loc-place"><span class="loc-name">🏔️ Three Sisters Lookout</span><span class="loc-dist">8 min drive</span></div>
-          <div class="loc-place"><span class="loc-name">🌅 Echo Point</span><span class="loc-dist">10 min drive</span></div>
-          <div class="loc-place"><span class="loc-name">☕ Katoomba Town Centre</span><span class="loc-dist">5 min drive</span></div>
-          <div class="loc-place"><span class="loc-name">🌲 Blue Mountains National Park</span><span class="loc-dist">10 min drive</span></div>
-          <div class="loc-place"><span class="loc-name">🚂 Katoomba Train Station</span><span class="loc-dist">6 min drive</span></div>
-          <div class="loc-place"><span class="loc-name">🌆 Sydney CBD</span><span class="loc-dist">~1.5 hr drive</span></div>
-        </div>
-      </div>
-      <div class="map-wrap reveal">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26514.234!2d150.3124!3d-33.7142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b0ce94dc8fc7bab%3A0xc46c02a87bb4a9b7!2sKatoomba%20NSW%202780!5e0!3m2!1sen!2sau" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>
   </div>
@@ -413,10 +317,10 @@
       <div class="footer-col">
         <h4>Property</h4>
         <ul>
-          <li><a href="#photos">Gallery</a></li>
-          <li><a href="#amenities">Amenities</a></li>
-          <li><a href="#location">Location</a></li>
-          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="amenities.html">Amenities</a></li>
+          <li><a href="location.html">Location</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -430,13 +334,13 @@
       </div>
       <div class="footer-col">
         <h4>Stay in touch</h4>
-        <p style="font-size:.82rem;margin-bottom:.1rem;">Get early access to open dates.</p>
+        <p style="font-size:.82rem;margin-bottom:.5rem;">Get early access to open dates.</p>
         <div class="nl-form">
           <input class="nl-input" type="email" placeholder="your@email.com"/>
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="/cdn-cgi/l/email-protection#137e7a707b767f677c66262353747e727a7f3d707c7e"><span class="__cf_email__" data-cfemail="264b4f454e434a524953131666414b474f4a0845494b">[email&#160;protected]</span></a></li>
+          <li><a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a></li>
           <li><a href="admin.html" style="margin-top:.3rem;display:block;">Host login</a></li>
         </ul>
       </div>
@@ -452,52 +356,159 @@
   </div>
 </footer>
 
-<!-- LIGHTBOX -->
-<div id="lightbox">
-  <button class="lb-close" onclick="closeLightbox()">×</button>
-  <button class="lb-arrow lb-prev" onclick="lbShift(-1)">‹</button>
-  <img id="lbImg" src="" alt=""/>
-  <button class="lb-arrow lb-next" onclick="lbShift(1)">›</button>
-</div>
-
 <script src="script.js"></script>
 <script>
-  // Load live availability from Google Sheet
+  // ── Load availability ──────────────────────────────────────
   loadAvailability().then(() => {
     if (typeof homeCal !== 'undefined' && homeCal) homeCal.renderDays();
+    drpRender();
   });
-</script>
-<script>
-  const LB_IMGS = [
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg',
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg',
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
-  ];
-  let lbIdx = 0;
-  function openLightbox(i) { lbIdx=i; document.getElementById('lbImg').src=LB_IMGS[i]; document.getElementById('lightbox').classList.add('open'); }
-  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
-  function lbShift(d) { lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length; document.getElementById('lbImg').src=LB_IMGS[lbIdx]; }
-  document.getElementById('lightbox').addEventListener('click', e => { if(e.target===document.getElementById('lightbox')) closeLightbox(); });
-  document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') lbShift(-1); if(e.key==='ArrowRight') lbShift(1); });
 
-  // Set min dates
-  const today = todayISO();
-  document.getElementById('hci').min = today;
-  document.getElementById('hco').min = today;
-  document.getElementById('s-ci').min = today;
-  document.getElementById('s-co').min = today;
+  // ── DATE RANGE PICKER ─────────────────────────────────────
+  let drpBase = new Date();
+  drpBase.setDate(1);
+  let drpCI = null, drpCO = null, drpHov = null, drpMode = null;
+  const TODAY = todayISO();
 
-  // Hero search
-  function heroCheck() {
-    const ci=document.getElementById('hci').value, co=document.getElementById('hco').value, g=document.getElementById('hg').value;
-    if (!ci||!co) { alert('Please select check-in and check-out dates.'); return; }
-    if (isRangeBlocked(ci,co)) { alert('Those dates are not available. Please choose different dates.'); return; }
-    window.location.href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
+  function drpISO(y, m, d) {
+    return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
   }
 
-  // Home calendar
+  function drpOpen(mode) {
+    drpMode = mode;
+    document.getElementById('drpWrap').classList.add('open');
+    document.getElementById('sfCI').querySelector('.s-val').classList.add('active');
+    document.getElementById('sfCO').querySelector('.s-val').classList.add('active');
+    drpUpdateHint();
+    drpRender();
+  }
+
+  function drpClose() {
+    document.getElementById('drpWrap').classList.remove('open');
+    document.getElementById('sfCI').querySelector('.s-val').classList.remove('active');
+    document.getElementById('sfCO').querySelector('.s-val').classList.remove('active');
+  }
+
+  document.addEventListener('click', e => {
+    if (!document.getElementById('heroSearch').contains(e.target)) drpClose();
+  });
+
+  function drpShift(d) {
+    drpBase.setMonth(drpBase.getMonth() + d);
+    drpRender();
+  }
+
+  function drpRender() {
+    const months = [new Date(drpBase), new Date(drpBase.getFullYear(), drpBase.getMonth()+1, 1)];
+    months.forEach((m, idx) => {
+      document.getElementById('drpTitle'+idx).textContent =
+        m.toLocaleString('default', {month:'long', year:'numeric'});
+      drpRenderGrid(m, idx);
+    });
+  }
+
+  function drpRenderGrid(monthDate, idx) {
+    const grid = document.getElementById('drpGrid'+idx);
+    const y = monthDate.getFullYear(), m = monthDate.getMonth();
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysIn = new Date(y, m+1, 0).getDate();
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += '<div class="drp-day empty"></div>';
+    for (let d = 1; d <= daysIn; d++) {
+      const iso = drpISO(y, m, d);
+      const isPast = iso < TODAY;
+      const isBlocked = isDateBlocked(iso);
+      let cls = 'drp-day';
+      if (isPast || isBlocked) cls += isPast ? ' past' : ' blocked';
+      else cls += ' avail';
+      if (drpCI && iso === drpCI) cls += ' sel-s';
+      if (drpCO && iso === drpCO) cls += ' sel-e';
+      if (drpCI && !drpCO && drpHov && iso > drpCI && iso <= drpHov) cls += ' in-h';
+      if (drpCI && drpCO && iso > drpCI && iso < drpCO) cls += ' in-r';
+      html += `<div class="${cls}" data-iso="${iso}" onclick="drpClick('${iso}')" onmouseenter="drpHover('${iso}')">${d}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  function drpClick(iso) {
+    if (iso < TODAY || isDateBlocked(iso)) return;
+    if (!drpCI || (drpCI && drpCO)) {
+      drpCI = iso; drpCO = null; drpMode = 'co';
+    } else {
+      if (iso <= drpCI) { drpCI = iso; drpCO = null; drpMode = 'co'; }
+      else {
+        // Check no blocked dates in range
+        const blocked = isRangeBlocked(drpCI, iso);
+        if (blocked) { alert('A booked date falls within this range. Please choose different dates.'); return; }
+        drpCO = iso;
+        drpMode = null;
+        drpUpdateDisplay();
+        setTimeout(drpClose, 300);
+      }
+    }
+    drpRender();
+    drpUpdateHint();
+  }
+
+  function drpHover(iso) {
+    if (drpCI && !drpCO) { drpHov = iso; drpRender(); }
+  }
+
+  function drpClear() {
+    drpCI = null; drpCO = null; drpHov = null; drpMode = 'ci';
+    drpUpdateDisplay();
+    drpRender();
+    drpUpdateHint();
+  }
+
+  function drpUpdateDisplay() {
+    const ciEl = document.getElementById('ciVal');
+    const coEl = document.getElementById('coVal');
+    const badge = document.getElementById('nightsBadge');
+    if (drpCI) {
+      ciEl.textContent = fmtShort(drpCI);
+      ciEl.classList.remove('s-placeholder');
+    } else {
+      ciEl.textContent = 'Add date';
+      ciEl.classList.add('s-placeholder');
+    }
+    if (drpCO) {
+      coEl.textContent = fmtShort(drpCO);
+      coEl.classList.remove('s-placeholder');
+      const n = Math.round((new Date(drpCO) - new Date(drpCI)) / 86400000);
+      badge.textContent = n + ' night' + (n !== 1 ? 's' : '');
+      badge.style.display = 'inline-block';
+    } else {
+      coEl.textContent = 'Add date';
+      coEl.classList.add('s-placeholder');
+      badge.style.display = 'none';
+    }
+    // Sync to sticky card
+    if (drpCI) document.getElementById('s-ci').value = drpCI;
+    if (drpCO) { document.getElementById('s-co').value = drpCO; updateStickyCard(); }
+  }
+
+  function drpUpdateHint() {
+    const hint = document.getElementById('drpHint');
+    if (!drpCI) hint.textContent = 'Select check-in date';
+    else if (!drpCO) hint.textContent = 'Now select your check-out date';
+    else {
+      const n = Math.round((new Date(drpCO) - new Date(drpCI)) / 86400000);
+      hint.textContent = n + ' night' + (n!==1?'s':'') + ' selected';
+    }
+  }
+
+  function heroCheck() {
+    if (!drpCI || !drpCO) {
+      drpOpen('ci');
+      document.getElementById('drpHint').textContent = '👆 Select your check-in date to get started';
+      return;
+    }
+    const g = document.getElementById('hg').value;
+    window.location.href = `booking.html?ci=${drpCI}&co=${drpCO}&g=${g}`;
+  }
+
+  // ── HOME CALENDAR ─────────────────────────────────────────
   const homeCal = new MiniCal('homeCalContainer', {
     onSelect: ({ checkIn, checkOut }) => {
       if (checkIn) document.getElementById('s-ci').value = checkIn;
@@ -505,34 +516,34 @@
     }
   });
 
-  // Sticky card
+  // ── STICKY CARD ───────────────────────────────────────────
   function updateStickyCard() {
     const ci = document.getElementById('s-ci').value;
     const co = document.getElementById('s-co').value;
     const g  = document.getElementById('s-g').value;
     const p  = calcPrice(ci, co, g);
     const bk = document.getElementById('stickyBreakdown');
-    const bkEl = document.getElementById('stickyBK');
-
-    // Update urgency
     document.getElementById('stickyUrgency').querySelector('span').textContent = getUrgencyMsg(ci, co);
-
     if (p) {
       let html = `<div class="price-row"><span>${p.nights} nights × ${fmtAUD(p.avgNightly)}</span><span>${fmtAUD(p.nightlyTotal)}</span></div>`;
-      if (p.discountAmt > 0) html += `<div class="price-row" style="color:var(--green-d)"><span>Discount (${Math.round(p.losDiscount*100)}% LOS)</span><span>−${fmtAUD(p.discountAmt)}</span></div>`;
+      if (p.discountAmt > 0) html += `<div class="price-row" style="color:var(--green-d)"><span>Discount (${Math.round(p.losDiscount*100)}%)</span><span>−${fmtAUD(p.discountAmt)}</span></div>`;
       html += `<div class="price-row"><span>Cleaning fee</span><span>${fmtAUD(p.cleaningFee)}</span></div>`;
       html += `<div class="price-row tot"><span>Total</span><span>${fmtAUD(p.total)}</span></div>`;
-      bkEl.innerHTML = html;
+      document.getElementById('stickyBK').innerHTML = html;
       bk.style.display = 'block';
-      const btn = document.getElementById('stickyBtn');
-      btn.href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
+      document.getElementById('stickyBtn').href = `booking.html?ci=${ci}&co=${co}&g=${g}`;
     } else {
       bk.style.display = 'none';
     }
     homeCal.setRange(ci, co);
   }
 
-  // Pre-fill from URL
+  // Pre-fill from URL params
   const pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-  if (pci) document.getElementById('s-ci').value = pci;
-  if (pco) document.getElementById('s-co')
+  if (pci) { document.getElementById('s-ci').value = pci; drpCI = pci; }
+  if (pco) { document.getElementById('s-co').value = pco; drpCO = pco; }
+  if (pg)  document.getElementById('s-g').value = pg;
+  if (pci || pco) { drpUpdateDisplay(); updateStickyCard(); }
+</script>
+</body>
+</html>

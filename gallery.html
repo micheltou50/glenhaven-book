@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gallery — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .page-hero{background:var(--g100);padding:4rem 0 2rem;border-bottom:1px solid var(--g200)}
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:2rem}
+    .photo-card{border-radius:var(--r-xl);overflow:hidden;aspect-ratio:4/3;cursor:pointer;position:relative;box-shadow:var(--sh)}
+    .photo-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .photo-card:hover img{transform:scale(1.05)}
+    .photo-card .photo-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.5));color:#fff;padding:.75rem 1rem;font-size:.82rem;font-weight:500;opacity:0;transition:opacity .25s}
+    .photo-card:hover .photo-label{opacity:1}
+    .photo-card.big{grid-column:span 2}
+    @media(max-width:768px){.photo-card.big{grid-column:span 1}}
+  </style>
+</head>
+<body>
+<header><nav class="navbar"><div class="container nav-inner">
+  <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="gallery.html" class="active">Gallery</a></li>
+    <li><a href="amenities.html">Amenities</a></li>
+    <li><a href="location.html">Location</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="booking.html" class="nav-cta">Book Now</a></li>
+  </ul>
+  <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</div></nav></header>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow">The Space</span>
+    <h1>Glenhaven Gallery</h1>
+    <p style="margin-top:.5rem;color:var(--g500);">A 4-bedroom timber cottage in the heart of Katoomba.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="photo-grid">
+      <div class="photo-card big" onclick="openLightbox(0)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven exterior"/>
+        <div class="photo-label">Exterior</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(1)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Living room"/>
+        <div class="photo-label">Living room</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(2)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg" alt="Kitchen"/>
+        <div class="photo-label">Kitchen</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(3)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg" alt="Master bedroom"/>
+        <div class="photo-label">Master bedroom</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(4)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg" alt="Garden"/>
+        <div class="photo-label">Private garden</div>
+      </div>
+      <div class="photo-card big" onclick="openLightbox(1)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Dining area"/>
+        <div class="photo-label">Dining area</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(2)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg" alt="Conservatory"/>
+        <div class="photo-label">Conservatory</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(0)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Cottage evening"/>
+        <div class="photo-label">Evening view</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(3)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg" alt="Bedroom"/>
+        <div class="photo-label">Bedroom</div>
+      </div>
+      <div class="photo-card" onclick="openLightbox(4)">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg" alt="Outdoor"/>
+        <div class="photo-label">Outdoor space</div>
+      </div>
+    </div>
+    <div class="text-center" style="margin-top:3rem;">
+      <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><div class="container"><div class="footer-bot">
+  <p>© 2025 Glenhaven · Katoomba, NSW, Australia</p>
+  <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
+</div></div></footer>
+
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <button class="lb-arrow lb-prev" onclick="lbShift(-1)">‹</button>
+  <img id="lbImg" src="" alt=""/>
+  <button class="lb-arrow lb-next" onclick="lbShift(1)">›</button>
+</div>
+<script src="script.js"></script>
+<script>
+  const LB_IMGS = [
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
+  ];
+  let lbIdx = 0;
+  function openLightbox(i) { lbIdx=i; document.getElementById('lbImg').src=LB_IMGS[i]; document.getElementById('lightbox').classList.add('open'); }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+  function lbShift(d) { lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length; document.getElementById('lbImg').src=LB_IMGS[lbIdx]; }
+  document.getElementById('lightbox').addEventListener('click', e => { if(e.target===document.getElementById('lightbox')) closeLightbox(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') lbShift(-1); if(e.key==='ArrowRight') lbShift(1); });
+</script>
+</body></html>

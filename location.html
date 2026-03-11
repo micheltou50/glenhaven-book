@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Location — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .page-hero{background:var(--g100);padding:4rem 0 2rem;border-bottom:1px solid var(--g200)}
+    .loc-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;margin-top:2.5rem}
+    .map-full{border-radius:var(--r-xl);overflow:hidden;height:500px;box-shadow:var(--sh-lg)}
+    .map-full iframe{width:100%;height:100%;border:0}
+    .loc-places{display:flex;flex-direction:column;gap:.6rem;margin-top:1.5rem}
+    .loc-place{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1rem;background:#fff;border:1px solid var(--g200);border-radius:var(--r);transition:border-color var(--tr)}
+    .loc-place:hover{border-color:var(--green)}
+    .loc-name{font-weight:500;font-size:.9rem}
+    .loc-dist{font-size:.82rem;color:var(--g500);font-weight:600}
+    .transport-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+    .transport-card{background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:1rem}
+    .transport-card h4{font-size:.85rem;font-weight:700;margin-bottom:.4rem}
+    .transport-card p{font-size:.8rem;color:var(--g500);line-height:1.5}
+    @media(max-width:768px){.loc-layout{grid-template-columns:1fr}.map-full{height:320px}.transport-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header><nav class="navbar"><div class="container nav-inner">
+  <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="amenities.html">Amenities</a></li>
+    <li><a href="location.html" class="active">Location</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="booking.html" class="nav-cta">Book Now</a></li>
+  </ul>
+  <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</div></nav></header>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow">Getting around</span>
+    <h1>Heart of the Blue Mountains</h1>
+    <p style="margin-top:.5rem;color:var(--g500);">Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="loc-layout">
+      <div>
+        <h2>Nearby attractions</h2>
+        <p style="color:var(--g500);margin-top:.4rem;">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
+        <div class="loc-places">
+          <div class="loc-place"><span class="loc-name">🏔️ Three Sisters Lookout</span><span class="loc-dist">8 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🌅 Echo Point</span><span class="loc-dist">10 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">☕ Katoomba Town Centre</span><span class="loc-dist">5 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🌲 Blue Mountains National Park</span><span class="loc-dist">10 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🚂 Katoomba Train Station</span><span class="loc-dist">6 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🎢 Scenic World</span><span class="loc-dist">12 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🍷 Leura Village</span><span class="loc-dist">8 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🌊 Wentworth Falls</span><span class="loc-dist">15 min drive</span></div>
+          <div class="loc-place"><span class="loc-name">🌆 Sydney CBD</span><span class="loc-dist">~1.5 hr drive</span></div>
+        </div>
+
+        <h3 style="margin-top:2rem;">Getting here</h3>
+        <div class="transport-grid">
+          <div class="transport-card">
+            <h4>🚗 By car</h4>
+            <p>Take the Western Motorway (M4) from Sydney. Journey time ~90 minutes. Free off-street parking for 2 cars.</p>
+          </div>
+          <div class="transport-card">
+            <h4>🚂 By train</h4>
+            <p>Blue Mountains Line from Central Station to Katoomba. Trains run hourly. Journey ~2 hours.</p>
+          </div>
+          <div class="transport-card">
+            <h4>🚌 Local bus</h4>
+            <p>Blue Mountains Bus Company connects Katoomba to major sights. Bus stop 3 min walk from property.</p>
+          </div>
+          <div class="transport-card">
+            <h4>✈️ By air</h4>
+            <p>Sydney Airport (SYD) is ~2 hrs away by car. Hire car recommended for exploring the mountains.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="map-full">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26514.234!2d150.3124!3d-33.7142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b0ce94dc8fc7bab%3A0xc46c02a87bb4a9b7!2sKatoomba%20NSW%202780!5e0!3m2!1sen!2sau" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+        <p style="font-size:.78rem;color:var(--g400);margin-top:.6rem;">Exact address provided after booking is confirmed.</p>
+      </div>
+    </div>
+
+    <div class="text-center" style="margin-top:3rem;">
+      <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><div class="container"><div class="footer-bot">
+  <p>© 2025 Glenhaven · Katoomba, NSW, Australia</p>
+  <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
+</div></div></footer>
+<script src="script.js"></script>
+</body></html>
