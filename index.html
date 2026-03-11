@@ -128,14 +128,14 @@
     <div class="search-box" id="heroSearch">
       <div class="s-field">
         <label>Check-in</label>
-        <div class="s-display" id="dispCI" onclick="heroCalOpen()">
+        <div class="s-display" id="dispCI">
           <span class="s-display-txt" id="txtCI">Add date</span>
         </div>
       </div>
       <div class="s-divider"></div>
       <div class="s-field">
         <label>Check-out <span class="nights-pill" id="nightsPill"></span></label>
-        <div class="s-display" id="dispCO" onclick="heroCalOpen()">
+        <div class="s-display" id="dispCO">
           <span class="s-display-txt" id="txtCO">Add date</span>
         </div>
       </div>
@@ -369,16 +369,29 @@ function heroCalOpen() {
   var box   = document.getElementById('heroSearch').getBoundingClientRect();
   // position:fixed — viewport coords only, NO scrollY added
   var topPos = box.bottom + 8;
-  // If hero is scrolled and panel would go offscreen top, pin to 8px
   if (topPos < 8) topPos = 8;
-  // If panel would go offscreen bottom, flip it above the search box
   if (topPos + 500 > window.innerHeight) topPos = Math.max(8, box.top - 510);
   panel.style.top  = topPos + 'px';
   panel.style.left = Math.max(8, Math.min(box.left, window.innerWidth - 770)) + 'px';
   panel.classList.add('open');
   heroCalIsOpen = true;
+
+  // Create heroCalInst lazily on first open — panel is now visible,
+  // so MiniCal renders into a real container with proper dimensions.
+  if (!heroCalInst) {
+    heroCalInst = new MiniCal('heroCalMount', {
+      onSelect: function(sel) {
+        sharedCI = sel.checkIn  ? sel.checkIn  : sharedCI;
+        sharedCO = sel.checkOut ? sel.checkOut : null;
+        if (sel.checkIn && sel.checkOut) { sharedCI = sel.checkIn; sharedCO = sel.checkOut; }
+        if (mainCal) mainCal.setRange(sharedCI, sharedCO);
+        onDateChange(sel.checkIn, sel.checkOut);
+      }
+    });
+  }
+  // Sync current selection into hero calendar
+  heroCalInst.setRange(sharedCI, sharedCO);
   updateHeroCalHint();
-  // heroCalInst lives permanently in #heroCalMount — no DOM moving
 }
 
 function heroCalClose() {
@@ -559,51 +572,27 @@ document.getElementById('s-co').min = todayISO();
 
 loadAvailability().then(function() {
 
-  // ── TWO permanent MiniCal instances, shared state ─────────
-  // mainCal     → always mounted in #homeCalContainer (availability section)
-  // heroCalInst → always mounted in #heroCalMount (hero floating panel)
-  // Neither is ever moved. Both sync via sharedCI / sharedCO.
-
+  // ── mainCal: always visible in availability section ───────
   mainCal = new MiniCal('homeCalContainer', {
     onSelect: function(sel) {
       sharedCI = sel.checkIn  ? sel.checkIn  : sharedCI;
       sharedCO = sel.checkOut ? sel.checkOut : null;
       if (sel.checkIn && sel.checkOut) { sharedCI = sel.checkIn; sharedCO = sel.checkOut; }
-      // Sync the hero panel calendar
       if (heroCalInst) heroCalInst.setRange(sharedCI, sharedCO);
       onDateChange(sel.checkIn, sel.checkOut);
     }
   });
 
-  heroCalInst = new MiniCal('heroCalMount', {
-    onSelect: function(sel) {
-      sharedCI = sel.checkIn  ? sel.checkIn  : sharedCI;
-      sharedCO = sel.checkOut ? sel.checkOut : null;
-      if (sel.checkIn && sel.checkOut) { sharedCI = sel.checkIn; sharedCO = sel.checkOut; }
-      // Sync the availability section calendar
-      if (mainCal) mainCal.setRange(sharedCI, sharedCO);
-      onDateChange(sel.checkIn, sel.checkOut);
-    }
-  });
+  // ── heroCalInst: created lazily on first panel open ───────
+  // Must NOT be created here because #heroCalMount is inside
+  // #heroCal which has display:none — clicks on invisible elements
+  // never fire. It is created in heroCalOpen() below instead.
 
-  // Pre-fill from URL params (e.g. arriving from a promo link)
+  // Pre-fill from URL params
   var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
-  if (pci) {
-    sharedCI = pci;
-    mainCal.ci = pci; mainCal.renderDays();
-    heroCalInst.ci = pci; heroCalInst.renderDays();
-    document.getElementById('s-ci').value = pci;
-  }
-  if (pco) {
-    sharedCO = pco;
-    mainCal.co = pco; mainCal.renderDays();
-    heroCalInst.co = pco; heroCalInst.renderDays();
-    document.getElementById('s-co').value = pco;
-  }
-  if (pg) {
-    document.getElementById('s-g').value = pg;
-    document.getElementById('hg').value  = pg;
-  }
+  if (pci) { sharedCI = pci; mainCal.ci = pci; mainCal.renderDays(); document.getElementById('s-ci').value = pci; }
+  if (pco) { sharedCO = pco; mainCal.co = pco; mainCal.renderDays(); document.getElementById('s-co').value = pco; }
+  if (pg)  { document.getElementById('s-g').value = pg; document.getElementById('hg').value = pg; }
   if (pci || pco) onDateChange(sharedCI, sharedCO);
 
 });
