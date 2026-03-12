@@ -36,7 +36,7 @@
       <img class="bk-thumb" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven"/>
       <div class="bk-prop-info">
         <h3>Glenhaven — Blue Mountains Cottage</h3>
-        <p>Katoomba, NSW · 4 bedrooms · Up to 8 guests</p>
+        <p>Katoomba, NSW · <span id="bkBedrooms">4</span> bedrooms · Up to <span id="bkMaxGuests">8</span> guests</p>
         <div class="stars" style="font-size:.78rem;margin-top:.2rem;">★★★★★ <span style="color:var(--g500);font-weight:500;">5.0</span></div>
       </div>
     </div>
@@ -203,7 +203,7 @@
   const urlCI = getParam('ci'), urlCO = getParam('co'), urlG = getParam('g');
   if (urlCI) bkCI = urlCI;
   if (urlCO) bkCO = urlCO;
-  if (urlG)  adults = Math.min(8, Math.max(1, parseInt(urlG)||2));
+  if (urlG)  adults = Math.min(CONFIG.MAX_GUESTS, Math.max(1, parseInt(urlG)||2));
 
   // Guard: show banner if page loaded without dates
   if (!bkCI || !bkCO) {

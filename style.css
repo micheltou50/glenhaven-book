@@ -193,6 +193,7 @@ p { line-height: 1.65; color: var(--g600); }
 .sticky-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,.13); }
 .sticky-price { font-size: 1.35rem; font-weight: 800; margin-bottom: .15rem; }
 .sticky-price span { font-size: .95rem; font-weight: 400; color: var(--g500); }
+.sticky-price #stickyFromPrice { font-size: 1.35rem; font-weight: 800; color: inherit; }
 .s-dates { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--g200); border-radius: var(--r); overflow: hidden; margin-bottom: .65rem; }
 .s-df { padding: .65rem .85rem; cursor: pointer; transition: background var(--tr); }
 .s-df:first-child { border-right: 1.5px solid var(--g200); }

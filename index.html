@@ -551,6 +551,12 @@ document.getElementById('heroCalClear').addEventListener('click', function() {
 document.getElementById('heroCalDone').addEventListener('click', heroCalClose);
 document.getElementById('btnCheck').addEventListener('click', function() {
   if (!sharedCI || !sharedCO) { heroCalOpen(); return; }
+  var nights = Math.round((new Date(sharedCO) - new Date(sharedCI)) / 86400000);
+  var minN   = getMinNights(sharedCI);
+  if (nights < minN) {
+    alert('Minimum stay is ' + minN + ' nights for these dates.');
+    return;
+  }
   var g = document.getElementById('hg').value;
   window.location.href = 'booking.html?ci=' + sharedCI + '&co=' + sharedCO + '&g=' + g;
 });

@@ -155,6 +155,28 @@ function applySiteConfig(cfg) {
     if (fp) fp.textContent = cfg.pricing.baseRate;
   }
 
+  // ── Guest fee note (booking.html) ──
+  const note = document.getElementById('guestFeeNote');
+  if (note) {
+    const max  = cfg.pricing && cfg.pricing.maxGuests  != null ? cfg.pricing.maxGuests  : CONFIG.MAX_GUESTS;
+    const fee  = cfg.pricing && cfg.pricing.extraGuest != null ? cfg.pricing.extraGuest : CONFIG.EXTRA_GUEST;
+    const base = cfg.pricing && cfg.pricing.baseGuests != null ? cfg.pricing.baseGuests : CONFIG.BASE_GUESTS;
+    note.textContent = "Maximum " + max + " guests (infants don't count). $" + fee + "/night per guest beyond " + base + ".";
+  }
+
+  // ── Booking page header (bedrooms + max guests) ──
+  if (cfg.property) {
+    const bkBed = document.getElementById('bkBedrooms');
+    const bkMx  = document.getElementById('bkMaxGuests');
+    if (bkBed && cfg.property.bedrooms  != null) bkBed.textContent = cfg.property.bedrooms;
+    if (bkMx  && cfg.property.guests    != null) bkMx.textContent  = cfg.property.guests;
+  }
+
+  // ── Browser tab title ──
+  if (cfg.property && cfg.property.name) {
+    if (!document.title.startsWith(cfg.property.name)) document.title = cfg.property.name + ' — ' + document.title.split('—').slice(1).join('—').trim();
+  }
+
   // ── Nav logo ──
   if (cfg.property && cfg.property.name) {
     document.querySelectorAll('.nav-logo').forEach(el => {
