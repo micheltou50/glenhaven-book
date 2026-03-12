@@ -597,4 +597,11 @@ loadAvailability().then(function() {
   // Pre-fill from URL params
   var pci = getParam('ci'), pco = getParam('co'), pg = getParam('g');
   if (pci) { sharedCI = pci; mainCal.ci = pci; mainCal.renderDays(); document.getElementById('s-ci').value = pci; }
-  if (pco) { sharedCO = pco; mainCal.co = pco; main
+  if (pco) { sharedCO = pco; mainCal.co = pco; mainCal.renderDays(); document.getElementById('s-co').value = pco; }
+  if (pg)  { document.getElementById('s-g').value = pg; document.getElementById('hg').value = pg; }
+  if (pci || pco) updateStickyCard();
+
+});
+</script>
+</body>
+</html>
