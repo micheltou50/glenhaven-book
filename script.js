@@ -358,10 +358,11 @@ class MiniCal {
       const isEnd     = this.co === iso;
       const inRange   = this.ci && this.co && iso > this.ci && iso < this.co;
       const inHover   = this.ci && !this.co && this.hov && iso > this.ci && iso <= this.hov;
+      const isBeforeCI = this.ci && !this.co && iso < this.ci;
       let cls = 'cal-day';
-      if (isPast)         cls += ' past';
-      else if (isBlocked) cls += ' blocked';
-      else                cls += ' avail';
+      if (isPast || isBeforeCI) cls += ' past';
+      else if (isBlocked)       cls += ' blocked';
+      else                      cls += ' avail';
       if (isStart) cls += ' sel-s';
       if (isEnd)   cls += ' sel-e';
       if (inRange) cls += ' in-r';
@@ -389,10 +390,11 @@ class MiniCal {
       const isEnd     = this.co === iso;
       const inRange   = this.ci && this.co && iso > this.ci && iso < this.co;
       const inHover   = this.ci && !this.co && this.hov && iso > this.ci && iso <= this.hov;
+      const isBeforeCI = this.ci && !this.co && iso < this.ci;
       let cls = 'cal-day';
-      if (isPast)         cls += ' past';
-      else if (isBlocked) cls += ' blocked';
-      else                cls += ' avail';
+      if (isPast || isBeforeCI) cls += ' past';
+      else if (isBlocked)       cls += ' blocked';
+      else                      cls += ' avail';
       if (isStart) cls += ' sel-s';
       if (isEnd)   cls += ' sel-e';
       if (inRange) cls += ' in-r';
@@ -456,10 +458,16 @@ class MiniCal {
   }
 
   selectDay(iso) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dt    = new Date(iso + 'T00:00:00');
+
+    // Guard 1: never allow past dates
+    if (dt < today) return;
+
+    // Guard 2: during checkout selection, block same day or before check-in
+    if (this.ci && !this.co && iso <= this.ci) return;
+
     if (!this.ci || (this.ci && this.co)) {
-      this.ci = iso; this.co = null;
-      this.onSelect({ checkIn: this.ci, checkOut: null });
-    } else if (iso <= this.ci) {
       this.ci = iso; this.co = null;
       this.onSelect({ checkIn: this.ci, checkOut: null });
     } else {

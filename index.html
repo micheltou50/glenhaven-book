@@ -575,7 +575,8 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && her
 document.getElementById('s-ci').min = todayISO();
 document.getElementById('s-co').min = todayISO();
 
-loadSiteConfig().then(() => loadAvailability()).then(function() {
+loadSiteConfig(); // fire-and-forget — applies colors/text if config exists, never blocks calendar
+loadAvailability().then(function() {
 
   // ── mainCal: always visible in availability section ───────
   mainCal = new MiniCal('homeCalContainer', {

@@ -116,7 +116,8 @@ p { line-height: 1.65; color: var(--g600); }
 .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
 .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--r-sm); font-size: .82rem; cursor: pointer; transition: all .13s; padding: 2px; position: relative; }
 .cal-day.empty { cursor: default; }
-.cal-day.past, .cal-day.blocked { color: var(--g300); cursor: not-allowed; }
+.cal-day.past, .cal-day.blocked { color: var(--g300); cursor: not-allowed; background: transparent; pointer-events: none; }
+.cal-day.past { opacity: .45; }
 .cal-day.blocked { text-decoration: line-through; background: var(--g100); }
 .cal-day.avail:hover { background: var(--green-p); }
 .cal-day.sel-s, .cal-day.sel-e { background: var(--green) !important; color: #fff !important; font-weight: 700; }
