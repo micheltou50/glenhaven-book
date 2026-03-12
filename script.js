@@ -37,6 +37,18 @@ let HOLIDAY_PRICES = {
 let SITE_CONFIG = null;
 
 const CONFIG_CACHE_KEY = 'gh_site_config';
+
+// Apply cached config synchronously right now — before any async calls.
+// This means the calendar always renders with the correct prices on the very
+// first paint, with zero waiting. The async fetch later just refreshes it.
+(function applyConfigFromCache() {
+  try {
+    const raw = localStorage.getItem(CONFIG_CACHE_KEY);
+    if (!raw) return;
+    const cached = JSON.parse(raw);
+    if (cached && cached.config) applySiteConfig(cached.config);
+  } catch(e) {}
+})();
 const CONFIG_CACHE_TTL  = 60 * 60 * 1000; // 1 hour
 
 async function loadSiteConfig() {
