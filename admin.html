@@ -242,6 +242,47 @@
           <div class="field-group"><label>Max Guests</label><input type="number" id="eMaxGuests" min="1" placeholder="8"/></div>
         </div>
       </div>
+
+      <div class="edit-card" style="margin-top:1.5rem;">
+        <h3>📋 House Rules</h3>
+        <p style="font-size:.83rem;color:var(--g500);margin-bottom:1rem;">These rules appear on your house-rules.html page. Edit each line — one rule per line.</p>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Check-in Time</label>
+            <input type="text" id="eCheckin" placeholder="3:00 PM"/>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Check-out Time</label>
+            <input type="text" id="eCheckout" placeholder="10:00 AM"/>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>General Rules (one per line)</label>
+            <textarea id="eRulesGeneral" rows="5" placeholder="Maximum 8 guests at any time&#10;Self check-in via lockbox&#10;Leave property clean and tidy"></textarea>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Noise Rules (one per line)</label>
+            <textarea id="eRulesNoise" rows="4" placeholder="Quiet hours 10pm – 8am&#10;No parties or large gatherings"></textarea>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Smoking Rules (one per line)</label>
+            <textarea id="eRulesSmoking" rows="3" placeholder="No smoking inside&#10;Smoking in garden only"></textarea>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Pet Rules (one per line)</label>
+            <textarea id="eRulesPets" rows="3" placeholder="Pets welcome — please advise in advance&#10;Keep pets off furniture"></textarea>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PRICING -->
@@ -454,6 +495,14 @@ const DEFAULT_CONFIG = {
     'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
     'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
   ],
+  houseRules: {
+    checkin: '3:00 PM',
+    checkout: '10:00 AM',
+    general: ['Maximum 8 guests at any time', 'Self check-in via key lockbox', 'Please treat the property as your own home', 'Report any damage or breakages promptly', 'Leave the property in a clean and tidy condition'],
+    noise: ['Quiet hours: 10pm – 8am', 'No parties or large gatherings', 'Music and outdoor entertaining welcome until 10pm'],
+    smoking: ['No smoking inside the property', 'Smoking permitted in the garden only', 'Please dispose of cigarette butts responsibly'],
+    pets: ['Well-behaved pets welcome — please advise in advance', 'Pets must not be left alone in the property', 'Please keep pets off the furniture'],
+  },
   amenities:['Wood fireplace','Glass conservatory','Private garden','Full kitchen','Washer & dryer','Fast WiFi','Smart TV','BBQ grill','Free parking','Self check-in','Pet friendly','Air conditioning'],
 };
 
@@ -579,6 +628,13 @@ function populateForm(cfg) {
   const p=cfg.property||{}, h=cfg.hero||{}, pr=cfg.pricing||{}, c=cfg.colors||{};
   setVal('eName',p.name); setVal('eTagline',p.tagline); setVal('eHeroHeadline',h.headline); setVal('eHeroSub',h.subheadline);
   setVal('eDescription',p.description); setVal('eBedrooms',p.bedrooms); setVal('eBathrooms',p.bathrooms); setVal('eMaxGuests',p.guests);
+  const hr = cfg.houseRules || {};
+  setVal('eCheckin',  hr.checkin  || '');
+  setVal('eCheckout', hr.checkout || '');
+  setVal('eRulesGeneral', (hr.general || []).join('\n'));
+  setVal('eRulesNoise',   (hr.noise   || []).join('\n'));
+  setVal('eRulesSmoking', (hr.smoking || []).join('\n'));
+  setVal('eRulesPets',    (hr.pets    || []).join('\n'));
   setVal('pBaseRate',pr.baseRate); setVal('pFriSurcharge',pr.friSurcharge); setVal('pSatSurcharge',pr.satSurcharge);
   setVal('pCleaningFee',pr.cleaningFee); setVal('pExtraGuest',pr.extraGuest); setVal('pBaseGuests',pr.baseGuests);
   setVal('pPeakPct',pr.peakPct); setVal('pLowPct',pr.lowPct);
@@ -602,6 +658,14 @@ function populateForm(cfg) {
 function readForm() {
   return {
     property:{ name:gVal('eName')||'Glenhaven', tagline:gVal('eTagline'), description:gVal('eDescription'), bedrooms:nVal('eBedrooms'), bathrooms:nVal('eBathrooms'), guests:nVal('eMaxGuests') },
+    houseRules:{
+      checkin:  gVal('eCheckin'),
+      checkout: gVal('eCheckout'),
+      general:  gVal('eRulesGeneral').split('\n').map(s=>s.trim()).filter(Boolean),
+      noise:    gVal('eRulesNoise').split('\n').map(s=>s.trim()).filter(Boolean),
+      smoking:  gVal('eRulesSmoking').split('\n').map(s=>s.trim()).filter(Boolean),
+      pets:     gVal('eRulesPets').split('\n').map(s=>s.trim()).filter(Boolean),
+    },
     hero:{ headline:gVal('eHeroHeadline'), subheadline:gVal('eHeroSub') },
     pricing:{ baseRate:nVal('pBaseRate'), friSurcharge:nVal('pFriSurcharge'), satSurcharge:nVal('pSatSurcharge'), cleaningFee:nVal('pCleaningFee'), extraGuest:nVal('pExtraGuest'), baseGuests:nVal('pBaseGuests'), maxGuests:nVal('eMaxGuests'), peakPct:nVal('pPeakPct'), lowPct:nVal('pLowPct'), minNights:{weekday:nVal('pMinWeekday'),weekend:nVal('pMinWeekend'),peak:nVal('pMinPeak')}, losDiscounts:{nights3:nVal('pLos3'),nights5:nVal('pLos5'),nights7:nVal('pLos7')}, holidayPrices:{'12-25':nVal('pXmas'),'12-26':nVal('pBoxing'),'12-31':nVal('pNYE'),'01-01':nVal('pNYD'),'04-18':nVal('pGoodFri'),'04-20':nVal('pEasterSun')} },
     colors:{ primary:document.getElementById('cPrimary').value, accent:document.getElementById('cAccent').value },

@@ -26,7 +26,7 @@
     <li><a href="reviews.html">Reviews</a></li>
     <li><a href="booking.html" class="nav-cta">Book Now</a></li>
   </ul>
-  <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  <button class="nav-burger" id="navBurger" aria-label="Open menu">☰</button>
 </div></nav></header>
 
 <div class="page-hero">
@@ -113,5 +113,14 @@
   function lbShift(d) { lbIdx=(lbIdx+d+LB_IMGS.length)%LB_IMGS.length; document.getElementById('lbImg').src=LB_IMGS[lbIdx]; }
   document.getElementById('lightbox').addEventListener('click', e => { if(e.target===document.getElementById('lightbox')) closeLightbox(); });
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') lbShift(-1); if(e.key==='ArrowRight') lbShift(1); });
+</script>
+<script>
+(function(){
+  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
+  if(b&&l){
+    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
+    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
+  }
+})();
 </script>
 </body></html>

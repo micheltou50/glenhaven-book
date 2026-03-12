@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .page-hero { background: var(--g100); padding: 4rem 0 2rem; border-bottom: 1px solid var(--g200); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2.5rem; align-items: start; }
+    .contact-form-card { background: #fff; border: 1px solid var(--g200); border-radius: var(--r); padding: 2rem; }
+    .contact-form-card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .cf-group { margin-bottom: 1.1rem; }
+    .cf-group label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .4rem; color: #444; }
+    .cf-group input, .cf-group textarea, .cf-group select { width: 100%; border: 1.5px solid var(--g200); border-radius: var(--r-sm); padding: .7rem .9rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; box-sizing: border-box; background: #fff; }
+    .cf-group input:focus, .cf-group textarea:focus, .cf-group select:focus { border-color: var(--green); }
+    .cf-group textarea { resize: vertical; min-height: 120px; }
+    .cf-success { display: none; background: #dcfce7; border: 1px solid #86efac; border-radius: var(--r); padding: 1.25rem 1.5rem; color: #166534; font-size: .9rem; margin-top: 1rem; }
+    .contact-info h3 { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: 1rem; }
+    .ci-item { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem; }
+    .ci-icon { width: 40px; height: 40px; background: var(--g100); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .ci-body h4 { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+    .ci-body p, .ci-body a { font-size: .85rem; color: var(--g500); line-height: 1.5; }
+    .ci-body a { color: var(--green); }
+    .faq-quick { background: var(--g100); border-radius: var(--r); padding: 1.5rem; margin-top: 1.5rem; }
+    .faq-quick h3 { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--g500); margin-bottom: 1rem; }
+    .faq-quick ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .5rem; }
+    .faq-quick ul li a { font-size: .85rem; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: .4rem; }
+    .faq-quick ul li a:hover { text-decoration: underline; }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="amenities.html">Amenities</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="reviews.html">Reviews</a></li>
+        <li><a href="booking.html" class="nav-cta">Book Now</a></li>
+      </ul>
+      <button class="nav-burger" id="navBurger" aria-label="Open menu">☰</button>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="badge badge-green" style="margin-bottom:1rem;">Contact Us</div>
+    <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:.5rem;">We'd love to hear from you</h1>
+    <p style="color:var(--g500);font-size:1rem;max-width:580px;">Questions about the property, a booking, or just want to say hello — we usually respond within a few hours.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Contact Form -->
+      <div class="contact-form-card">
+        <h2>Send us a message</h2>
+        <div class="cf-group">
+          <label>Your Name</label>
+          <input type="text" id="cfName" placeholder="Jane Smith"/>
+        </div>
+        <div class="cf-group">
+          <label>Email Address</label>
+          <input type="email" id="cfEmail" placeholder="jane@example.com"/>
+        </div>
+        <div class="cf-group">
+          <label>Topic</label>
+          <select id="cfTopic">
+            <option value="">Select a topic…</option>
+            <option value="booking">Booking enquiry</option>
+            <option value="dates">Checking availability</option>
+            <option value="property">Question about the property</option>
+            <option value="rules">House rules</option>
+            <option value="cancellation">Cancellation or modification</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div class="cf-group">
+          <label>Message</label>
+          <textarea id="cfMessage" placeholder="Tell us what you need…"></textarea>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="submitContact()" id="cfBtn">Send Message</button>
+        <div class="cf-success" id="cfSuccess">
+          ✅ Message sent! We'll get back to you within a few hours.
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div>
+        <h3 style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem;">Get in touch</h3>
+
+        <div class="ci-item">
+          <div class="ci-icon">✉️</div>
+          <div class="ci-body">
+            <h4>Email</h4>
+            <a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a>
+            <p>Best for detailed questions. We reply within a few hours.</p>
+          </div>
+        </div>
+
+        <div class="ci-item">
+          <div class="ci-icon">📍</div>
+          <div class="ci-body">
+            <h4>Location</h4>
+            <p>Katoomba, NSW 2780<br/>Blue Mountains, Australia</p>
+          </div>
+        </div>
+
+        <div class="ci-item">
+          <div class="ci-icon">🕐</div>
+          <div class="ci-body">
+            <h4>Response time</h4>
+            <p>We typically respond within 2–4 hours during business hours (9am–8pm AEST).</p>
+          </div>
+        </div>
+
+        <div class="faq-quick">
+          <h3>Quick answers</h3>
+          <ul>
+            <li><a href="house-rules.html">→ House rules &amp; check-in times</a></li>
+            <li><a href="cancellation-policy.html">→ Cancellation &amp; refund policy</a></li>
+            <li><a href="amenities.html">→ What's included at the property</a></li>
+            <li><a href="booking.html">→ Check availability &amp; book</a></li>
+            <li><a href="location.html">→ How to get there</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Glen<em>haven</em></div>
+        <p>A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Property</h4>
+        <ul>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="amenities.html">Amenities</a></li>
+          <li><a href="location.html">Location</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Booking</h4>
+        <ul>
+          <li><a href="booking.html">Book Direct</a></li>
+          <li><a href="cancellation-policy.html">Cancellation Policy</a></li>
+          <li><a href="house-rules.html">House Rules</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <p>2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+loadSiteConfig();
+
+function submitContact() {
+  var name    = document.getElementById('cfName').value.trim();
+  var email   = document.getElementById('cfEmail').value.trim();
+  var topic   = document.getElementById('cfTopic').value;
+  var message = document.getElementById('cfMessage').value.trim();
+
+  if (!name || !email || !message) {
+    alert('Please fill in your name, email, and message.');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  var btn = document.getElementById('cfBtn');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  // Send via the enquiry endpoint
+  fetch('/api/book', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'enquiry',
+      guestName: name,
+      email: email,
+      message: '[' + (topic || 'General') + '] ' + message,
+    })
+  }).then(function() {
+    document.getElementById('cfSuccess').style.display = 'block';
+    btn.style.display = 'none';
+  }).catch(function() {
+    // Even if the API fails, show success and tell them to email directly
+    document.getElementById('cfSuccess').innerHTML = 'Thanks! If you do not hear back within 24 hours, please email us directly at <a href="mailto:micheltou50@gmail.com" style="color:var(--green);">micheltou50@gmail.com</a>';
+    document.getElementById('cfSuccess').style.display = 'block';
+    btn.style.display = 'none';
+  });
+}
+</script>
+<script>
+(function(){
+  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
+  if(b&&l){
+    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
+    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
+  }
+})();
+</script>
+</body>
+</html>

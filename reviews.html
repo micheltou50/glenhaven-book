@@ -33,7 +33,7 @@
     <li><a href="reviews.html" class="active">Reviews</a></li>
     <li><a href="booking.html" class="nav-cta">Book Now</a></li>
   </ul>
-  <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  <button class="nav-burger" id="navBurger" aria-label="Open menu">☰</button>
 </div></nav></header>
 
 <div class="page-hero">
@@ -148,4 +148,13 @@
   <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
 </div></div></footer>
 <script src="script.js"></script>
+<script>
+(function(){
+  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
+  if(b&&l){
+    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
+    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
+  }
+})();
+</script>
 </body></html>

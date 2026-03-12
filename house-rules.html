@@ -18,7 +18,7 @@
     .time-card .time-val { font-size: 2rem; font-weight: 800; line-height: 1; }
     .time-card .time-sub { font-size: .8rem; opacity: .8; margin-top: .3rem; }
     .rules-note { background: #fffbf0; border: 1px solid #f0e0a0; border-radius: var(--r); padding: 1.25rem 1.5rem; margin-top: 2rem; font-size: .87rem; color: #7a6000; line-height: 1.6; }
-    @media (max-width: 768px) { .rules-grid { grid-template-columns: 1fr; } .times-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .rules-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -33,7 +33,7 @@
         <li><a href="reviews.html">Reviews</a></li>
         <li><a href="booking.html" class="nav-cta">Book Now</a></li>
       </ul>
-      <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+      <button class="nav-burger" id="navBurger" aria-label="Open menu">☰</button>
     </div>
   </nav>
 </header>
@@ -48,96 +48,66 @@
 
 <section class="section">
   <div class="container">
-
-    <!-- Check-in / Check-out times -->
-    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0;">Check-in & Check-out</h2>
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0;">Check-in &amp; Check-out</h2>
     <div class="times-row">
       <div class="time-card">
-        <div class="time-label">Check-in</div>
-        <div class="time-val">3:00<span style="font-size:1.2rem;">pm</span></div>
+        <div class="time-label">Check-in from</div>
+        <div class="time-val" id="timeCheckin">3:00 PM</div>
         <div class="time-sub">Self check-in via key lockbox</div>
       </div>
-      <div class="time-card" style="background:var(--g800,#222);">
-        <div class="time-label">Check-out</div>
-        <div class="time-val">10:00<span style="font-size:1.2rem;">am</span></div>
+      <div class="time-card" style="background:#222;">
+        <div class="time-label">Check-out by</div>
+        <div class="time-val" id="timeCheckout">10:00 AM</div>
         <div class="time-sub">Please leave keys in lockbox</div>
       </div>
     </div>
 
-    <!-- Rules grid -->
     <div class="rules-grid">
-
       <div class="rules-card">
-        <h3>🏠 General</h3>
-        <ul>
-          <li><span class="ri">✓</span> Maximum 8 guests at any time</li>
-          <li><span class="ri">✓</span> Self check-in — lockbox code sent before arrival</li>
-          <li><span class="ri">✓</span> Please treat the property as your own home</li>
-          <li><span class="ri">✓</span> Report any damage or breakages promptly</li>
-          <li><span class="ri">✓</span> Leave the property in a clean and tidy condition</li>
+        <h3>General</h3>
+        <ul id="rulesGeneral">
+          <li><span class="ri">✓</span>Maximum 8 guests at any time</li>
+          <li><span class="ri">✓</span>Self check-in via key lockbox</li>
+          <li><span class="ri">✓</span>Please treat the property as your own home</li>
+          <li><span class="ri">✓</span>Report any damage or breakages promptly</li>
+          <li><span class="ri">✓</span>Leave the property in a clean and tidy condition</li>
         </ul>
       </div>
-
       <div class="rules-card">
-        <h3>🤫 Noise & Neighbours</h3>
-        <ul>
-          <li><span class="ri">✓</span> Quiet hours: 10pm – 8am</li>
-          <li><span class="ri">✓</span> No parties or large gatherings</li>
-          <li><span class="ri">✓</span> Please be mindful of neighbours at all times</li>
-          <li><span class="ri">✓</span> Music and outdoor entertaining welcome until 10pm</li>
+        <h3>Noise &amp; Neighbours</h3>
+        <ul id="rulesNoise">
+          <li><span class="ri">✓</span>Quiet hours: 10pm to 8am</li>
+          <li><span class="ri">✓</span>No parties or large gatherings</li>
+          <li><span class="ri">✓</span>Please be mindful of neighbours at all times</li>
+          <li><span class="ri">✓</span>Music and outdoor entertaining welcome until 10pm</li>
         </ul>
       </div>
-
       <div class="rules-card">
-        <h3>🚭 Smoking & Substances</h3>
-        <ul>
-          <li><span class="ri">✗</span> No smoking inside the property</li>
-          <li><span class="ri">✓</span> Smoking permitted in the garden only</li>
-          <li><span class="ri">✗</span> No illegal substances on the premises</li>
-          <li><span class="ri">✓</span> Please dispose of cigarette butts responsibly</li>
+        <h3>Smoking</h3>
+        <ul id="rulesSmoking">
+          <li><span class="ri">✗</span>No smoking inside the property</li>
+          <li><span class="ri">✓</span>Smoking permitted in the garden only</li>
+          <li><span class="ri">✓</span>Please dispose of cigarette butts responsibly</li>
         </ul>
       </div>
-
       <div class="rules-card">
-        <h3>🐾 Pets</h3>
-        <ul>
-          <li><span class="ri">✓</span> Well-behaved pets welcome — please let us know</li>
-          <li><span class="ri">✓</span> Pets must not be left alone in the property</li>
-          <li><span class="ri">✓</span> Please keep pets off the furniture</li>
-          <li><span class="ri">✓</span> Clean up after your pet in the garden</li>
+        <h3>Pets</h3>
+        <ul id="rulesPets">
+          <li><span class="ri">✓</span>Well-behaved pets welcome — please advise in advance</li>
+          <li><span class="ri">✓</span>Pets must not be left alone in the property</li>
+          <li><span class="ri">✓</span>Please keep pets off the furniture</li>
+          <li><span class="ri">✓</span>Clean up after your pet in the garden</li>
         </ul>
       </div>
-
-      <div class="rules-card">
-        <h3>🔥 Fireplace & Safety</h3>
-        <ul>
-          <li><span class="ri">✓</span> Wood fireplace available — firewood provided</li>
-          <li><span class="ri">✓</span> Never leave fireplace unattended when lit</li>
-          <li><span class="ri">✓</span> Extinguish fire fully before going to bed</li>
-          <li><span class="ri">✓</span> Fire extinguisher located in the kitchen</li>
-        </ul>
-      </div>
-
-      <div class="rules-card">
-        <h3>🌿 Garden & Outdoors</h3>
-        <ul>
-          <li><span class="ri">✓</span> BBQ available — please clean after use</li>
-          <li><span class="ri">✓</span> Please do not pick plants or flowers</li>
-          <li><span class="ri">✓</span> Gate must remain closed if travelling with pets</li>
-          <li><span class="ri">✓</span> Outdoor furniture may be moved but please return it</li>
-        </ul>
-      </div>
-
     </div>
 
     <div class="rules-note">
-      💬 <strong>Questions before you arrive?</strong> We're always happy to help. Reach out via email at <a href="mailto:micheltou50@gmail.com" style="color:var(--green);">micheltou50@gmail.com</a> and we'll respond promptly. We want your stay to be perfect.
+      Questions before you arrive? <a href="contact.html" style="color:var(--green);font-weight:600;">Contact us</a> and we will respond promptly.
     </div>
 
     <div style="text-align:center;margin-top:3rem;">
       <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
     </div>
-
   </div>
 </section>
 
@@ -163,15 +133,50 @@
           <li><a href="booking.html">Book Direct</a></li>
           <li><a href="cancellation-policy.html">Cancellation Policy</a></li>
           <li><a href="house-rules.html">House Rules</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bot">
-      <p>© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
+      <p>2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
     </div>
   </div>
 </footer>
+
 <script src="script.js"></script>
-<script>loadSiteConfig();</script>
+<script>
+function renderHouseRules(cfg) {
+  var hr = (cfg && cfg.houseRules) || {};
+  var ci = document.getElementById('timeCheckin');
+  var co = document.getElementById('timeCheckout');
+  if (ci && hr.checkin)  ci.textContent = hr.checkin;
+  if (co && hr.checkout) co.textContent = hr.checkout;
+  var cats = [
+    { id:'rulesGeneral', key:'general' },
+    { id:'rulesNoise',   key:'noise'   },
+    { id:'rulesSmoking', key:'smoking' },
+    { id:'rulesPets',    key:'pets'    },
+  ];
+  cats.forEach(function(c) {
+    var el = document.getElementById(c.id);
+    if (!el || !hr[c.key] || !hr[c.key].length) return;
+    el.innerHTML = hr[c.key].map(function(r) {
+      return '<li><span class="ri">✓</span>' + r + '</li>';
+    }).join('');
+  });
+}
+loadSiteConfig().then(function() {
+  if (window.SITE_CONFIG) renderHouseRules(window.SITE_CONFIG);
+});
+</script>
+<script>
+(function(){
+  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
+  if(b&&l){
+    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
+    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
+  }
+})();
+</script>
 </body>
 </html>

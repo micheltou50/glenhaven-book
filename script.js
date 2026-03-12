@@ -37,6 +37,7 @@ let HOLIDAY_PRICES = {
 // ── SITE CONFIG (loaded from server) ──────────────────────────
 // Default values — overwritten by loadSiteConfig() on page load
 let SITE_CONFIG = null;
+window.SITE_CONFIG = null; // exposed globally for page-specific scripts
 
 const CONFIG_CACHE_KEY = 'gh_site_config';
 
@@ -96,6 +97,7 @@ async function _fetchSiteConfig() {
     try { localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify({ config: envelope.config, ts: Date.now() })); } catch(e) {}
 
     SITE_CONFIG = envelope.config;
+    window.SITE_CONFIG = envelope.config;
     applySiteConfig(envelope.config);
     return { loaded: true, status: 'ok' };
 
@@ -551,7 +553,22 @@ class MiniCal {
 document.addEventListener('DOMContentLoaded', () => {
   const burger = document.querySelector('.nav-burger');
   const links  = document.querySelector('.nav-links');
-  if (burger && links) burger.addEventListener('click', () => links.classList.toggle('open'));
+  if (burger && links) {
+    burger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      links.classList.toggle('open');
+    });
+    // Close menu when clicking a link
+    links.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() { links.classList.remove('open'); });
+    });
+    // Close menu on outside click
+    document.addEventListener('click', function(e) {
+      if (!burger.contains(e.target) && !links.contains(e.target)) {
+        links.classList.remove('open');
+      }
+    });
+  }
 
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
