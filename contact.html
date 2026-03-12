@@ -99,7 +99,7 @@
           <div class="ci-icon">✉️</div>
           <div class="ci-body">
             <h4>Email</h4>
-            <a href="mailto:micheltou50@gmail.com">micheltou50@gmail.com</a>
+            <a href="/cdn-cgi/l/email-protection#bcd1d5dfd4d9d0c8d3c9898cfcdbd1ddd5d092dfd3d1"><span class="__cf_email__" data-cfemail="711c181219141d051e04444131161c10181d5f121e1c">[email&#160;protected]</span></a>
             <p>Best for detailed questions. We reply within a few hours.</p>
           </div>
         </div>
@@ -168,7 +168,7 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
 <script>
 loadSiteConfig();
 
@@ -192,14 +192,14 @@ function submitContact() {
   btn.disabled = true;
 
   // Send via the enquiry endpoint
-  fetch('/api/book', {
+  fetch('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'enquiry',
-      guestName: name,
+      name: name,
       email: email,
-      message: '[' + (topic || 'General') + '] ' + message,
+      topic: topic || 'General',
+      message: message,
     })
   }).then(function() {
     document.getElementById('cfSuccess').style.display = 'block';
@@ -216,10 +216,4 @@ function submitContact() {
 (function(){
   var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
   if(b&&l){
-    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
-    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
-  }
-})();
-</script>
-</body>
-</html>
+    b.addEve
