@@ -576,6 +576,20 @@ document.getElementById('s-ci').min = todayISO();
 document.getElementById('s-co').min = todayISO();
 
 loadSiteConfig().then(() => {
+  // Rebuild guest dropdowns to respect MAX_GUESTS from config
+  ['hg','s-g'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    var cur = sel.value;
+    sel.innerHTML = '';
+    for (var i = 1; i <= CONFIG.MAX_GUESTS; i++) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i + (i === 1 ? ' guest' : ' guests');
+      if (i == cur) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  });
   // Re-render calendar after config loads so price labels reflect updated rates
   if (typeof mainCal !== 'undefined' && mainCal) mainCal.renderDays();
   if (typeof heroCalInst !== 'undefined' && heroCalInst) heroCalInst.renderDays();

@@ -288,8 +288,10 @@
     window.scrollTo({top:0,behavior:'smooth'});
   }
   function goStep1() { setStep(1); }
-  function goStep2() {
+  async function goStep2() {
     if (!bkCI||!bkCO) { const a=document.getElementById('dateAlert'); a.textContent='Please select your check-in and check-out dates.'; a.classList.add('show'); return; }
+    // Ensure config is loaded before checking min nights
+    await loadSiteConfig();
     const nights = Math.round((new Date(bkCO)-new Date(bkCI))/86400000);
     const minN   = getMinNights(bkCI);
     if (nights < minN) { const a=document.getElementById('dateAlert'); a.textContent=`Minimum stay is ${minN} nights for these dates.`; a.classList.add('show'); return; }
@@ -352,6 +354,7 @@
 
 </script>
 <script>
+  loadSiteConfig(); // load pricing/min nights config — non-blocking
   loadAvailability().then(() => {
     if (typeof bkCal !== "undefined" && bkCal) {
       // Re-apply setRange after availability loads so the correct month is shown
