@@ -321,8 +321,8 @@
         <ul>
           <li><a href="booking.html">Book Direct</a></li>
           <li><a href="booking.html">Check Availability</a></li>
-          <li><a href="#">Cancellation Policy</a></li>
-          <li><a href="#">House Rules</a></li>
+          <li><a href="cancellation-policy.html">Cancellation Policy</a></li>
+          <li><a href="house-rules.html">House Rules</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -505,6 +505,17 @@ function updateStickyCard() {
       btn.href = 'booking.html';
     }
   }
+  // Sync mobile booking bar
+  var mbb = document.getElementById('mobBookBtn');
+  if (mbb) {
+    if (ci && co) {
+      mbb.href = 'booking.html?ci=' + ci + '&co=' + co + '&g=' + g;
+      mbb.textContent = 'Reserve';
+    } else {
+      mbb.href = 'booking.html';
+      mbb.textContent = 'Check Availability';
+    }
+  }
 
   // Sync both calendar highlights
   if (mainCal)     mainCal.setRange(ci || sharedCI, co || sharedCO);
@@ -585,6 +596,8 @@ loadSiteConfig().then(() => {
   // Update "from $X/night" display
   var fp = document.getElementById('stickyFromPrice');
   if (fp) fp.textContent = CONFIG.BASE_RATE;
+  var mfp = document.getElementById('mobFromPrice');
+  if (mfp) mfp.textContent = CONFIG.BASE_RATE;
 
   // Rebuild guest dropdowns to respect MAX_GUESTS from config
   ['hg','s-g'].forEach(function(id) {
@@ -632,5 +645,14 @@ loadAvailability().then(function() {
 
 });
 </script>
+
+<!-- MOBILE STICKY BOOKING BAR -->
+<div class="mob-book-bar" id="mobBookBar">
+  <div class="mob-book-left">
+    <span class="mob-book-price">$<span id="mobFromPrice">400</span></span>
+    <span class="mob-book-night">/ night</span>
+  </div>
+  <a href="booking.html" class="btn btn-primary mob-book-btn" id="mobBookBtn">Check Availability</a>
+</div>
 </body>
 </html>

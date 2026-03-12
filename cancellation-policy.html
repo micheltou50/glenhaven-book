@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cancellation Policy — Glenhaven</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .page-hero { background: var(--g100); padding: 4rem 0 2rem; border-bottom: 1px solid var(--g200); }
+    .policy-timeline { display: flex; flex-direction: column; gap: 0; margin: 2.5rem 0; position: relative; }
+    .policy-timeline::before { content:''; position:absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: var(--g200); z-index: 0; }
+    .pt-item { display: flex; gap: 1.5rem; align-items: flex-start; position: relative; padding-bottom: 2rem; }
+    .pt-item:last-child { padding-bottom: 0; }
+    .pt-dot { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; z-index: 1; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--g200); }
+    .pt-dot.green { background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+    .pt-dot.yellow { background: #f59e0b; box-shadow: 0 0 0 2px #f59e0b; }
+    .pt-dot.red { background: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
+    .pt-body { padding-top: .6rem; flex: 1; }
+    .pt-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+    .pt-body p { font-size: .88rem; color: var(--g500); line-height: 1.6; margin: 0; }
+    .pt-body .pt-tag { display: inline-block; padding: .2rem .65rem; border-radius: 99px; font-size: .75rem; font-weight: 700; margin-bottom: .4rem; }
+    .tag-green { background: #dcfce7; color: #166534; }
+    .tag-yellow { background: #fef3c7; color: #92400e; }
+    .tag-red { background: #fee2e2; color: #991b1b; }
+    .policy-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; margin: 2.5rem 0; }
+    .policy-card { background: #fff; border: 1px solid var(--g200); border-radius: var(--r); padding: 1.5rem; text-align: center; }
+    .policy-card .pc-icon { font-size: 1.8rem; margin-bottom: .75rem; }
+    .policy-card h4 { font-size: .85rem; font-weight: 700; margin-bottom: .4rem; }
+    .policy-card p { font-size: .8rem; color: var(--g500); line-height: 1.5; margin: 0; }
+    .policy-faq { margin-top: 2.5rem; }
+    .faq-item { border-bottom: 1px solid var(--g200); padding: 1.25rem 0; }
+    .faq-item:first-child { border-top: 1px solid var(--g200); }
+    .faq-q { font-size: .92rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-a { font-size: .86rem; color: var(--g500); line-height: 1.7; margin-top: .65rem; display: none; }
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-arrow { transition: transform .2s; font-size: .8rem; }
+    @media (max-width: 768px) { .policy-cards { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="amenities.html">Amenities</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="reviews.html">Reviews</a></li>
+        <li><a href="booking.html" class="nav-cta">Book Now</a></li>
+      </ul>
+      <button class="nav-burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="badge badge-green" style="margin-bottom:1rem;">Cancellation Policy</div>
+    <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:.5rem;">Book with confidence</h1>
+    <p style="color:var(--g500);font-size:1rem;max-width:580px;">We understand plans change. Our policy is designed to be fair to both guests and hosts.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width:760px;">
+
+    <!-- Summary cards -->
+    <div class="policy-cards">
+      <div class="policy-card">
+        <div class="pc-icon">✅</div>
+        <h4>Full refund</h4>
+        <p>Cancel more than 7 days before check-in for a complete refund</p>
+      </div>
+      <div class="policy-card">
+        <div class="pc-icon">⚡</div>
+        <h4>50% refund</h4>
+        <p>Cancel 3–7 days before check-in for a 50% refund of total paid</p>
+      </div>
+      <div class="policy-card">
+        <div class="pc-icon">🔒</div>
+        <h4>No refund</h4>
+        <p>Cancellations within 72 hours of check-in are non-refundable</p>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Refund timeline</h2>
+    <div class="policy-timeline">
+
+      <div class="pt-item">
+        <div class="pt-dot green">✓</div>
+        <div class="pt-body">
+          <span class="pt-tag tag-green">Full refund</span>
+          <h3>More than 7 days before check-in</h3>
+          <p>Cancel any time before this window for a 100% refund. No questions asked. Refund processed within 5–10 business days to your original payment method.</p>
+        </div>
+      </div>
+
+      <div class="pt-item">
+        <div class="pt-dot yellow">½</div>
+        <div class="pt-body">
+          <span class="pt-tag tag-yellow">50% refund</span>
+          <h3>3 to 7 days before check-in</h3>
+          <p>If you cancel in this window, you'll receive a 50% refund of the total amount paid. The remaining 50% covers the cost of holding the dates and turning away other guests.</p>
+        </div>
+      </div>
+
+      <div class="pt-item">
+        <div class="pt-dot red">✗</div>
+        <div class="pt-body">
+          <span class="pt-tag tag-red">No refund</span>
+          <h3>Less than 72 hours before check-in</h3>
+          <p>Cancellations within 72 hours of your check-in time are non-refundable. We're unable to rebook the property on short notice and costs have already been committed.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FAQ -->
+    <div class="policy-faq">
+      <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Common questions</h2>
+
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How do I cancel my booking? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Email us at <a href="mailto:micheltou50@gmail.com" style="color:var(--green);">micheltou50@gmail.com</a> with your booking reference and we'll process the cancellation promptly. You can also use the cancel link in your booking confirmation email.</div>
+      </div>
+
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How long does a refund take? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Refunds are processed within 2 business days of your cancellation request. Depending on your bank, funds typically appear within 5–10 business days.</div>
+      </div>
+
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What if I need to change my dates instead of cancelling? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Date changes are treated as a cancellation of the original booking and a new booking. If your original booking qualifies for a full refund, we'll apply the full amount to your new booking. Get in touch and we'll do our best to accommodate you.</div>
+      </div>
+
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What if Glenhaven needs to cancel my booking? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">In the rare event that we need to cancel, you will receive a 100% full refund regardless of how close to your check-in date. We will also do our best to find alternative accommodation and provide a discount on a future stay.</div>
+      </div>
+
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Is travel insurance recommended? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Yes — we always recommend travel insurance for unexpected situations like illness, flight cancellations, or family emergencies. Our cancellation policy is fixed, but travel insurance can cover circumstances outside our policy window.</div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
+      <p style="font-size:.8rem;color:var(--g400);margin-top:.75rem;">Questions? <a href="mailto:micheltou50@gmail.com" style="color:var(--green);">Contact us</a></p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Glen<em>haven</em></div>
+        <p>A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Property</h4>
+        <ul>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="amenities.html">Amenities</a></li>
+          <li><a href="location.html">Location</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Booking</h4>
+        <ul>
+          <li><a href="booking.html">Book Direct</a></li>
+          <li><a href="cancellation-policy.html">Cancellation Policy</a></li>
+          <li><a href="house-rules.html">House Rules</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <p>© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>loadSiteConfig();</script>
+</body>
+</html>

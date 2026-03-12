@@ -354,3 +354,33 @@ tbody tr:hover td { background: var(--g50); }
   .cfm-grid { grid-template-columns: 1fr; }
   .s-dates { grid-template-columns: 1fr; }
 }
+
+/* ── MOBILE STICKY BOOKING BAR ────────────────────────────── */
+.mob-book-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid var(--g200);
+  padding: .9rem 1.25rem;
+  z-index: 500;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+}
+.mob-book-left { display: flex; align-items: baseline; gap: .25rem; }
+.mob-book-price { font-size: 1.25rem; font-weight: 800; color: #111; }
+.mob-book-night { font-size: .82rem; color: var(--g500); }
+.mob-book-btn { flex-shrink: 0; padding: .7rem 1.4rem; font-size: .9rem; }
+
+@media (max-width: 1024px) {
+  .mob-book-bar { display: flex; }
+  body { padding-bottom: 72px; }
+}
+
+/* ── SINGLE MONTH CALENDAR ON MOBILE ──────────────────────── */
+@media (max-width: 640px) {
+  .cal-two-months .cal-month-wrap { grid-template-columns: 1fr; }
+  .cal-two-months .cal-month:last-child { display: none; }
+}
