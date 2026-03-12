@@ -149,6 +149,12 @@ function applySiteConfig(cfg) {
     setEl('siteHeroSub',      cfg.hero.subheadline);
   }
 
+  // ── From price display ──
+  if (cfg.pricing && cfg.pricing.baseRate != null) {
+    const fp = document.getElementById('stickyFromPrice');
+    if (fp) fp.textContent = cfg.pricing.baseRate;
+  }
+
   // ── Nav logo ──
   if (cfg.property && cfg.property.name) {
     document.querySelectorAll('.nav-logo').forEach(el => {

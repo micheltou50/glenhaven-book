@@ -238,7 +238,7 @@
       <div>
         <div class="sticky-wrap">
           <div class="sticky-card" id="stickyCard">
-            <div class="sticky-price">from $320 <span>/ night</span></div>
+            <div class="sticky-price">from $<span id="stickyFromPrice">320</span> <span>/ night</span></div>
             <div class="stars" style="margin-bottom:.9rem;">★★★★★ <span style="font-size:.8rem;font-weight:500;color:var(--g500);">5.0</span></div>
             <div id="stickyUrgency" class="urgency"><div class="urgency-dot"></div><span>Popular dates are filling fast</span></div>
             <div class="s-dates">
@@ -576,6 +576,10 @@ document.getElementById('s-ci').min = todayISO();
 document.getElementById('s-co').min = todayISO();
 
 loadSiteConfig().then(() => {
+  // Update "from $X/night" display
+  var fp = document.getElementById('stickyFromPrice');
+  if (fp) fp.textContent = CONFIG.BASE_RATE;
+
   // Rebuild guest dropdowns to respect MAX_GUESTS from config
   ['hg','s-g'].forEach(function(id) {
     var sel = document.getElementById(id);

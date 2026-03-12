@@ -106,7 +106,7 @@
             </div>
           </div>
         </div>
-        <p style="font-size:.78rem;color:var(--g400);margin-top:.85rem;">Maximum 8 guests (infants don't count). $40/night per guest beyond 2.</p>
+        <p id="guestFeeNote" style="font-size:.78rem;color:var(--g400);margin-top:.85rem;">Maximum 8 guests (infants don't count). $40/night per guest beyond 2.</p>
         <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
           <button class="btn btn-white" onclick="goStep1()">← Back</button>
           <button class="btn btn-primary" onclick="goStep3()">Continue →</button>
@@ -354,7 +354,10 @@
 
 </script>
 <script>
-  loadSiteConfig(); // load pricing/min nights config — non-blocking
+  loadSiteConfig().then(() => {
+    var note = document.getElementById('guestFeeNote');
+    if (note) note.textContent = 'Maximum ' + CONFIG.MAX_GUESTS + ' guests (infants don't count). $' + CONFIG.EXTRA_GUEST + '/night per guest beyond ' + CONFIG.BASE_GUESTS + '.';
+  });
   loadAvailability().then(() => {
     if (typeof bkCal !== "undefined" && bkCal) {
       // Re-apply setRange after availability loads so the correct month is shown
