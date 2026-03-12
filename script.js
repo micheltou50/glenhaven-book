@@ -132,22 +132,22 @@ function fmtAUD(n) { return '$' + Number(n).toLocaleString('en-AU', { minimumFra
 function getParam(k) { return new URLSearchParams(window.location.search).get(k); }
 
 // ── BOOKING STORE ─────────────────────────────────────────────
-// No localStorage caching — always fetched fresh from server.
-// This ensures deletions from the Sheet are reflected immediately.
+// Uses localStorage as a render cache for fast initial paint.
+// On every page load, server is fetched and cache is overwritten —
+// so stale data never persists beyond one page load.
 
 let _blockedRanges = [];
 
 function rebuildBlockedRanges() {
-  // _blockedRanges is populated entirely from server — no local state
+  _blockedRanges = JSON.parse(localStorage.getItem('gh_blocked') || '[]');
 }
 
-// Kept for admin.html compatibility — returns empty, admin reads from server
-function getBookings() { return []; }
-function getBlocks()   { return []; }
-function saveBooking(b) {}
-function deleteBooking(id) {}
-function saveBlock(b) {}
-function deleteBlock(id) {}
+function getBookings() { return JSON.parse(localStorage.getItem('gh_bookings') || '[]'); }
+function getBlocks()   { return JSON.parse(localStorage.getItem('gh_blocks')   || '[]'); }
+function saveBooking(b) { const a = getBookings(); a.push(b); localStorage.setItem('gh_bookings', JSON.stringify(a)); rebuildBlockedRanges(); }
+function deleteBooking(id) { localStorage.setItem('gh_bookings', JSON.stringify(getBookings().filter(b => b.id !== id))); rebuildBlockedRanges(); }
+function saveBlock(b) { const a = getBlocks(); a.push(b); localStorage.setItem('gh_blocks', JSON.stringify(a)); rebuildBlockedRanges(); }
+function deleteBlock(id) { localStorage.setItem('gh_blocks', JSON.stringify(getBlocks().filter(b => b.id !== id))); rebuildBlockedRanges(); }
 
 function isDateBlocked(iso) {
   const d = new Date(iso); d.setHours(0,0,0,0);
@@ -342,7 +342,12 @@ class MiniCal {
     this.refreshClasses();
   }
 
-  setRange(ci, co) { this.ci = ci; this.co = co; this.refreshClasses(); }
+  setRange(ci, co) {
+    this.ci = ci; this.co = co;
+    // Navigate calendar to the check-in month so it opens on the right dates
+    if (ci) { this.cur = new Date(ci + 'T00:00:00'); this.cur.setDate(1); this.renderDays(); }
+    else { this.refreshClasses(); }
+  }
   reset()          { this.ci = null; this.co = null; this.renderDays(); }
 }
 
@@ -438,18 +443,27 @@ function getUrgencyMsg(checkIn, checkOut) {
 }
 
 // ── AVAILABILITY — fetch real booked dates from Google Sheet ──
-// Fetches blocked ranges fresh from server every page load — no caching.
-// Deletions from the Sheet are reflected immediately on next page load.
+// Fetches fresh availability from server and overwrites localStorage cache.
+// Fast initial paint uses cached data; server data always wins on load.
 async function loadAvailability() {
+  // 1. Paint immediately from cache so calendar feels instant
+  rebuildBlockedRanges();
+
   try {
+    // 2. Fetch fresh from server — overwrites cache completely
     const res  = await fetch(CONFIG.AVAIL_URL);
     const data = await res.json();
     if (data.success && Array.isArray(data.ranges)) {
+      // Overwrite cache with authoritative server data
       _blockedRanges = data.ranges.map(r => ({ start: r.start, end: r.end }));
+      localStorage.setItem('gh_blocked', JSON.stringify(_blockedRanges));
+      // Clear old booking/block keys — server is now the source of truth
+      localStorage.setItem('gh_bookings', '[]');
+      localStorage.setItem('gh_blocks',   '[]');
     }
   } catch (err) {
     console.error('Availability API failed:', err.message);
-    _blockedRanges = []; // fail open — show all dates as available
+    // Keep cached data on failure — better than showing nothing
   }
 }
 
