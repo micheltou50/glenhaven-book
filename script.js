@@ -36,44 +36,56 @@ let HOLIDAY_PRICES = {
 // Default values — overwritten by loadSiteConfig() on page load
 let SITE_CONFIG = null;
 
+const CONFIG_CACHE_KEY = 'gh_site_config';
+const CONFIG_CACHE_TTL  = 60 * 60 * 1000; // 1 hour
+
 async function loadSiteConfig() {
-  // Returns a result object so callers (e.g. admin) can react to errors.
-  // The public site always falls back to defaults and never breaks on failure.
+  // 1. Paint instantly from cache (makes page feel immediate on repeat visits)
+  try {
+    const cached = JSON.parse(localStorage.getItem(CONFIG_CACHE_KEY) || 'null');
+    if (cached && cached.ts && (Date.now() - cached.ts) < CONFIG_CACHE_TTL && cached.config) {
+      SITE_CONFIG = cached.config;
+      applySiteConfig(cached.config);
+      // Still refresh in background but don't await it
+      _fetchSiteConfig();
+      return { loaded: true, status: 'ok', fromCache: true };
+    }
+  } catch(e) {}
+
+  // 2. No valid cache — fetch fresh (first visit or expired)
+  return _fetchSiteConfig();
+}
+
+async function _fetchSiteConfig() {
   try {
     const res  = await fetch(CONFIG.CONFIG_URL);
     let envelope;
-    try {
-      envelope = await res.json();
-    } catch (parseErr) {
-      const msg = 'Response from /api/config was not valid JSON';
-      console.error('[loadSiteConfig]', msg);
-      return { loaded: false, status: 'error', error: msg };
+    try { envelope = await res.json(); }
+    catch (parseErr) {
+      console.error('[loadSiteConfig] Invalid JSON');
+      return { loaded: false, status: 'error', error: 'Invalid JSON' };
     }
 
-    // New response shape: { status: 'ok'|'empty'|'error', config, error }
-    // Old shape fallback: { config: {...}|null }
     const status = envelope.status || (envelope.config ? 'ok' : 'empty');
 
     if (status === 'error' || (!res.ok && !envelope.config)) {
-      const msg = envelope.error || ('HTTP ' + res.status);
-      console.error('[loadSiteConfig] Server error:', msg);
-      // Don't break the public site — fall back to defaults silently
-      return { loaded: false, status: 'error', error: msg };
+      console.error('[loadSiteConfig] Server error:', envelope.error || res.status);
+      return { loaded: false, status: 'error', error: envelope.error };
     }
 
     if (status === 'empty' || !envelope.config) {
-      // No config saved yet — totally normal on first run
-      console.info('[loadSiteConfig] No saved config — using hardcoded defaults');
+      console.info('[loadSiteConfig] No saved config yet');
       return { loaded: false, status: 'empty' };
     }
 
-    // Happy path
+    // Save to cache with timestamp
+    try { localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify({ config: envelope.config, ts: Date.now() })); } catch(e) {}
+
     SITE_CONFIG = envelope.config;
     applySiteConfig(envelope.config);
     return { loaded: true, status: 'ok' };
 
   } catch (err) {
-    // Network failure — log, use defaults, don't crash visitors
     console.warn('[loadSiteConfig] Network error:', err.message);
     return { loaded: false, status: 'error', error: err.message };
   }

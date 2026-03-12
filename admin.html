@@ -709,6 +709,8 @@ async function publishChanges() {
     document.getElementById('discardBtn').style.display = 'none';
     document.getElementById('previewBadge').style.display = 'none';
     applySiteConfig(config);
+    // Clear config cache so live site picks up new config immediately on next visit
+    try { localStorage.removeItem('gh_site_config'); } catch(e) {}
     setStatus('saved', 'Published · ' + new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}));
   } catch(err) {
     alert('Publish failed: ' + err.message);
