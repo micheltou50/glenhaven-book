@@ -678,10 +678,13 @@ let admCal;
 function showTab(name, el) {
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab-btn,.adm-nav a').forEach(b=>b.classList.remove('on'));
-  document.getElementById('tab-'+name).classList.add('on');
+  const pane = document.getElementById('tab-'+name);
+  if (!pane) { console.warn('No tab pane found for:', name); return; }
+  pane.classList.add('on');
   if(el) el.classList.add('on');
   if(name==='calendar'&&!admCal) setTimeout(()=>{ admCal=new MiniCal('admCalContainer',{onSelect:()=>{},showPrice:false}); },50);
   if(name==='block') renderBlockList();
+  if(name==='checklist') { if(typeof renderChecklist==='function') renderChecklist(); }
 }
 
 // ── BOOKINGS (reads from server via _blockedRanges) ───────────
@@ -823,11 +826,7 @@ async function checkConfigLoad() {
 }
 
 // Render checklist when tab opens
-const _origShowTab = showTab;
-function showTab(name, el) {
-  _origShowTab(name, el);
-  if (name === 'checklist') renderChecklist();
-}
+
 
 </script>
 </body>
