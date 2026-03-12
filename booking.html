@@ -353,7 +353,11 @@
 </script>
 <script>
   loadAvailability().then(() => {
-    if (typeof bkCal !== "undefined" && bkCal) bkCal.renderDays();
+    if (typeof bkCal !== "undefined" && bkCal) {
+      // Re-apply setRange after availability loads so the correct month is shown
+      if (bkCI && bkCO) bkCal.setRange(bkCI, bkCO);
+      else bkCal.renderDays();
+    }
   });
 </script>
 </body>
