@@ -434,11 +434,38 @@ const DEFAULT_CONFIG = {
   hero: { headline:'Blue Mountains\nCottage Escape', subheadline:'📍 Katoomba · Blue Mountains · NSW Australia' },
   pricing: { baseRate:320, baseGuests:2, extraGuest:40, cleaningFee:150, maxGuests:8, friSurcharge:60, satSurcharge:80, peakPct:25, lowPct:-10, minNights:{weekday:2,weekend:3,peak:4}, holidayPrices:{'12-25':550,'12-26':550,'01-01':650,'12-31':650,'04-18':480,'04-20':480} },
   colors: { primary:'#1a6640', accent:'#b45309' },
-  photos: ['https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg'],
+  photos: [
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
+    'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
+  ],
   amenities:['Wood fireplace','Glass conservatory','Private garden','Full kitchen','Washer & dryer','Fast WiFi','Smart TV','BBQ grill','Free parking','Self check-in','Pet friendly','Air conditioning'],
 };
 
 function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+async function loadAdminBookings() {
+  try {
+    const res  = await fetch('/api/bookings');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.bookings)) {
+      allBK = data.bookings;
+    } else {
+      console.warn('loadAdminBookings:', data.error || 'No bookings returned');
+      allBK = [];
+    }
+  } catch(err) {
+    console.warn('Could not load bookings from server:', err.message);
+    allBK = [];
+  }
+}
 
 function setStatus(state, text) {
   document.getElementById('statusDot').className = 'dot ' + state;
@@ -457,6 +484,7 @@ async function init() {
   document.getElementById('blkTo').min   = todayISO();
   await fetchServerConfig();
   await loadAvailability();
+  await loadAdminBookings();
   renderStats();
   renderTable();
   renderBlockList();
@@ -632,9 +660,26 @@ function applyPreset(primary, accent) {
 // ── PREVIEW / PUBLISH ─────────────────────────────────────────
 function previewChanges() {
   const cfg = readForm();
-  applySiteConfig(cfg);
+
+  // Apply colors to admin page itself so you can see the change immediately
+  if (cfg.colors) {
+    const root = document.documentElement;
+    if (cfg.colors.primary) {
+      const p = cfg.colors.primary;
+      root.style.setProperty('--green',   p);
+      root.style.setProperty('--green-d', shadeColor(p, -20));
+      root.style.setProperty('--green-l', shadeColor(p,  20));
+      root.style.setProperty('--green-p', hexToRgba(p, 0.1));
+    }
+    if (cfg.colors.accent) root.style.setProperty('--warm', cfg.colors.accent);
+  }
+
+  // Open the live site in a new tab with a preview flag
+  const previewUrl = 'index.html?preview=1';
+  window.open(previewUrl, '_blank');
+
   document.getElementById('previewBadge').style.display = 'inline-block';
-  setStatus('unsaved', 'Previewing — click Publish to go live');
+  setStatus('unsaved', 'Preview opened in new tab — click Publish to go live');
 }
 function discardChanges() {
   if(!confirm('Discard all unsaved changes?')) return;

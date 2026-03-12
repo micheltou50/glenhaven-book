@@ -575,7 +575,12 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && her
 document.getElementById('s-ci').min = todayISO();
 document.getElementById('s-co').min = todayISO();
 
-loadSiteConfig(); // fire-and-forget — applies colors/text if config exists, never blocks calendar
+loadSiteConfig().then(() => {
+  // Re-render calendar after config loads so price labels reflect updated rates
+  if (typeof mainCal !== 'undefined' && mainCal) mainCal.renderDays();
+  if (typeof heroCalInst !== 'undefined' && heroCalInst) heroCalInst.renderDays();
+  updateStickyCard();
+}); // non-blocking — calendar init runs independently below
 loadAvailability().then(function() {
 
   // ── mainCal: always visible in availability section ───────
