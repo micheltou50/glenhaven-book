@@ -7,29 +7,160 @@
 
 // ── CONFIG ────────────────────────────────────────────────────
 const CONFIG = {
-  WEBHOOK_URL  : '/api/book',         // Netlify Function
-  AVAIL_URL    : '/api/availability',  // Netlify Function
-  BASE_RATE    : 320,
-  BASE_GUESTS  : 2,
-  EXTRA_GUEST  : 40,
-  CLEANING_FEE : 150,
-  MAX_GUESTS   : 8,
-  MIN_NIGHTS   : {
-    weekday: 2,
-    weekend: 3,
-    peak   : 4,
-  },
+  WEBHOOK_URL    : '/api/book',
+  AVAIL_URL      : '/api/availability',
+  CONFIG_URL     : '/api/config',
+  BASE_RATE      : 320,
+  BASE_GUESTS    : 2,
+  EXTRA_GUEST    : 40,
+  CLEANING_FEE   : 150,
+  MAX_GUESTS     : 8,
+  FRI_SURCHARGE  : 60,
+  SAT_SURCHARGE  : 80,
+  PEAK_PCT       : 25,   // +25% in peak season
+  LOW_PCT        : -10,  // -10% in low season
+  MIN_NIGHTS     : { weekday: 2, weekend: 3, peak: 4 },
 };
 
 // ── PRICING RULES ─────────────────────────────────────────────
-const HOLIDAY_PRICES = {
-  '12-25': 550,   // Christmas Day nightly rate
-  '12-26': 550,   // Boxing Day
-  '01-01': 650,   // New Year's Day
-  '12-31': 650,   // New Year's Eve
-  '04-18': 480,   // Good Friday (approx — fixed for demo)
-  '04-20': 480,   // Easter Sunday
+let HOLIDAY_PRICES = {
+  '12-25': 550,
+  '12-26': 550,
+  '01-01': 650,
+  '12-31': 650,
+  '04-18': 480,
+  '04-20': 480,
 };
+
+// ── SITE CONFIG (loaded from server) ──────────────────────────
+// Default values — overwritten by loadSiteConfig() on page load
+let SITE_CONFIG = null;
+
+async function loadSiteConfig() {
+  // Returns a result object so callers (e.g. admin) can react to errors.
+  // The public site always falls back to defaults and never breaks on failure.
+  try {
+    const res  = await fetch(CONFIG.CONFIG_URL);
+    let envelope;
+    try {
+      envelope = await res.json();
+    } catch (parseErr) {
+      const msg = 'Response from /api/config was not valid JSON';
+      console.error('[loadSiteConfig]', msg);
+      return { loaded: false, status: 'error', error: msg };
+    }
+
+    // New response shape: { status: 'ok'|'empty'|'error', config, error }
+    // Old shape fallback: { config: {...}|null }
+    const status = envelope.status || (envelope.config ? 'ok' : 'empty');
+
+    if (status === 'error' || (!res.ok && !envelope.config)) {
+      const msg = envelope.error || ('HTTP ' + res.status);
+      console.error('[loadSiteConfig] Server error:', msg);
+      // Don't break the public site — fall back to defaults silently
+      return { loaded: false, status: 'error', error: msg };
+    }
+
+    if (status === 'empty' || !envelope.config) {
+      // No config saved yet — totally normal on first run
+      console.info('[loadSiteConfig] No saved config — using hardcoded defaults');
+      return { loaded: false, status: 'empty' };
+    }
+
+    // Happy path
+    SITE_CONFIG = envelope.config;
+    applySiteConfig(envelope.config);
+    return { loaded: true, status: 'ok' };
+
+  } catch (err) {
+    // Network failure — log, use defaults, don't crash visitors
+    console.warn('[loadSiteConfig] Network error:', err.message);
+    return { loaded: false, status: 'error', error: err.message };
+  }
+}
+
+function applySiteConfig(cfg) {
+  if (!cfg) return;
+
+  // ── Pricing ──
+  if (cfg.pricing) {
+    if (cfg.pricing.baseRate     != null) CONFIG.BASE_RATE     = cfg.pricing.baseRate;
+    if (cfg.pricing.baseGuests   != null) CONFIG.BASE_GUESTS   = cfg.pricing.baseGuests;
+    if (cfg.pricing.extraGuest   != null) CONFIG.EXTRA_GUEST   = cfg.pricing.extraGuest;
+    if (cfg.pricing.cleaningFee  != null) CONFIG.CLEANING_FEE  = cfg.pricing.cleaningFee;
+    if (cfg.pricing.maxGuests    != null) CONFIG.MAX_GUESTS    = cfg.pricing.maxGuests;
+    if (cfg.pricing.friSurcharge != null) CONFIG.FRI_SURCHARGE = cfg.pricing.friSurcharge;
+    if (cfg.pricing.satSurcharge != null) CONFIG.SAT_SURCHARGE = cfg.pricing.satSurcharge;
+    if (cfg.pricing.peakPct      != null) CONFIG.PEAK_PCT      = cfg.pricing.peakPct;
+    if (cfg.pricing.lowPct       != null) CONFIG.LOW_PCT       = cfg.pricing.lowPct;
+    if (cfg.pricing.minNights)            CONFIG.MIN_NIGHTS    = { ...CONFIG.MIN_NIGHTS, ...cfg.pricing.minNights };
+    if (cfg.pricing.holidayPrices)        HOLIDAY_PRICES       = { ...HOLIDAY_PRICES, ...cfg.pricing.holidayPrices };
+  }
+
+  // ── Colors — inject CSS variables ──
+  if (cfg.colors) {
+    const root = document.documentElement;
+    const c    = cfg.colors;
+    if (c.primary) {
+      root.style.setProperty('--green',   c.primary);
+      root.style.setProperty('--green-d', shadeColor(c.primary, -20));
+      root.style.setProperty('--green-l', shadeColor(c.primary, 20));
+      root.style.setProperty('--green-p', hexToRgba(c.primary, 0.1));
+    }
+    if (c.accent)  root.style.setProperty('--warm', c.accent);
+  }
+
+  // ── Text content ──
+  if (cfg.property) {
+    setEl('sitePropertyName', cfg.property.name);
+    setEl('siteTagline',      cfg.property.tagline);
+    setEl('siteDescription',  cfg.property.description);
+    setEl('siteBeds',         cfg.property.bedrooms  != null ? cfg.property.bedrooms  : null);
+    setEl('siteBaths',        cfg.property.bathrooms != null ? cfg.property.bathrooms : null);
+    setEl('siteMaxGuests',    cfg.property.guests    != null ? cfg.property.guests    : null);
+    if (cfg.property.guests != null) CONFIG.MAX_GUESTS = cfg.property.guests;
+  }
+  if (cfg.hero) {
+    setEl('siteHeroHeadline', cfg.hero.headline);
+    setEl('siteHeroSub',      cfg.hero.subheadline);
+  }
+
+  // ── Nav logo ──
+  if (cfg.property && cfg.property.name) {
+    document.querySelectorAll('.nav-logo').forEach(el => {
+      el.innerHTML = cfg.property.name;
+    });
+  }
+
+  // ── Photos ──
+  if (cfg.photos && cfg.photos.length) {
+    document.querySelectorAll('[data-site-photo]').forEach(el => {
+      const idx = parseInt(el.dataset.sitePhoto) || 0;
+      if (cfg.photos[idx]) el.src = cfg.photos[idx];
+    });
+  }
+}
+
+// Set element text content if element exists and value is non-null
+function setEl(id, val) {
+  if (val == null) return;
+  const el = document.getElementById(id);
+  if (el) el.textContent = String(val);
+}
+
+// Lighten/darken a hex color by amount (-100 to 100)
+function shadeColor(hex, amount) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, Math.max(0, (n >> 16) + amount));
+  const g = Math.min(255, Math.max(0, ((n >> 8) & 0xff) + amount));
+  const b = Math.min(255, Math.max(0, (n & 0xff) + amount));
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+function hexToRgba(hex, alpha) {
+  const n = parseInt(hex.replace('#',''), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 0xff},${n & 0xff},${alpha})`;
+}
 
 function getPeakSeason(date) {
   const m = date.getMonth() + 1;
@@ -49,15 +180,17 @@ function getNightlyRate(date, extraGuests = 0) {
 
   let base = CONFIG.BASE_RATE;
 
-  // Weekend surcharge
+  // Weekend surcharge — uses dynamic CONFIG values (set from admin panel)
   const day = date.getDay();
-  if (day === 5) base += 60; // Friday
-  if (day === 6) base += 80; // Saturday
+  if (day === 5) base += (CONFIG.FRI_SURCHARGE != null ? CONFIG.FRI_SURCHARGE : 60); // Friday
+  if (day === 6) base += (CONFIG.SAT_SURCHARGE != null ? CONFIG.SAT_SURCHARGE : 80); // Saturday
 
-  // Seasonal
+  // Seasonal modifier — uses dynamic CONFIG values
   const season = getPeakSeason(date);
-  if (season === 'peak') base *= 1.25;
-  if (season === 'low')  base *= 0.90;
+  const peakMult = 1 + (CONFIG.PEAK_PCT != null ? CONFIG.PEAK_PCT : 25) / 100;
+  const lowMult  = 1 + (CONFIG.LOW_PCT  != null ? CONFIG.LOW_PCT  : -10) / 100;
+  if (season === 'peak') base *= peakMult;
+  if (season === 'low')  base *= lowMult;
 
   return Math.round(base) + extraGuests * CONFIG.EXTRA_GUEST;
 }

@@ -5,43 +5,134 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — Glenhaven</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { background: #f0f2f5; }
+    .adm-wrap  { display: flex; min-height: calc(100vh - 70px); }
+    .adm-side  { width: 220px; flex-shrink: 0; background: #111; min-height: calc(100vh - 70px); position: sticky; top: 70px; height: calc(100vh - 70px); overflow-y: auto; }
+    .adm-main  { flex: 1; padding: 2rem; overflow-x: hidden; }
+    .adm-nav a { display: flex; align-items: center; gap: .6rem; padding: .65rem 1.4rem; font-size: .84rem; color: rgba(255,255,255,.55); text-decoration: none; transition: all .15s; }
+    .adm-nav a:hover, .adm-nav a.on { background: rgba(255,255,255,.07); color: #fff; }
+    .adm-nav a.on { border-left: 3px solid var(--green); padding-left: calc(1.4rem - 3px); }
+    .adm-nav .nav-group { font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.25); padding: 1.2rem 1.4rem .4rem; }
+    .adm-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+    .stat-box  { background: #fff; border-radius: var(--r); padding: 1.1rem 1.25rem; box-shadow: var(--sh-sm); }
+    .slabel { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--g400); margin-bottom: .35rem; }
+    .sval   { font-size: 1.65rem; font-weight: 800; color: var(--black); line-height: 1; }
+    .sval.g { color: var(--green); }
+    .ssub   { font-size: .72rem; color: var(--g400); margin-top: .3rem; }
+    .tab-bar { display: flex; gap: .35rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .tab-btn { padding: .5rem 1.1rem; border-radius: var(--r-full); font-size: .82rem; font-weight: 600; background: #fff; border: 1px solid var(--g200); color: var(--g600); cursor: pointer; transition: all .15s; }
+    .tab-btn.on, .tab-btn:hover { background: var(--black); color: #fff; border-color: var(--black); }
+    .tab-pane { display: none; }
+    .tab-pane.on { display: block; }
+    .tbl-wrap { background: #fff; border-radius: var(--r-lg); box-shadow: var(--sh-sm); overflow: hidden; }
+    .tbl-bar  { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--g100); gap: .75rem; flex-wrap: wrap; }
+    .tbl-search input { padding: .48rem .9rem; border: 1.5px solid var(--g200); border-radius: var(--r-full); font-size: .83rem; width: 220px; outline: none; }
+    .tbl-search input:focus { border-color: var(--green); }
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead th { padding: .65rem 1rem; text-align: left; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--g400); background: var(--g50); border-bottom: 1px solid var(--g100); }
+    tbody td { padding: .75rem 1rem; border-bottom: 1px solid var(--g100); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--g50); }
+    .t-act { font-size: .75rem; padding: .3rem .75rem; border-radius: var(--r-full); border: 1px solid var(--g200); background: #fff; cursor: pointer; color: var(--g600); }
+    .t-act:hover { border-color: var(--red); color: var(--red); }
+    .spill { display: inline-block; font-size: .7rem; font-weight: 700; padding: .2rem .55rem; border-radius: 100px; letter-spacing: .04em; }
+    .s-cfm { background: #dcfce7; color: #166534; }
+    .s-pen { background: #fef9c3; color: #854d0e; }
+    .s-can { background: #fee2e2; color: #991b1b; }
+    .edit-card { background: #fff; border-radius: var(--r-lg); padding: 1.5rem; box-shadow: var(--sh-sm); margin-bottom: 1.25rem; }
+    .edit-card h3 { font-size: .95rem; margin-bottom: 1.1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--g100); }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: .85rem; }
+    .field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .field-row.single { grid-template-columns: 1fr; }
+    .field-group { display: flex; flex-direction: column; gap: .35rem; }
+    .field-group label { font-size: .75rem; font-weight: 700; color: var(--g600); text-transform: uppercase; letter-spacing: .05em; }
+    .field-group input, .field-group textarea { padding: .6rem .9rem; border: 1.5px solid var(--g200); border-radius: var(--r); font-size: .88rem; color: var(--black); outline: none; font-family: inherit; transition: border-color .15s; }
+    .field-group input:focus, .field-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,102,64,.08); }
+    .field-group textarea { resize: vertical; min-height: 80px; }
+    .field-hint { font-size: .72rem; color: var(--g400); margin-top: .2rem; }
+    .color-row { display: flex; align-items: center; gap: .75rem; }
+    .color-swatch { width: 36px; height: 36px; border-radius: var(--r-sm); border: 2px solid var(--g200); cursor: pointer; flex-shrink: 0; overflow: hidden; padding: 0; display: flex; }
+    .color-swatch input[type=color] { width: 48px; height: 48px; border: none; margin: -6px; cursor: pointer; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; margin-bottom: 1rem; }
+    .photo-item { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 4/3; background: var(--g100); border: 1.5px solid var(--g200); }
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-item .photo-del { position: absolute; top: .35rem; right: .35rem; background: rgba(0,0,0,.65); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 1rem; cursor: pointer; line-height: 1; }
+    .photo-item .photo-idx { position: absolute; bottom: .35rem; left: .35rem; background: rgba(0,0,0,.55); color: #fff; font-size: .68rem; font-weight: 700; padding: .15rem .45rem; border-radius: 100px; }
+    .photo-add { border: 2px dashed var(--g300); border-radius: var(--r); padding: 1rem; display: flex; flex-direction: column; gap: .5rem; }
+    .photo-add input { font-size: .82rem; padding: .5rem .75rem; border: 1.5px solid var(--g200); border-radius: var(--r); outline: none; }
+    .amenity-list { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .85rem; min-height: 40px; }
+    .amenity-tag { display: inline-flex; align-items: center; gap: .35rem; background: var(--g100); border-radius: 100px; padding: .3rem .75rem; font-size: .8rem; }
+    .amenity-tag button { background: none; border: none; color: var(--g400); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; }
+    .amenity-tag button:hover { color: var(--red); }
+    .amenity-add { display: flex; gap: .5rem; }
+    .amenity-add input { flex: 1; padding: .5rem .85rem; border: 1.5px solid var(--g200); border-radius: var(--r-full); font-size: .85rem; outline: none; }
+    .publish-bar { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--g200); padding: .85rem 2rem; display: flex; align-items: center; justify-content: space-between; z-index: 100; box-shadow: 0 -4px 12px rgba(0,0,0,.06); }
+    .pub-status { font-size: .82rem; color: var(--g500); display: flex; align-items: center; gap: .5rem; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--g300); display: inline-block; flex-shrink: 0; }
+    .dot.saved { background: var(--green); }
+    .dot.unsaved { background: var(--warm); animation: blink 1.5s infinite; }
+    .dot.saving { background: var(--gold); }
+    .preview-badge { background: var(--warm-p); color: var(--warm); font-size: .75rem; font-weight: 700; padding: .25rem .7rem; border-radius: 100px; }
+    .price-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: #fff; border-radius: var(--r-lg); padding: 2rem; width: 320px; box-shadow: var(--sh-xl); }
+    .login-box h2 { font-size: 1.1rem; margin-bottom: 1.25rem; }
+    .login-error { font-size: .82rem; color: var(--red); margin-top: .5rem; display: none; }
+    @media(max-width:700px){.adm-side{display:none;}.publish-bar{left:0;}.price-edit-grid,.field-row,.field-row.three{grid-template-columns:1fr;}}
+  </style>
 </head>
 <body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>Host Login</h2>
+    <div class="field-group">
+      <label>Password</label>
+      <input type="password" id="loginPwd" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-error" id="loginErr">Incorrect password. Try again.</div>
+    <button class="btn btn-primary" style="margin-top:1rem;width:100%;" onclick="doLogin()">Login</button>
+  </div>
+</div>
 
 <header>
   <nav class="navbar">
     <div class="container nav-inner">
       <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
       <ul class="nav-links">
-        <li><a href="index.html" target="_blank">View site ↗</a></li>
-        <li><a href="booking.html" target="_blank">Booking page ↗</a></li>
+        <span id="previewBadge" class="preview-badge" style="display:none;">PREVIEW MODE</span>
+        <li><a href="index.html" target="_blank">View live site ↗</a></li>
       </ul>
     </div>
   </nav>
 </header>
 
 <div class="adm-wrap">
-
-  <!-- SIDEBAR -->
   <aside class="adm-side">
-    <div style="padding:1.2rem 1.4rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:1.25rem;">
+    <div style="padding:1.2rem 1.4rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.5rem;">
       <div style="color:#fff;font-weight:700;font-size:.9rem;">Host Dashboard</div>
       <div style="color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.2rem;" id="admDate"></div>
     </div>
     <nav class="adm-nav">
-      <a href="#" class="on" onclick="showTab('bookings',this)">📋 Bookings <span id="bkBadge" style="margin-left:auto;background:var(--green);color:#fff;font-size:.65rem;padding:.12rem .45rem;border-radius:100px;">0</span></a>
+      <div class="nav-group">Bookings</div>
+      <a href="#" class="on" onclick="showTab('bookings',this)">📋 All Bookings</a>
       <a href="#" onclick="showTab('calendar',this)">📅 Calendar</a>
       <a href="#" onclick="showTab('block',this)">🚫 Block Dates</a>
+      <div class="nav-group">Site Editor</div>
+      <a href="#" onclick="showTab('edit-property',this)">🏡 Property Info</a>
+      <a href="#" onclick="showTab('edit-pricing',this)">💰 Pricing</a>
+      <a href="#" onclick="showTab('edit-photos',this)">🖼 Photos</a>
+      <a href="#" onclick="showTab('edit-amenities',this)">✅ Amenities</a>
+      <a href="#" onclick="showTab('edit-design',this)">🎨 Design & Colors</a>
+      <div class="nav-group">System</div>
       <a href="#" onclick="showTab('ical',this)">🔄 iCal Sync</a>
-      <a href="#" onclick="showTab('pricing',this)">💰 Pricing Rules</a>
-      <a href="index.html" target="_blank">🌐 Live Site</a>
+      <a href="#" onclick="showTab('checklist',this)">✅ Deploy Checks</a>
+      <a href="index.html" target="_blank">🌐 Live Site ↗</a>
     </nav>
   </aside>
 
-  <!-- MAIN -->
-  <main class="adm-main">
-
-    <!-- STATS -->
+  <main class="adm-main" style="padding-bottom:80px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
       <div>
         <h2 style="font-size:1.35rem;">Dashboard</h2>
@@ -51,31 +142,37 @@
     </div>
 
     <div class="adm-stats">
-      <div class="stat-box"><div class="slabel">Total Bookings</div><div class="sval g" id="stTotal">0</div><div class="ssub">All time</div></div>
-      <div class="stat-box"><div class="slabel">Upcoming</div><div class="sval" id="stUpcoming">0</div><div class="ssub">Next 90 days</div></div>
-      <div class="stat-box"><div class="slabel">Nights Booked</div><div class="sval" id="stNights">0</div><div class="ssub">Total</div></div>
-      <div class="stat-box"><div class="slabel">Direct Revenue</div><div class="sval g" id="stRevenue">$0</div><div class="ssub">Estimated</div></div>
+      <div class="stat-box"><div class="slabel">Total Bookings</div><div class="sval g" id="stTotal">—</div><div class="ssub">All time</div></div>
+      <div class="stat-box"><div class="slabel">Upcoming</div><div class="sval" id="stUpcoming">—</div><div class="ssub">Next 90 days</div></div>
+      <div class="stat-box"><div class="slabel">Nights Booked</div><div class="sval" id="stNights">—</div><div class="ssub">Total</div></div>
+      <div class="stat-box"><div class="slabel">Direct Revenue</div><div class="sval g" id="stRevenue">—</div><div class="ssub">Estimated</div></div>
     </div>
 
-    <!-- TAB BAR -->
+    <!-- CONFIG LOAD BANNER — shown only when there's a load error or on first run -->
+    <div id="cfgBanner" style="display:none;border-radius:var(--r);padding:.85rem 1.1rem;margin-bottom:1.1rem;font-size:.84rem;display:none;align-items:center;gap:.75rem;"></div>
+
     <div class="tab-bar">
-      <button class="tab-btn on" onclick="showTab('bookings',this)">All Bookings</button>
+      <button class="tab-btn on" onclick="showTab('bookings',this)">Bookings</button>
       <button class="tab-btn" onclick="showTab('calendar',this)">Calendar</button>
       <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
-      <button class="tab-btn" onclick="showTab('ical',this)">iCal Sync</button>
-      <button class="tab-btn" onclick="showTab('pricing',this)">Pricing</button>
+      <button class="tab-btn" onclick="showTab('edit-property',this)">Property</button>
+      <button class="tab-btn" onclick="showTab('edit-pricing',this)">Pricing</button>
+      <button class="tab-btn" onclick="showTab('edit-photos',this)">Photos</button>
+      <button class="tab-btn" onclick="showTab('edit-amenities',this)">Amenities</button>
+      <button class="tab-btn" onclick="showTab('edit-design',this)">Design</button>
+      <button class="tab-btn" onclick="showTab('ical',this)">iCal</button>
+      <button class="tab-btn" onclick="showTab('checklist',this)">✅ Tests</button>
     </div>
 
-    <!-- BOOKINGS TAB -->
+    <!-- BOOKINGS -->
     <div class="tab-pane on" id="tab-bookings">
       <div class="tbl-wrap">
         <div class="tbl-bar">
-          <div class="tbl-search"><input type="text" placeholder="Search name or email…" oninput="filterTable(this.value)" id="tblSearch"/></div>
+          <div class="tbl-search"><input type="text" placeholder="Search name…" oninput="filterTable(this.value)"/></div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
             <select class="form-select" style="width:auto;padding:.48rem .85rem;font-size:.82rem;" onchange="filterStatus(this.value)">
               <option value="">All status</option>
               <option value="CONFIRMED">Confirmed</option>
-              <option value="PENDING">Pending</option>
               <option value="CANCELLED">Cancelled</option>
             </select>
             <button class="btn btn-sm btn-white" onclick="exportCSV()">Export CSV</button>
@@ -83,35 +180,19 @@
         </div>
         <div style="overflow-x:auto;">
           <table>
-            <thead>
-              <tr>
-                <th>Guest</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Nights</th>
-                <th>Guests</th>
-                <th>Total</th>
-                <th>Platform</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Guest</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Guests</th><th>Total</th><th>Platform</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="bkTable"></tbody>
           </table>
         </div>
         <div id="bkEmpty" style="text-align:center;padding:3rem;color:var(--g400);font-size:.9rem;display:none;">
-          <div style="font-size:2rem;margin-bottom:.6rem;">📋</div>
-          <p>No bookings yet.</p>
-          <a href="booking.html" class="btn btn-primary btn-sm" style="margin-top:.75rem;display:inline-flex;">Create test booking</a>
+          <div style="font-size:2rem;margin-bottom:.6rem;">📋</div><p>No bookings yet.</p>
         </div>
       </div>
     </div>
 
-    <!-- CALENDAR TAB -->
+    <!-- CALENDAR -->
     <div class="tab-pane" id="tab-calendar">
-      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
-        <h3 style="font-size:1rem;margin-bottom:1.2rem;">Availability Overview</h3>
-        <div id="admCalContainer"></div>
+      <div class="edit-card"><h3>📅 Availability Overview</h3><div id="admCalContainer"></div>
         <div class="cal-legend" style="margin-top:.85rem;">
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:var(--green)"></div>Booked / Blocked</div>
           <div class="cal-legend-i"><div class="cal-legend-d" style="background:#fff;border:1px solid var(--g200)"></div>Available</div>
@@ -119,111 +200,195 @@
       </div>
     </div>
 
-    <!-- BLOCK DATES TAB -->
+    <!-- BLOCK DATES -->
     <div class="tab-pane" id="tab-block">
-      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);margin-bottom:1.5rem;">
-        <h3 style="font-size:1rem;margin-bottom:.4rem;">Block dates</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.1rem;">Block dates for maintenance, personal stays, or any other reason.</p>
-        <div class="form-row" style="margin-bottom:.85rem;">
-          <div class="form-group"><label class="form-label">From</label><input type="date" id="blkFrom" class="form-input"/></div>
-          <div class="form-group"><label class="form-label">To</label><input type="date" id="blkTo" class="form-input"/></div>
+      <div class="edit-card">
+        <h3>🚫 Block Dates</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.1rem;">Block dates for maintenance, owner stays, or any other reason.</p>
+        <div class="field-row">
+          <div class="field-group"><label>From</label><input type="date" id="blkFrom"/></div>
+          <div class="field-group"><label>To</label><input type="date" id="blkTo"/></div>
         </div>
-        <div class="form-group" style="margin-bottom:.85rem;"><label class="form-label">Reason</label><input type="text" id="blkReason" class="form-input" placeholder="Maintenance, owner stay, etc."/></div>
+        <div class="field-group" style="margin-bottom:.85rem;"><label>Reason</label><input type="text" id="blkReason" placeholder="Maintenance, owner stay…"/></div>
         <button class="btn btn-black" onclick="addBlock()">Block these dates</button>
       </div>
-      <div class="tbl-wrap" id="blockListWrap">
+      <div class="tbl-wrap">
         <div class="tbl-bar"><span style="font-size:.875rem;font-weight:600;">Blocked periods</span></div>
         <div id="blockList"></div>
         <div id="blockEmpty" style="text-align:center;padding:2rem;color:var(--g400);font-size:.85rem;">No blocked dates.</div>
       </div>
     </div>
 
-    <!-- ICAL TAB -->
-    <div class="tab-pane" id="tab-ical">
-      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
-        <h3 style="font-size:1rem;margin-bottom:.4rem;">🔄 iCal Calendar Sync</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.2rem;">Paste iCal feed URLs from other platforms. Dates imported from these feeds will be blocked automatically.</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:1.2rem;">
-          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
-            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">🏠 Airbnb</div>
-            <input type="url" id="icalAirbnb" class="form-input" placeholder="https://www.airbnb.com.au/calendar/ical/..."/>
-            <div id="syncAirbnb" style="font-size:.72rem;margin-top:.3rem;"></div>
+    <!-- PROPERTY INFO -->
+    <div class="tab-pane" id="tab-edit-property">
+      <div class="edit-card">
+        <h3>🏡 Property Information</h3>
+        <div class="field-row">
+          <div class="field-group"><label>Property Name</label><input type="text" id="eName" placeholder="Glenhaven"/></div>
+          <div class="field-group"><label>Tagline</label><input type="text" id="eTagline" placeholder="A Quintessential Katoomba Cottage"/><div class="field-hint">Used in page &lt;title&gt; and booking page</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Hero Headline</label><input type="text" id="eHeroHeadline" placeholder="Blue Mountains Cottage Escape"/><div class="field-hint">Main headline on the homepage banner</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Hero Tag (above headline)</label><input type="text" id="eHeroSub" placeholder="Katoomba · Blue Mountains · NSW"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Property Description</label><textarea id="eDescription" rows="4" placeholder="A peaceful 2-storey timber retreat…"></textarea></div>
+        </div>
+        <div class="field-row three">
+          <div class="field-group"><label>Bedrooms</label><input type="number" id="eBedrooms" min="1" placeholder="4"/></div>
+          <div class="field-group"><label>Bathrooms</label><input type="number" id="eBathrooms" min="1" step="0.5" placeholder="2.5"/></div>
+          <div class="field-group"><label>Max Guests</label><input type="number" id="eMaxGuests" min="1" placeholder="8"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div class="tab-pane" id="tab-edit-pricing">
+      <div class="edit-card">
+        <h3>💰 Nightly Rates</h3>
+        <div class="price-edit-grid">
+          <div>
+            <p style="font-size:.75rem;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem;">Base Rates (AUD)</p>
+            <div class="field-row single"><div class="field-group"><label>Weekday rate (Mon–Thu)</label><input type="number" id="pBaseRate" min="0" placeholder="320"/></div></div>
+            <div class="field-row single"><div class="field-group"><label>Friday surcharge (+$)</label><input type="number" id="pFriSurcharge" min="0" placeholder="60"/></div></div>
+            <div class="field-row single"><div class="field-group"><label>Saturday surcharge (+$)</label><input type="number" id="pSatSurcharge" min="0" placeholder="80"/></div></div>
+            <div class="field-row single"><div class="field-group"><label>Cleaning fee (flat $)</label><input type="number" id="pCleaningFee" min="0" placeholder="150"/></div></div>
+            <div class="field-row single"><div class="field-group"><label>Extra guest fee per night</label><input type="number" id="pExtraGuest" min="0" placeholder="40"/></div></div>
+            <div class="field-row single"><div class="field-group"><label>Base guests (included, no charge)</label><input type="number" id="pBaseGuests" min="1" max="10" placeholder="2"/></div></div>
           </div>
-          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
-            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">🏡 VRBO</div>
-            <input type="url" id="icalVrbo" class="form-input" placeholder="https://www.vrbo.com/icalendar/..."/>
-            <div id="syncVrbo" style="font-size:.72rem;margin-top:.3rem;"></div>
-          </div>
-          <div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;">
-            <div style="font-weight:600;font-size:.88rem;margin-bottom:.5rem;">📅 Other</div>
-            <input type="url" id="icalOther" class="form-input" placeholder="https://..."/>
-            <div id="syncOther" style="font-size:.72rem;margin-top:.3rem;"></div>
+          <div>
+            <p style="font-size:.75rem;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem;">Seasonal Modifiers</p>
+            <div class="field-row single"><div class="field-group"><label>Peak season (Dec–Jan) modifier %</label><input type="number" id="pPeakPct" placeholder="25"/><div class="field-hint">e.g. 25 = +25% on all rates</div></div></div>
+            <div class="field-row single"><div class="field-group"><label>Low season (May–Aug) modifier %</label><input type="number" id="pLowPct" placeholder="-10"/><div class="field-hint">e.g. -10 = 10% discount</div></div></div>
+            <p style="font-size:.75rem;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.07em;margin:.85rem 0 .5rem;">Holiday Rates (AUD / night)</p>
+            <div class="field-row"><div class="field-group"><label>Christmas Day (25 Dec)</label><input type="number" id="pXmas" placeholder="550"/></div><div class="field-group"><label>Boxing Day (26 Dec)</label><input type="number" id="pBoxing" placeholder="550"/></div></div>
+            <div class="field-row"><div class="field-group"><label>New Year's Eve (31 Dec)</label><input type="number" id="pNYE" placeholder="650"/></div><div class="field-group"><label>New Year's Day (1 Jan)</label><input type="number" id="pNYD" placeholder="650"/></div></div>
+            <div class="field-row"><div class="field-group"><label>Good Friday</label><input type="number" id="pGoodFri" placeholder="480"/></div><div class="field-group"><label>Easter Sunday</label><input type="number" id="pEasterSun" placeholder="480"/></div></div>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="syncICal()">Sync Now</button>
-        <p style="font-size:.75rem;color:var(--g400);margin-top:.6rem;" id="syncLast"></p>
-        <hr style="margin:1.5rem 0;">
-        <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.6rem;">How to get your Airbnb iCal URL</h4>
-        <ol style="padding-left:1.2rem;font-size:.84rem;color:var(--g600);line-height:1.9;">
-          <li>Open your Airbnb listing → <strong>Calendar</strong> → <strong>Availability Settings</strong></li>
-          <li>Scroll to <strong>Sync calendars</strong></li>
-          <li>Copy the <strong>Export calendar</strong> link and paste above</li>
+      </div>
+      <div class="edit-card">
+        <h3>📏 Minimum Stay (nights)</h3>
+        <div class="field-row three">
+          <div class="field-group"><label>Weekday</label><input type="number" id="pMinWeekday" min="1" placeholder="2"/></div>
+          <div class="field-group"><label>Weekend</label><input type="number" id="pMinWeekend" min="1" placeholder="3"/></div>
+          <div class="field-group"><label>Peak season</label><input type="number" id="pMinPeak" min="1" placeholder="4"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTOS -->
+    <div class="tab-pane" id="tab-edit-photos">
+      <div class="edit-card">
+        <h3>🖼 Photos</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Photos appear in the order shown below. The first photo is the hero image.</p>
+        <div class="photo-grid" id="photoGrid"></div>
+        <div class="photo-add">
+          <p style="font-size:.8rem;font-weight:600;color:var(--g600);">Add a photo by URL</p>
+          <input type="url" id="photoUrlInput" placeholder="https://… (must end in .jpg, .jpeg, .png or .webp)"/>
+          <button class="btn btn-sm btn-black" onclick="addPhoto()" style="align-self:flex-start;">Add Photo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="tab-pane" id="tab-edit-amenities">
+      <div class="edit-card">
+        <h3>✅ Amenities</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">These are saved with your config and shown on the Amenities page. Click × to remove, then Publish to go live.</p>
+        <div class="amenity-list" id="amenityList"></div>
+        <div class="amenity-add">
+          <input type="text" id="amenityInput" placeholder="e.g. Wood fireplace" onkeydown="if(event.key==='Enter')addAmenity()"/>
+          <button class="btn btn-sm btn-black" onclick="addAmenity()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGN -->
+    <div class="tab-pane" id="tab-edit-design">
+      <div class="edit-card">
+        <h3>🎨 Colors</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.25rem;">Changes apply across the entire site — buttons, links, highlights, and email templates. Use Preview to see before publishing.</p>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Primary Color</label>
+            <div class="color-row">
+              <label class="color-swatch"><input type="color" id="cPrimary" value="#1a6640" oninput="onColorInput('primary',this.value)"/></label>
+              <input type="text" id="cPrimaryHex" value="#1a6640" placeholder="#1a6640" oninput="onHexInput('primary',this.value)" style="flex:1;"/>
+            </div>
+            <div class="field-hint">Buttons, links, calendar highlights</div>
+          </div>
+          <div class="field-group">
+            <label>Accent Color</label>
+            <div class="color-row">
+              <label class="color-swatch"><input type="color" id="cAccent" value="#b45309" oninput="onColorInput('accent',this.value)"/></label>
+              <input type="text" id="cAccentHex" value="#b45309" placeholder="#b45309" oninput="onHexInput('accent',this.value)" style="flex:1;"/>
+            </div>
+            <div class="field-hint">Urgency badges, warnings</div>
+          </div>
+        </div>
+        <div style="margin-top:.75rem;">
+          <p style="font-size:.8rem;font-weight:600;color:var(--g600);margin-bottom:.5rem;">Quick presets</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-white" onclick="applyPreset('#1a6640','#b45309')">🌿 Forest (default)</button>
+            <button class="btn btn-sm btn-white" onclick="applyPreset('#1e3a5f','#c2852a')">🌊 Ocean Blue</button>
+            <button class="btn btn-sm btn-white" onclick="applyPreset('#6b3a2a','#7c3aed')">🍂 Earthy Red</button>
+            <button class="btn btn-sm btn-white" onclick="applyPreset('#374151','#f59e0b')">🖤 Charcoal & Gold</button>
+            <button class="btn btn-sm btn-white" onclick="applyPreset('#7c3aed','#059669')">💜 Purple & Teal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICAL -->
+    <div class="tab-pane" id="tab-ical">
+      <div class="edit-card">
+        <h3>🔄 iCal Calendar Sync</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.2rem;">Your direct booking calendar is automatically exported for Airbnb to import. No manual action needed — Airbnb syncs every few hours.</p>
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem;">
+          <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.4rem;">Your iCal Export URL</div>
+          <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+            <code style="font-size:.82rem;color:var(--green-d);flex:1;word-break:break-all;">https://glenhaven-book.netlify.app/calendar.ics</code>
+            <button class="btn btn-sm btn-white" onclick="copyIcal()">Copy</button>
+          </div>
+        </div>
+        <hr style="margin:1.25rem 0;border:none;border-top:1px solid var(--g100);">
+        <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.75rem;">How to add to Airbnb:</h4>
+        <ol style="padding-left:1.2rem;font-size:.84rem;color:var(--g600);line-height:2;">
+          <li>Go to your Airbnb listing → <strong>Calendar</strong></li>
+          <li>Click <strong>Availability Settings</strong> → <strong>Sync calendars</strong></li>
+          <li>Click <strong>Import Calendar</strong> and paste the URL above</li>
+          <li>Airbnb will sync within a few hours automatically</li>
         </ol>
       </div>
     </div>
 
-    <!-- PRICING TAB -->
-    <div class="tab-pane" id="tab-pricing">
-      <div style="background:#fff;border-radius:var(--r-lg);padding:1.5rem;box-shadow:var(--sh-sm);">
-        <h3 style="font-size:1rem;margin-bottom:1.1rem;">💰 Dynamic Pricing Rules</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-          <div>
-            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Base Rates</h4>
-            <table style="width:100%;font-size:.85rem;">
-              <tbody>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekday (Mon–Thu)</td><td style="font-weight:600;text-align:right;">$320/night</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Friday</td><td style="font-weight:600;text-align:right;">$380/night</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Saturday</td><td style="font-weight:600;text-align:right;">$400/night</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Extra guest (3+)</td><td style="font-weight:600;text-align:right;">+$40/night</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Cleaning fee</td><td style="font-weight:600;text-align:right;">$150 flat</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Seasonal Modifiers</h4>
-            <table style="width:100%;font-size:.85rem;">
-              <tbody>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Peak (Dec–Jan)</td><td style="font-weight:600;text-align:right;color:var(--red);">+25%</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Low (May–Aug)</td><td style="font-weight:600;text-align:right;color:var(--green);">−10%</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Christmas Day</td><td style="font-weight:600;text-align:right;">$550</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">New Year's Eve/Day</td><td style="font-weight:600;text-align:right;">$650</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Easter</td><td style="font-weight:600;text-align:right;">$480</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Length-of-Stay Discounts</h4>
-            <table style="width:100%;font-size:.85rem;">
-              <tbody>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">3+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">5% off</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">5+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">10% off</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">7+ nights</td><td style="font-weight:600;text-align:right;color:var(--green);">15% off</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h4 style="font-size:.85rem;font-weight:700;margin-bottom:.85rem;color:var(--g600);text-transform:uppercase;letter-spacing:.07em;">Minimum Stay</h4>
-            <table style="width:100%;font-size:.85rem;">
-              <tbody>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekdays</td><td style="font-weight:600;text-align:right;">2 nights</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Weekends</td><td style="font-weight:600;text-align:right;">3 nights</td></tr>
-                <tr><td style="padding:.5rem 0;color:var(--g600);">Peak season</td><td style="font-weight:600;text-align:right;">4 nights</td></tr>
-              </tbody>
-            </table>
-          </div>
+
+    <!-- DEPLOY CHECKLIST -->
+    <div class="tab-pane" id="tab-checklist">
+      <div class="edit-card">
+        <h3>✅ Deploy Checklist</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.25rem;">Run these tests before trusting the site live. Click each row to mark it done.</p>
+
+        <div id="checklistItems">
+          <!-- Items injected by JS -->
         </div>
-        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-top:1.25rem;font-size:.82rem;color:var(--g500);">
-          To update pricing rules, edit the <code>CONFIG</code> and <code>HOLIDAY_PRICES</code> objects in <code>script.js</code>.
+
+        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--g100);display:flex;gap:.6rem;">
+          <button class="btn btn-sm btn-white" onclick="resetChecklist()">Reset all</button>
+          <span id="checklistScore" style="font-size:.84rem;color:var(--g500);align-self:center;margin-left:auto;"></span>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <h3>🔗 Quick Links</h3>
+        <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.85rem;">
+          <a href="index.html" target="_blank" style="color:var(--green);">🌐 Homepage — check text &amp; colors</a>
+          <a href="booking.html" target="_blank" style="color:var(--green);">📅 Booking page — check pricing</a>
+          <a href="/calendar.ics" target="_blank" style="color:var(--green);">📆 calendar.ics — check iCal feed</a>
+          <a href="https://app.netlify.com" target="_blank" style="color:var(--green);">⚙️ Netlify dashboard — check env vars &amp; function logs</a>
         </div>
       </div>
     </div>
@@ -231,179 +396,439 @@
   </main>
 </div>
 
+<!-- PUBLISH BAR -->
+<div class="publish-bar">
+  <div class="pub-status">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Loading…</span>
+  </div>
+  <div style="display:flex;gap:.6rem;">
+    <button class="btn btn-sm btn-white" onclick="previewChanges()">👁 Preview</button>
+    <button class="btn btn-sm btn-white" onclick="discardChanges()" id="discardBtn" style="display:none;">Discard</button>
+    <button class="btn btn-sm btn-primary" onclick="publishChanges()" id="publishBtn">Publish Changes</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 <script>
-  // ── Init ──
-  // Load server bookings first, then render
-  loadAvailability().then(() => {
-    allBK = getBookings();
-    renderBookings();
-    renderCalendar();
-  });
+'use strict';
+const ADMIN_PWD_KEY = 'gh_admin_pwd';
+let adminPassword   = sessionStorage.getItem(ADMIN_PWD_KEY) || '';
 
-  let allBK  = getBookings();
-  let blkList = getBlocks();
-  let icalUrls = JSON.parse(localStorage.getItem('gh_ical')||'{}');
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value.trim();
+  if (!pwd) return;
+  // Quick check — actual auth happens on POST /api/config
+  adminPassword = pwd;
+  sessionStorage.setItem(ADMIN_PWD_KEY, pwd);
+  document.getElementById('loginOverlay').style.display = 'none';
+  init();
+}
 
-  function getLocalBookings() { return getBookings(); }
+// ── CONFIG STATE ──────────────────────────────────────────────
+let serverConfig = null;
+let isDirty = false;
 
-  // Date
+const DEFAULT_CONFIG = {
+  property: { name:'Glenhaven', tagline:'A Quintessential Katoomba Cottage', description:'A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden.', bedrooms:4, bathrooms:2.5, guests:8 },
+  hero: { headline:'Blue Mountains\nCottage Escape', subheadline:'📍 Katoomba · Blue Mountains · NSW Australia' },
+  pricing: { baseRate:320, baseGuests:2, extraGuest:40, cleaningFee:150, maxGuests:8, friSurcharge:60, satSurcharge:80, peakPct:25, lowPct:-10, minNights:{weekday:2,weekend:3,peak:4}, holidayPrices:{'12-25':550,'12-26':550,'01-01':650,'12-31':650,'04-18':480,'04-20':480} },
+  colors: { primary:'#1a6640', accent:'#b45309' },
+  photos: ['https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg','https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg'],
+  amenities:['Wood fireplace','Glass conservatory','Private garden','Full kitchen','Washer & dryer','Fast WiFi','Smart TV','BBQ grill','Free parking','Self check-in','Pet friendly','Air conditioning'],
+};
+
+function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function setStatus(state, text) {
+  document.getElementById('statusDot').className = 'dot ' + state;
+  document.getElementById('statusText').textContent = text;
+}
+function markDirty() {
+  if (!isDirty) { isDirty = true; document.getElementById('discardBtn').style.display='inline-flex'; setStatus('unsaved','Unsaved changes — click Publish to go live'); }
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
   const now = new Date();
-  document.getElementById('admDate').textContent = now.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('admDate').textContent    = now.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
   document.getElementById('admDateSub').textContent = now.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('blkFrom').min = todayISO();
   document.getElementById('blkTo').min   = todayISO();
-
-  // Load iCal
-  if (icalUrls.airbnb) document.getElementById('icalAirbnb').value = icalUrls.airbnb;
-  if (icalUrls.vrbo)   document.getElementById('icalVrbo').value   = icalUrls.vrbo;
-  if (icalUrls.other)  document.getElementById('icalOther').value  = icalUrls.other;
-  const ls = localStorage.getItem('gh_lastsync');
-  if (ls) document.getElementById('syncLast').textContent = 'Last synced: ' + ls;
-
-  // Stats
-  function renderStats() {
-    const n90 = new Date(); n90.setDate(n90.getDate()+90);
-    let up=0, nights=0, rev=0;
-    allBK.forEach(b => {
-      const ci = new Date(b.checkIn);
-      if (ci >= now && ci <= n90) up++;
-      nights += Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
-      rev += (b.total||0);
-    });
-    document.getElementById('stTotal').textContent   = allBK.length;
-    document.getElementById('stUpcoming').textContent = up;
-    document.getElementById('stNights').textContent  = nights;
-    document.getElementById('stRevenue').textContent = fmtAUD(rev);
-    document.getElementById('bkBadge').textContent   = allBK.length;
-  }
-
-  // Table
-  let fText='', fStatus='';
-  function renderTable() {
-    const tbody = document.getElementById('bkTable');
-    const empty = document.getElementById('bkEmpty');
-    let rows = allBK.filter(b => {
-      const matchTxt = !fText || (b.guestName||'').toLowerCase().includes(fText) || (b.email||'').toLowerCase().includes(fText);
-      const matchSt  = !fStatus || (b.status||'CONFIRMED').toUpperCase() === fStatus;
-      return matchTxt && matchSt;
-    });
-    if (!rows.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-    empty.style.display = 'none';
-    tbody.innerHTML = rows.map(b => {
-      const n  = Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
-      const st = (b.status||'CONFIRMED').toUpperCase();
-      const stCls = st==='CONFIRMED'?'s-cfm':st==='PENDING'?'s-pen':'s-can';
-      return `<tr>
-        <td><strong>${b.guestName||'—'}</strong><br><span style="font-size:.74rem;color:var(--g400);">${b.email||''}</span></td>
-        <td>${fmtDate(b.checkIn)}</td>
-        <td>${fmtDate(b.checkOut)}</td>
-        <td>${n}</td>
-        <td>${b.guests||'—'}</td>
-        <td style="font-weight:600;">${fmtAUD(b.total||0)}</td>
-        <td><span class="badge badge-green" style="font-size:.7rem;">${b.platform||'Direct'}</span></td>
-        <td><span class="spill ${stCls}">${st}</span></td>
-        <td><button class="t-act" onclick="delBooking('${b.id}')">Delete</button></td>
-      </tr>`;
-    }).join('');
-  }
-  function filterTable(v) { fText=v.toLowerCase(); renderTable(); }
-  function filterStatus(v) { fStatus=v; renderTable(); }
-  function delBooking(id) {
-    if (!confirm('Delete this booking? This cannot be undone.')) return;
-    deleteBooking(id);
-    allBK = getBookings();
-    renderStats(); renderTable(); renderBlockList();
-  }
-
-  // Block dates
-  function renderBlockList() {
-    blkList = getBlocks();
-    const el = document.getElementById('blockList');
-    const em = document.getElementById('blockEmpty');
-    if (!blkList.length) { el.innerHTML=''; em.style.display='block'; return; }
-    em.style.display = 'none';
-    el.innerHTML = blkList.map(b => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.2rem;border-bottom:1px solid var(--g100);font-size:.875rem;">
-        <div>
-          <strong>${fmtDate(b.start)} → ${fmtDate(b.end)}</strong>
-          <div style="font-size:.75rem;color:var(--g400);margin-top:.15rem;">${b.reason||'Blocked'} · Manual</div>
-        </div>
-        <button class="t-act" onclick="removeBlock('${b.id}')">Remove</button>
-      </div>`).join('');
-  }
-  function addBlock() {
-    const from   = document.getElementById('blkFrom').value;
-    const to     = document.getElementById('blkTo').value;
-    const reason = document.getElementById('blkReason').value.trim();
-    if (!from||!to) { alert('Please select both dates.'); return; }
-    if (to <= from) { alert('End date must be after start date.'); return; }
-    const id = 'blk-'+Date.now();
-    saveBlock({ id, start: from, end: to, reason: reason||'Blocked' });
-    blkList = getBlocks();
-    renderBlockList();
-    document.getElementById('blkFrom').value='';
-    document.getElementById('blkTo').value='';
-    document.getElementById('blkReason').value='';
-  }
-  function removeBlock(id) {
-    deleteBlock(id);
-    blkList = getBlocks();
-    renderBlockList();
-  }
-
-  // iCal
-  async function syncICal() {
-    const airbnb = document.getElementById('icalAirbnb').value.trim();
-    const vrbo   = document.getElementById('icalVrbo').value.trim();
-    const other  = document.getElementById('icalOther').value.trim();
-    localStorage.setItem('gh_ical', JSON.stringify({airbnb,vrbo,other}));
-    const platforms = [{key:'airbnb',url:airbnb,el:'syncAirbnb'},{key:'vrbo',url:vrbo,el:'syncVrbo'},{key:'other',url:other,el:'syncOther'}].filter(p=>p.url);
-    if (!platforms.length) { alert('Enter at least one iCal URL.'); return; }
-    for (const p of platforms) {
-      const el = document.getElementById(p.el);
-      el.textContent='Syncing…'; el.style.color=var_g500;
-      await new Promise(r=>setTimeout(r,700));
-      el.textContent='✓ Connected (real sync via Apps Script in production)';
-      el.style.color='var(--green-d)';
-    }
-    const ts = new Date().toLocaleString('en-AU');
-    localStorage.setItem('gh_lastsync',ts);
-    document.getElementById('syncLast').textContent='Last synced: '+ts;
-  }
-  const var_g500 = 'var(--g500)';
-
-  // Tabs
-  let admCal;
-  function showTab(name, el) {
-    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
-    document.querySelectorAll('.tab-btn,.adm-nav a').forEach(b=>b.classList.remove('on'));
-    document.getElementById('tab-'+name).classList.add('on');
-    if(el) el.classList.add('on');
-    if (name==='calendar' && !admCal) {
-      setTimeout(()=>{ admCal = new MiniCal('admCalContainer',{onSelect:()=>{},showPrice:false}); },50);
-    }
-    if (name==='block') renderBlockList();
-  }
-
-  // Export CSV
-  function exportCSV() {
-    const rows = [['Guest Name','Email','Check-in','Check-out','Nights','Guests','Total','Platform','Status']];
-    getBookings().forEach(b => {
-      const n = Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000);
-      rows.push([b.guestName,b.email,b.checkIn,b.checkOut,n,b.guests,b.total,b.platform||'Direct',b.status||'CONFIRMED']);
-    });
-    const csv = rows.map(r=>r.map(c=>`"${c||''}"`).join(',')).join('\n');
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-    a.download = 'glenhaven-bookings-' + todayISO() + '.csv';
-    a.click();
-  }
-
-  // Init
+  await fetchServerConfig();
+  await loadAvailability();
   renderStats();
   renderTable();
   renderBlockList();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (adminPassword) { init(); }
+  else { document.getElementById('loginPwd').focus(); }
+});
+
+async function fetchServerConfig() {
+  // /api/config GET now returns: { status: 'ok'|'empty'|'error', config?, error? }
+  let envelope;
+  try {
+    const res = await fetch('/api/config');
+    envelope  = await res.json();
+  } catch (err) {
+    // Network-level failure (fetch threw)
+    showConfigBanner('error',
+      '⚠️ Could not reach /api/config: ' + err.message +
+      '. Check that APPS_SCRIPT_URL is set in Netlify environment variables.');
+    serverConfig = deepClone(DEFAULT_CONFIG);
+    setStatus('unsaved', 'Config load failed — check Netlify env vars');
+    populateForm(serverConfig);
+    return;
+  }
+
+  const status = envelope.status || (envelope.config ? 'ok' : 'empty');
+
+  if (status === 'error') {
+    // Real server/Apps Script error — surface it so it can be debugged
+    showConfigBanner('error',
+      '⚠️ Config failed to load: ' + (envelope.error || 'unknown error') +
+      '. The form is showing default values. Resolve the error before publishing.');
+    serverConfig = deepClone(DEFAULT_CONFIG);
+    setStatus('unsaved', 'Config load failed');
+
+  } else if (status === 'empty' || !envelope.config) {
+    // No config file yet — normal on first run, not an error
+    showConfigBanner('info',
+      'ℹ️ No published config yet — this is your first time here. ' +
+      'Fill in the form and click Publish Changes to go live.');
+    serverConfig = deepClone(DEFAULT_CONFIG);
+    setStatus('unsaved', 'No saved config yet — publish to go live');
+
+  } else {
+    // Loaded successfully
+    serverConfig = deepClone(envelope.config);
+    if (envelope.config.savedAt) {
+      const d = new Date(envelope.config.savedAt);
+      setStatus('saved', 'Published · saved ' + d.toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }));
+    } else {
+      setStatus('saved', 'All changes published');
+    }
+  }
+
+  populateForm(serverConfig);
+}
+
+function showConfigBanner(type, msg) {
+  let banner = document.getElementById('configBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'configBanner';
+    banner.style.cssText = 'margin-bottom:1rem;padding:.85rem 1.1rem;border-radius:var(--r);font-size:.84rem;display:flex;align-items:flex-start;gap:.6rem;';
+    const main = document.querySelector('.adm-main');
+    if (main) main.insertBefore(banner, main.firstChild);
+  }
+  if (type === 'error') {
+    banner.style.background = 'var(--red-p)'; banner.style.color = '#7f1d1d'; banner.style.border = '1px solid #fca5a5';
+  } else {
+    banner.style.background = 'var(--warm-p)'; banner.style.color = '#92400e'; banner.style.border = '1px solid #fde68a';
+  }
+  banner.textContent = msg;
+}
+
+// ── FORM ──────────────────────────────────────────────────────
+function setVal(id, v) { const el=document.getElementById(id); if(el&&v!=null) el.value=v; }
+function gVal(id) { const el=document.getElementById(id); return el ? el.value.trim() : ''; }
+function nVal(id) { const v=parseFloat(gVal(id)); return isNaN(v)?null:v; }
+
+function populateForm(cfg) {
+  if(!cfg) return;
+  const p=cfg.property||{}, h=cfg.hero||{}, pr=cfg.pricing||{}, c=cfg.colors||{};
+  setVal('eName',p.name); setVal('eTagline',p.tagline); setVal('eHeroHeadline',h.headline); setVal('eHeroSub',h.subheadline);
+  setVal('eDescription',p.description); setVal('eBedrooms',p.bedrooms); setVal('eBathrooms',p.bathrooms); setVal('eMaxGuests',p.guests);
+  setVal('pBaseRate',pr.baseRate); setVal('pFriSurcharge',pr.friSurcharge); setVal('pSatSurcharge',pr.satSurcharge);
+  setVal('pCleaningFee',pr.cleaningFee); setVal('pExtraGuest',pr.extraGuest); setVal('pBaseGuests',pr.baseGuests);
+  setVal('pPeakPct',pr.peakPct); setVal('pLowPct',pr.lowPct);
+  const hp=pr.holidayPrices||{};
+  setVal('pXmas',hp['12-25']); setVal('pBoxing',hp['12-26']); setVal('pNYE',hp['12-31']); setVal('pNYD',hp['01-01']); setVal('pGoodFri',hp['04-18']); setVal('pEasterSun',hp['04-20']);
+  const mn=pr.minNights||{};
+  setVal('pMinWeekday',mn.weekday); setVal('pMinWeekend',mn.weekend); setVal('pMinPeak',mn.peak);
+  if(c.primary){ document.getElementById('cPrimary').value=c.primary; document.getElementById('cPrimaryHex').value=c.primary; }
+  if(c.accent){  document.getElementById('cAccent').value=c.accent;  document.getElementById('cAccentHex').value=c.accent; }
+  renderPhotos(cfg.photos||[]);
+  renderAmenities(cfg.amenities||[]);
+  // Attach change listeners
+  ['eName','eTagline','eHeroHeadline','eHeroSub','eDescription','eBedrooms','eBathrooms','eMaxGuests',
+   'pBaseRate','pFriSurcharge','pSatSurcharge','pCleaningFee','pExtraGuest','pBaseGuests','pPeakPct','pLowPct',
+   'pXmas','pBoxing','pNYE','pNYD','pGoodFri','pEasterSun','pMinWeekday','pMinWeekend','pMinPeak'].forEach(id => {
+    const el=document.getElementById(id);
+    if(el && !el._gl){ el.addEventListener('input',markDirty); el._gl=true; }
+  });
+}
+
+function readForm() {
+  return {
+    property:{ name:gVal('eName')||'Glenhaven', tagline:gVal('eTagline'), description:gVal('eDescription'), bedrooms:nVal('eBedrooms'), bathrooms:nVal('eBathrooms'), guests:nVal('eMaxGuests') },
+    hero:{ headline:gVal('eHeroHeadline'), subheadline:gVal('eHeroSub') },
+    pricing:{ baseRate:nVal('pBaseRate'), friSurcharge:nVal('pFriSurcharge'), satSurcharge:nVal('pSatSurcharge'), cleaningFee:nVal('pCleaningFee'), extraGuest:nVal('pExtraGuest'), baseGuests:nVal('pBaseGuests'), maxGuests:nVal('eMaxGuests'), peakPct:nVal('pPeakPct'), lowPct:nVal('pLowPct'), minNights:{weekday:nVal('pMinWeekday'),weekend:nVal('pMinWeekend'),peak:nVal('pMinPeak')}, holidayPrices:{'12-25':nVal('pXmas'),'12-26':nVal('pBoxing'),'12-31':nVal('pNYE'),'01-01':nVal('pNYD'),'04-18':nVal('pGoodFri'),'04-20':nVal('pEasterSun')} },
+    colors:{ primary:document.getElementById('cPrimary').value, accent:document.getElementById('cAccent').value },
+    photos: currentPhotos(),
+    amenities: currentAmenities(),
+  };
+}
+
+// ── PHOTOS ────────────────────────────────────────────────────
+let _photos = [];
+function currentPhotos() { return [..._photos]; }
+function renderPhotos(photos) {
+  _photos = [...photos];
+  document.getElementById('photoGrid').innerHTML = _photos.map((url,i) =>
+    `<div class="photo-item"><img src="${url}" onerror="this.parentElement.style.background='var(--g200)'"/><button class="photo-del" onclick="removePhoto(${i})">×</button><div class="photo-idx">${i===0?'Hero':'#'+(i+1)}</div></div>`
+  ).join('');
+}
+function addPhoto() {
+  const url = document.getElementById('photoUrlInput').value.trim();
+  if(!url) return;
+  _photos.push(url); renderPhotos(_photos);
+  document.getElementById('photoUrlInput').value = '';
+  markDirty();
+}
+function removePhoto(i) { _photos.splice(i,1); renderPhotos(_photos); markDirty(); }
+
+// ── AMENITIES ─────────────────────────────────────────────────
+let _amenities = [];
+function currentAmenities() { return [..._amenities]; }
+function renderAmenities(list) {
+  _amenities = [...list];
+  document.getElementById('amenityList').innerHTML = _amenities.map((a,i) =>
+    `<span class="amenity-tag">${a}<button onclick="removeAmenity(${i})">×</button></span>`
+  ).join('');
+}
+function addAmenity() {
+  const v = document.getElementById('amenityInput').value.trim();
+  if(!v) return;
+  _amenities.push(v); renderAmenities(_amenities);
+  document.getElementById('amenityInput').value = '';
+  markDirty();
+}
+function removeAmenity(i) { _amenities.splice(i,1); renderAmenities(_amenities); markDirty(); }
+
+// ── COLORS ────────────────────────────────────────────────────
+function onColorInput(type, hex) {
+  document.getElementById(type==='primary'?'cPrimaryHex':'cAccentHex').value = hex;
+  applySiteConfig({ colors:{ primary:document.getElementById('cPrimary').value, accent:document.getElementById('cAccent').value } });
+  markDirty();
+}
+function onHexInput(type, hex) {
+  if(!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  document.getElementById(type==='primary'?'cPrimary':'cAccent').value = hex;
+  applySiteConfig({ colors:{ primary:document.getElementById('cPrimary').value, accent:document.getElementById('cAccent').value } });
+  markDirty();
+}
+function applyPreset(primary, accent) {
+  document.getElementById('cPrimary').value=primary; document.getElementById('cPrimaryHex').value=primary;
+  document.getElementById('cAccent').value=accent;   document.getElementById('cAccentHex').value=accent;
+  applySiteConfig({ colors:{ primary, accent } });
+  markDirty();
+}
+
+// ── PREVIEW / PUBLISH ─────────────────────────────────────────
+function previewChanges() {
+  const cfg = readForm();
+  applySiteConfig(cfg);
+  document.getElementById('previewBadge').style.display = 'inline-block';
+  setStatus('unsaved', 'Previewing — click Publish to go live');
+}
+function discardChanges() {
+  if(!confirm('Discard all unsaved changes?')) return;
+  populateForm(serverConfig);
+  applySiteConfig(serverConfig);
+  isDirty = false;
+  document.getElementById('discardBtn').style.display = 'none';
+  document.getElementById('previewBadge').style.display = 'none';
+  setStatus('saved', 'All changes published');
+}
+async function publishChanges() {
+  const btn = document.getElementById('publishBtn');
+  btn.textContent = 'Publishing…'; btn.disabled = true;
+  setStatus('saving', 'Saving…');
+  try {
+    const config = readForm();
+    const res = await fetch('/api/config', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify(config),
+    });
+    if(res.status === 401) { alert('Incorrect password — please log out and try again.'); sessionStorage.removeItem(ADMIN_PWD_KEY); location.reload(); return; }
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Unknown error');
+    serverConfig = deepClone(config);
+    isDirty = false;
+    document.getElementById('discardBtn').style.display = 'none';
+    document.getElementById('previewBadge').style.display = 'none';
+    applySiteConfig(config);
+    setStatus('saved', 'Published · ' + new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}));
+  } catch(err) {
+    alert('Publish failed: ' + err.message);
+    setStatus('unsaved', 'Publish failed — try again');
+  } finally {
+    btn.textContent = 'Publish Changes'; btn.disabled = false;
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+let admCal;
+function showTab(name, el) {
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn,.adm-nav a').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+name).classList.add('on');
+  if(el) el.classList.add('on');
+  if(name==='calendar'&&!admCal) setTimeout(()=>{ admCal=new MiniCal('admCalContainer',{onSelect:()=>{},showPrice:false}); },50);
+  if(name==='block') renderBlockList();
+}
+
+// ── BOOKINGS (reads from server via _blockedRanges) ───────────
+let allBK=[], fText='', fStat='';
+function renderStats() {
+  const n90=new Date(); n90.setDate(n90.getDate()+90);
+  const now=new Date(); let up=0,nights=0,rev=0;
+  allBK.forEach(b=>{ const ci=new Date(b.checkIn); if(ci>=now&&ci<=n90)up++; nights+=Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000)||0; rev+=b.total||0; });
+  document.getElementById('stTotal').textContent=allBK.length;
+  document.getElementById('stUpcoming').textContent=up;
+  document.getElementById('stNights').textContent=nights;
+  document.getElementById('stRevenue').textContent=fmtAUD(rev);
+}
+function renderTable() {
+  const tbody=document.getElementById('bkTable'), empty=document.getElementById('bkEmpty');
+  const rows=allBK.filter(b=>{ const mt=!fText||(b.guestName||'').toLowerCase().includes(fText); const ms=!fStat||(b.status||'CONFIRMED').toUpperCase()===fStat; return mt&&ms; });
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=rows.map(b=>{
+    const n=Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000)||'?';
+    const st=(b.status||'CONFIRMED').toUpperCase();
+    return `<tr><td><strong>${b.guestName||'—'}</strong><br><span style="font-size:.74rem;color:var(--g400);">${b.email||''}</span></td><td>${fmtDate(b.checkIn)}</td><td>${fmtDate(b.checkOut)}</td><td>${n}</td><td>${b.guests||'—'}</td><td style="font-weight:600;">${fmtAUD(b.total||0)}</td><td><span class="badge badge-green" style="font-size:.7rem;">${b.platform||'Direct'}</span></td><td><span class="spill ${st==='CONFIRMED'?'s-cfm':st==='CANCELLED'?'s-can':'s-pen'}">${st}</span></td><td><button class="t-act" onclick="delBooking('${b.id}')">Delete</button></td></tr>`;
+  }).join('');
+}
+function filterTable(v){fText=v.toLowerCase();renderTable();}
+function filterStatus(v){fStat=v;renderTable();}
+function delBooking(id){ if(!confirm('Delete this booking?'))return; deleteBooking(id); allBK=getBookings(); renderStats();renderTable(); }
+
+// ── BLOCK DATES ───────────────────────────────────────────────
+function renderBlockList() {
+  const bl=getBlocks(), el=document.getElementById('blockList'), em=document.getElementById('blockEmpty');
+  if(!bl.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  el.innerHTML=bl.map(b=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.2rem;border-bottom:1px solid var(--g100);font-size:.875rem;"><div><strong>${fmtDate(b.start)} → ${fmtDate(b.end)}</strong><div style="font-size:.75rem;color:var(--g400);margin-top:.15rem;">${b.reason||'Blocked'}</div></div><button class="t-act" onclick="removeBlock('${b.id}')">Remove</button></div>`).join('');
+}
+function addBlock() {
+  const from=document.getElementById('blkFrom').value, to=document.getElementById('blkTo').value, reason=document.getElementById('blkReason').value.trim();
+  if(!from||!to){alert('Please select both dates.');return;}
+  if(to<=from){alert('End date must be after start date.');return;}
+  saveBlock({id:'blk-'+Date.now(),start:from,end:to,reason:reason||'Blocked'});
+  renderBlockList();
+  document.getElementById('blkFrom').value=''; document.getElementById('blkTo').value=''; document.getElementById('blkReason').value='';
+}
+function removeBlock(id){deleteBlock(id);renderBlockList();}
+
+// ── ICAL ──────────────────────────────────────────────────────
+function copyIcal(){ navigator.clipboard.writeText('https://glenhaven-book.netlify.app/calendar.ics').then(()=>alert('Copied!')); }
+
+// ── EXPORT ───────────────────────────────────────────────────
+function exportCSV() {
+  const rows=[['Guest','Check-in','Check-out','Nights','Guests','Total','Platform','Status']];
+  allBK.forEach(b=>{ const n=Math.round((new Date(b.checkOut)-new Date(b.checkIn))/86400000); rows.push([b.guestName,b.checkIn,b.checkOut,n,b.guests,b.total,b.platform||'Direct',b.status||'CONFIRMED']); });
+  const csv=rows.map(r=>r.map(c=>`"${c||''}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='glenhaven-bookings-'+todayISO()+'.csv'; a.click();
+}
+
+// ── DEPLOY CHECKLIST ──────────────────────────────────────────
+const CHECKLIST = [
+  { id:'c1', label:'Netlify env vars set',          detail:'APPS_SCRIPT_URL and ADMIN_PASSWORD both present in Netlify → Site settings → Environment variables', test: checkEnvVars },
+  { id:'c2', label:'Config loads without error',    detail:'Open this page and check the banner above — should show no error', test: checkConfigLoad },
+  { id:'c3', label:'Edit &amp; publish hero text',  detail:'Change hero headline → Publish → open index.html in a new tab, confirm it updated', test: null },
+  { id:'c4', label:'Reload test (incognito)',        detail:'After publish, open site in a private/incognito window — confirm visitors see the updated content', test: null },
+  { id:'c5', label:'Pricing test',                  detail:'Change Friday surcharge → Publish → go to booking.html, pick dates including a Friday and verify total', test: null },
+  { id:'c6', label:'Color change test',             detail:'Change primary color → Preview → confirm buttons/links update → Publish → check live site', test: null },
+  { id:'c7', label:'Config missing/first-run safe', detail:'Site should work with hardcoded defaults if no config file exists in Drive yet — confirmed by fresh deploy', test: null },
+  { id:'c8', label:'Apps Script redeployed',         detail:'After updating Code.gs, did you click Deploy → Manage Deployments → New version in Apps Script?', test: null },
+  { id:'c9', label:'Stripe webhook live',            detail:'In Stripe Dashboard → Webhooks → confirm endpoint is https://glenhaven-book.netlify.app/api/webhook', test: null },
+];
+
+let checkState = JSON.parse(localStorage.getItem('gh_checklist') || '{}');
+
+function renderChecklist() {
+  const el = document.getElementById('checklistItems');
+  el.innerHTML = CHECKLIST.map(c => {
+    const done = !!checkState[c.id];
+    return `<div style="display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 0;border-bottom:1px solid var(--g100);cursor:pointer;" onclick="toggleCheck('${c.id}')">
+      <div style="width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:.1rem;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;border:2px solid ${done?'var(--green)':'var(--g300)'};background:${done?'var(--green)':'transparent'};color:${done?'#fff':'transparent'};">✓</div>
+      <div style="flex:1;">
+        <div style="font-size:.875rem;font-weight:600;color:${done?'var(--g400)':'var(--black)'};text-decoration:${done?'line-through':'none'};">${c.label}</div>
+        <div style="font-size:.75rem;color:var(--g400);margin-top:.2rem;">${c.detail}</div>
+        ${c.test ? `<button class="btn btn-sm btn-white" style="margin-top:.4rem;font-size:.75rem;" onclick="event.stopPropagation();runTest('${c.id}')">Run test</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  const done = Object.values(checkState).filter(Boolean).length;
+  document.getElementById('checklistScore').textContent = done + ' / ' + CHECKLIST.length + ' complete';
+}
+
+function toggleCheck(id) {
+  checkState[id] = !checkState[id];
+  localStorage.setItem('gh_checklist', JSON.stringify(checkState));
+  renderChecklist();
+}
+function resetChecklist() {
+  checkState = {};
+  localStorage.setItem('gh_checklist', JSON.stringify(checkState));
+  renderChecklist();
+}
+
+async function runTest(id) {
+  const item = CHECKLIST.find(c => c.id === id);
+  if (!item || !item.test) return;
+  const result = await item.test();
+  if (result.pass) {
+    checkState[id] = true;
+    localStorage.setItem('gh_checklist', JSON.stringify(checkState));
+  }
+  renderChecklist();
+  alert(result.pass ? '✅ ' + result.msg : '❌ ' + result.msg);
+}
+
+async function checkEnvVars() {
+  try {
+    const res  = await fetch('/api/config');
+    const body = await res.json();
+    if (res.status === 500 && body.error && body.error.includes('APPS_SCRIPT_URL')) {
+      return { pass: false, msg: 'APPS_SCRIPT_URL is not set in Netlify.' };
+    }
+    if (res.ok || res.status !== 500) {
+      return { pass: true, msg: 'APPS_SCRIPT_URL is set. (ADMIN_PASSWORD is only checked on publish.)' };
+    }
+    return { pass: false, msg: body.error || 'Unknown server error.' };
+  } catch (err) {
+    return { pass: false, msg: 'Could not reach /api/config: ' + err.message };
+  }
+}
+
+async function checkConfigLoad() {
+  try {
+    const res  = await fetch('/api/config');
+    const body = await res.json();
+    const status = body.status || (body.config ? 'ok' : 'empty');
+    if (status === 'error') return { pass: false, msg: 'Config load error: ' + (body.error || 'unknown') };
+    if (status === 'empty') return { pass: true,  msg: 'No config saved yet — defaults will be used. Publish to create one.' };
+    return { pass: true, msg: 'Config loaded successfully. Last saved: ' + (body.config && body.config.savedAt ? new Date(body.config.savedAt).toLocaleString('en-AU') : 'unknown') };
+  } catch (err) {
+    return { pass: false, msg: 'Network error: ' + err.message };
+  }
+}
+
+// Render checklist when tab opens
+const _origShowTab = showTab;
+function showTab(name, el) {
+  _origShowTab(name, el);
+  if (name === 'checklist') renderChecklist();
+}
+
 </script>
 </body>
 </html>
