@@ -6,6 +6,8 @@
 'use strict';
 
 // ── CONFIG ────────────────────────────────────────────────────
+const LOS_DISCOUNTS = { nights3: 5, nights5: 10, nights7: 15 };
+
 const CONFIG = {
   WEBHOOK_URL    : '/api/book',
   AVAIL_URL      : '/api/availability',
@@ -119,6 +121,7 @@ function applySiteConfig(cfg) {
     if (cfg.pricing.lowPct       != null) CONFIG.LOW_PCT       = cfg.pricing.lowPct;
     if (cfg.pricing.minNights)            CONFIG.MIN_NIGHTS    = { ...CONFIG.MIN_NIGHTS, ...cfg.pricing.minNights };
     if (cfg.pricing.holidayPrices)        HOLIDAY_PRICES       = { ...HOLIDAY_PRICES, ...cfg.pricing.holidayPrices };
+    if (cfg.pricing.losDiscounts)         Object.assign(LOS_DISCOUNTS, cfg.pricing.losDiscounts);
   }
 
   // ── Colors — inject CSS variables ──
@@ -255,9 +258,9 @@ function getMinNights(checkIn) {
 }
 
 function getLOSDiscount(nights) {
-  if (nights >= 7) return .15;
-  if (nights >= 5) return .10;
-  if (nights >= 3) return .05;
+  if (nights >= 7) return (LOS_DISCOUNTS.nights7 || 0) / 100;
+  if (nights >= 5) return (LOS_DISCOUNTS.nights5 || 0) / 100;
+  if (nights >= 3) return (LOS_DISCOUNTS.nights3 || 0) / 100;
   return 0;
 }
 

@@ -276,6 +276,14 @@
           <div class="field-group"><label>Weekend</label><input type="number" id="pMinWeekend" min="1" placeholder="3"/></div>
           <div class="field-group"><label>Peak season</label><input type="number" id="pMinPeak" min="1" placeholder="4"/></div>
         </div>
+
+        <h3 style="margin-top:1.5rem;">🏷 Length-of-Stay Discounts</h3>
+        <p style="font-size:.83rem;color:var(--g500);margin-bottom:1rem;">Automatic discounts for longer stays. Set to 0 to disable. Thresholds are minimum nights required.</p>
+        <div class="field-row three">
+          <div class="field-group"><label>3+ nights (%)</label><input type="number" id="pLos3" min="0" max="50" placeholder="5"/></div>
+          <div class="field-group"><label>5+ nights (%)</label><input type="number" id="pLos5" min="0" max="50" placeholder="10"/></div>
+          <div class="field-group"><label>7+ nights (%)</label><input type="number" id="pLos7" min="0" max="50" placeholder="15"/></div>
+        </div>
       </div>
     </div>
 
@@ -432,7 +440,7 @@ let isDirty = false;
 const DEFAULT_CONFIG = {
   property: { name:'Glenhaven', tagline:'A Quintessential Katoomba Cottage', description:'A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden.', bedrooms:4, bathrooms:2.5, guests:8 },
   hero: { headline:'Blue Mountains\nCottage Escape', subheadline:'📍 Katoomba · Blue Mountains · NSW Australia' },
-  pricing: { baseRate:320, baseGuests:2, extraGuest:40, cleaningFee:150, maxGuests:8, friSurcharge:60, satSurcharge:80, peakPct:25, lowPct:-10, minNights:{weekday:2,weekend:3,peak:4}, holidayPrices:{'12-25':550,'12-26':550,'01-01':650,'12-31':650,'04-18':480,'04-20':480} },
+  pricing: { baseRate:320, baseGuests:2, extraGuest:40, cleaningFee:150, maxGuests:8, friSurcharge:60, satSurcharge:80, peakPct:25, lowPct:-10, minNights:{weekday:2,weekend:3,peak:4}, losDiscounts:{nights3:5,nights5:10,nights7:15}, holidayPrices:{'12-25':550,'12-26':550,'01-01':650,'12-31':650,'04-18':480,'04-20':480} },
   colors: { primary:'#1a6640', accent:'#b45309' },
   photos: [
     'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
@@ -595,7 +603,7 @@ function readForm() {
   return {
     property:{ name:gVal('eName')||'Glenhaven', tagline:gVal('eTagline'), description:gVal('eDescription'), bedrooms:nVal('eBedrooms'), bathrooms:nVal('eBathrooms'), guests:nVal('eMaxGuests') },
     hero:{ headline:gVal('eHeroHeadline'), subheadline:gVal('eHeroSub') },
-    pricing:{ baseRate:nVal('pBaseRate'), friSurcharge:nVal('pFriSurcharge'), satSurcharge:nVal('pSatSurcharge'), cleaningFee:nVal('pCleaningFee'), extraGuest:nVal('pExtraGuest'), baseGuests:nVal('pBaseGuests'), maxGuests:nVal('eMaxGuests'), peakPct:nVal('pPeakPct'), lowPct:nVal('pLowPct'), minNights:{weekday:nVal('pMinWeekday'),weekend:nVal('pMinWeekend'),peak:nVal('pMinPeak')}, holidayPrices:{'12-25':nVal('pXmas'),'12-26':nVal('pBoxing'),'12-31':nVal('pNYE'),'01-01':nVal('pNYD'),'04-18':nVal('pGoodFri'),'04-20':nVal('pEasterSun')} },
+    pricing:{ baseRate:nVal('pBaseRate'), friSurcharge:nVal('pFriSurcharge'), satSurcharge:nVal('pSatSurcharge'), cleaningFee:nVal('pCleaningFee'), extraGuest:nVal('pExtraGuest'), baseGuests:nVal('pBaseGuests'), maxGuests:nVal('eMaxGuests'), peakPct:nVal('pPeakPct'), lowPct:nVal('pLowPct'), minNights:{weekday:nVal('pMinWeekday'),weekend:nVal('pMinWeekend'),peak:nVal('pMinPeak')}, losDiscounts:{nights3:nVal('pLos3'),nights5:nVal('pLos5'),nights7:nVal('pLos7')}, holidayPrices:{'12-25':nVal('pXmas'),'12-26':nVal('pBoxing'),'12-31':nVal('pNYE'),'01-01':nVal('pNYD'),'04-18':nVal('pGoodFri'),'04-20':nVal('pEasterSun')} },
     colors:{ primary:document.getElementById('cPrimary').value, accent:document.getElementById('cAccent').value },
     photos: currentPhotos(),
     amenities: currentAmenities(),
