@@ -121,8 +121,8 @@
           <div class="form-group"><label class="form-label">Last name *</label><input type="text" id="lName" class="form-input" placeholder="Smith"/></div>
         </div>
         <div class="form-group"><label class="form-label">Email address *</label><input type="email" id="fEmail" class="form-input" placeholder="jane@example.com"/></div>
-        <div class="form-group"><label class="form-label">Phone number</label><input type="tel" id="fPhone" class="form-input" placeholder="+61 4XX XXX XXX"/></div>
-        <div class="form-group"><label class="form-label">Special requests</label><textarea id="fNotes" class="form-textarea" placeholder="Dietary requirements, early check-in request, special occasions..."></textarea></div>
+        <div class="form-group"><label class="form-label">Phone number *</label><input type="tel" id="fPhone" class="form-input" placeholder="+61 4XX XXX XXX"/></div>
+        <div class="form-group"><label class="form-label">Special requests</label><textarea id="fNotes" class="form-textarea" placeholder="Early check-in request, special occasions, extra bedding..."></textarea></div>
         <div id="detailsAlert" class="alert alert-err"></div>
         <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
           <button class="btn btn-white" onclick="goStep2()">← Back</button>
@@ -133,15 +133,17 @@
       <!-- SECTION 4: PAYMENT -->
       <div class="bk-card" id="secPayment" style="display:none;">
         <h3>💳 Payment</h3>
-        <label class="pay-opt sel" id="payFull" onclick="selPay('full')">
-          <input type="radio" name="pay" value="full" checked/>
-          <div class="pay-opt-info"><h4>Pay full amount — <span id="payFullAmt">$0</span></h4><p>Fully confirmed immediately. Secure Stripe checkout.</p></div>
-        </label>
-        <label class="pay-opt" id="payDep" onclick="selPay('dep')">
-          <input type="radio" name="pay" value="dep"/>
-          <div class="pay-opt-info"><h4>Pay 30% deposit — <span id="payDepAmt">$0</span></h4><p>Remainder due 14 days before check-in.</p></div>
-        </label>
-        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-top:1rem;font-size:.82rem;color:var(--g500);">
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-bottom:1rem;">
+          <h4 style="margin:0 0 .5rem;font-size:.9rem;">Total: <span id="payFullAmt" style="color:var(--green-d);">$0</span></h4>
+          <p style="margin:0;font-size:.82rem;color:var(--g500);">Full payment required. Fully confirmed immediately.</p>
+        </div>
+        <div style="background:#fefce8;border:1px solid #fde68a;border-radius:var(--r);padding:1rem;margin-bottom:1rem;font-size:.8rem;color:#92400e;">
+          <p style="margin:0 0 .4rem;font-weight:700;font-size:.85rem;">Cancellation Policy</p>
+          <p style="margin:0 0 .25rem;">✓ <strong>Within 48 hours of booking</strong> (if check-in is 14+ days away) — full refund</p>
+          <p style="margin:0;">✗ <strong>All other cancellations</strong> — no refund</p>
+          <p style="margin:.5rem 0 0;"><a href="cancellation-policy.html" target="_blank" style="color:var(--green);font-weight:600;text-decoration:none;">View full policy →</a></p>
+        </div>
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;font-size:.82rem;color:var(--g500);">
           <p>🔒 Payment processed securely by Stripe. Your card details are never stored on our servers.</p>
           <p style="margin-top:.4rem;">After confirming you'll be redirected to Stripe's secure checkout page.</p>
         </div>
@@ -174,7 +176,7 @@
         <div style="background:var(--g50);border-radius:var(--r);padding:.9rem;margin-top:.75rem;">
           <div style="font-size:.78rem;color:var(--g500);">
             <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ No platform fees<span style="color:var(--green-d);font-weight:600;">Save up to 15%</span></div>
-            <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ Free cancellation</div>
+            <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ 48-hour free cancellation</div>
             <div style="display:flex;justify-content:space-between;padding:.22rem 0;">✓ Secure checkout</div>
           </div>
         </div>

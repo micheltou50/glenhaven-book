@@ -3,7 +3,7 @@
 // → Writes confirmed booking to Supabase
 // → Sends branded confirmation email via Resend
 
-const { confirmationEmail } = require('./email-templates');
+const { confirmationEmail, hostNotificationEmail } = require('./email-templates');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, HOST_USER_ID,
         STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, RESEND_FROM, HOST_EMAIL } = process.env;
@@ -78,10 +78,29 @@ exports.handler = async (event) => {
   // ── Generate reference code ────────────────────────────────
   const refCode = 'GH-' + Date.now().toString(36).toUpperCase().slice(-5);
 
+  // ── Fetch property config (mgmt_fee_rate) ──────────────────
+  let mgmtFeeRate = 0;
+  try {
+    const propUrl = `${SUPABASE_URL}/rest/v1/properties?id=eq.${PROPERTY_ID}&select=mgmt_fee_rate&limit=1`;
+    const propRes = await fetch(propUrl, { headers: sbHeaders });
+    const props = await propRes.json();
+    if (Array.isArray(props) && props[0]?.mgmt_fee_rate) {
+      mgmtFeeRate = parseFloat(props[0].mgmt_fee_rate) || 0;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch mgmt_fee_rate:', err.message);
+  }
+
   // ── Write booking to Supabase ──────────────────────────────
   const nights     = parseInt(meta.nights) || 0;
   const total      = parseFloat(meta.total) || 0;
   const amountPaid = (session.amount_total || 0) / 100;
+  const cleaningFee = parseFloat(meta.cleaningFee) || 0;
+
+  // Management fee = (host_payout - cleaning_fee) × rate%
+  const mgmtFee    = mgmtFeeRate > 0 ? Math.round((total - cleaningFee) * (mgmtFeeRate / 100) * 100) / 100 : 0;
+  const mgmtPayout = total - cleaningFee - mgmtFee;
+  const netPayout  = mgmtPayout;
 
   const booking = {
     user_id: HOST_USER_ID,
@@ -95,6 +114,11 @@ exports.handler = async (event) => {
     phone: meta.phone || null,
     guests: parseInt(meta.guests) || 1,
     host_payout: total,
+    cleaning_fee: cleaningFee,
+    mgmt_fee_raw: mgmtFeeRate,
+    mgmt_fee: mgmtFee,
+    mgmt_payout: mgmtPayout,
+    net_payout: netPayout,
     platform: 'Direct',
     confirmation_code: session.id,
     status: 'confirmed',
@@ -115,11 +139,12 @@ exports.handler = async (event) => {
     console.error('Supabase write failed:', err.message);
   }
 
-  // ── Calculate cancellation date (7 days before check-in) ───
+  // ── Calculate cancellation deadline (48 hours from now, only if check-in is 14+ days away) ───
+  const now = new Date();
   const ciDate = new Date(meta.checkIn + 'T00:00:00');
-  const cancelDate = new Date(ciDate);
-  cancelDate.setDate(cancelDate.getDate() - 7);
-  const cancellationDate = cancelDate > new Date() ? cancelDate.toISOString().split('T')[0] : null;
+  const daysUntilCheckin = Math.floor((ciDate - now) / 86400000);
+  const cancelDeadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+  const cancellationDate = daysUntilCheckin >= 14 ? cancelDeadline.toISOString().split('T')[0] : null;
 
   // ── Send branded confirmation email to guest ───────────────
   if (RESEND_API_KEY) {
@@ -131,8 +156,8 @@ exports.handler = async (event) => {
       guests: parseInt(meta.guests) || 1,
       total,
       amountPaid,
-      avgNightly: Math.round((total - 150) / (nights || 1)),
-      cleaningFee: 150,
+      avgNightly: nights > 0 ? Math.round((total - cleaningFee) / nights) : 0,
+      cleaningFee,
       discountAmt: 0,
       losDiscount: 0,
       refCode,
@@ -161,9 +186,24 @@ exports.handler = async (event) => {
       console.error('Guest email failed:', err.message);
     }
 
-    // Host notification (simpler)
+    // Host notification (branded)
     if (HOST_EMAIL) {
       try {
+        const hostHtml = hostNotificationEmail({
+          guestName: meta.guestName,
+          email: meta.email,
+          phone: meta.phone || null,
+          checkIn: meta.checkIn,
+          checkOut: meta.checkOut,
+          nights,
+          guests: parseInt(meta.guests) || 1,
+          total,
+          amountPaid,
+          cleaningFee,
+          refCode,
+          stripeId: session.id,
+          siteUrl: SITE_URL,
+        });
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -171,14 +211,7 @@ exports.handler = async (event) => {
             from: RESEND_FROM || 'Glenhaven Bookings <noreply@resend.dev>',
             to: HOST_EMAIL,
             subject: `New booking: ${meta.guestName} · ${meta.checkIn} → ${meta.checkOut} · ${refCode}`,
-            html: `<h2>New Confirmed Booking</h2>
-              <p><strong>Ref:</strong> ${refCode}</p>
-              <p><strong>Guest:</strong> ${meta.guestName} (${meta.email})</p>
-              <p><strong>Dates:</strong> ${meta.checkIn} → ${meta.checkOut} (${nights} nights)</p>
-              <p><strong>Guests:</strong> ${meta.guests}</p>
-              <p><strong>Total:</strong> $${total} AUD</p>
-              <p><strong>Paid:</strong> $${amountPaid} AUD</p>
-              <p><strong>Stripe:</strong> ${session.id}</p>`,
+            html: hostHtml,
           }),
         });
         console.log('Host notification email sent');

@@ -11,7 +11,6 @@ import { initNavBurger, initScrollReveal, getUrgencyMsg, sendBooking, storePendi
 // ── State ────────────────────────────────────────────────────
 let bkCI = null, bkCO = null;
 let adults = 2, children = 0, infants = 0;
-let payMode = 'full';
 
 // URL pre-fill
 const urlCI = getParam('ci'), urlCO = getParam('co'), urlG = getParam('g');
@@ -56,7 +55,6 @@ function updateSidebar() {
   document.getElementById('sdUrgency').innerHTML = `<div class="urgency-dot"></div><span>${getUrgencyMsg(bkCI, bkCO)}</span>`;
 
   document.getElementById('payFullAmt').textContent = fmtAUD(p.total);
-  document.getElementById('payDepAmt').textContent  = fmtAUD(Math.round(p.total * 0.3));
 }
 
 // Guest counter
@@ -82,13 +80,6 @@ window.adj = function (type, d) {
   updateGC();
 };
 updateGC();
-
-// Payment mode
-window.selPay = function (mode) {
-  payMode = mode;
-  document.getElementById('payFull').classList.toggle('sel', mode === 'full');
-  document.getElementById('payDep').classList.toggle('sel', mode === 'dep');
-};
 
 // Step nav
 function setStep(n) {
@@ -129,9 +120,10 @@ window.goStep4 = function () {
   const fn = document.getElementById('fName').value.trim();
   const ln = document.getElementById('lName').value.trim();
   const em = document.getElementById('fEmail').value.trim();
+  const ph = document.getElementById('fPhone').value.trim();
   const a  = document.getElementById('detailsAlert');
   a.classList.remove('show');
-  if (!fn || !ln || !em) { a.textContent = 'Please enter your name and email address.'; a.classList.add('show'); return; }
+  if (!fn || !ln || !em || !ph) { a.textContent = 'Please fill in all required fields (name, email, and phone).'; a.classList.add('show'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { a.textContent = 'Please enter a valid email address.'; a.classList.add('show'); return; }
   setStep(4);
 };
@@ -140,7 +132,6 @@ window.goStep4 = function () {
 window.submitBooking = async function () {
   const p = calcPrice(bkCI, bkCO, adults + children);
   if (!p) { alert('Please go back and select valid dates.'); return; }
-  const amtToPay = payMode === 'dep' ? Math.round(p.total * 0.3) : p.total;
 
   const btn = document.getElementById('payBtn');
   const txt = document.getElementById('payBtnText');
@@ -156,9 +147,9 @@ window.submitBooking = async function () {
     phone      : document.getElementById('fPhone').value.trim(),
     guests     : adults + children,
     message    : document.getElementById('fNotes').value.trim(),
-    paymentMode: payMode,
     total      : p.total,
-    totalAmount: amtToPay,
+    totalAmount: p.total,
+    cleaningFee: p.cleaningFee,
   };
 
   try {

@@ -166,10 +166,18 @@ ${cancellationDate ? `
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef9ec;border:1px solid #f0e4c8;border-radius:8px;">
     <tr><td style="padding:14px 18px;">
       <p style="margin:0;font-size:12px;color:#92650e;font-weight:bold;">Cancellation policy</p>
-      <p style="margin:4px 0 0;font-size:13px;color:${BRAND.muted};">Free cancellation until <strong style="color:${BRAND.bark};">${fmtDate(cancellationDate)}</strong>. After that, the first night is non-refundable.</p>
+      <p style="margin:4px 0 0;font-size:13px;color:${BRAND.muted};">Free cancellation until <strong style="color:${BRAND.bark};">${fmtDate(cancellationDate)}</strong> (48 hours from booking). After that, all cancellations are non-refundable.</p>
     </td></tr>
   </table>
-</td></tr>` : ''}
+</td></tr>` : `
+<tr><td style="padding:0 32px 20px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef9ec;border:1px solid #f0e4c8;border-radius:8px;">
+    <tr><td style="padding:14px 18px;">
+      <p style="margin:0;font-size:12px;color:#92650e;font-weight:bold;">Cancellation policy</p>
+      <p style="margin:4px 0 0;font-size:13px;color:${BRAND.muted};">This booking is non-refundable.</p>
+    </td></tr>
+  </table>
+</td></tr>`}
 
 <tr><td style="padding:0 32px 20px;">
   <p style="margin:0 0 12px;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">THE PROPERTY</p>
@@ -418,8 +426,98 @@ ${footer(siteUrl)}
 </body></html>`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// HOST NOTIFICATION — New confirmed booking (sent to host)
+// ═══════════════════════════════════════════════════════════════
+function hostNotificationEmail({ guestName, email, phone, checkIn, checkOut, nights, guests, total, amountPaid, cleaningFee, refCode, stripeId, siteUrl }) {
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/></head>
+<body style="margin:0;padding:0;background:${BRAND.linen};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};">
+<tr><td align="center" style="padding:24px 16px;">
+<table width="520" cellpadding="0" cellspacing="0" style="background:${BRAND.cream};border-radius:8px;overflow:hidden;border:1px solid ${BRAND.border};max-width:100%;">
+
+${header()}
+
+<tr><td style="background:${BRAND.green};padding:14px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td style="font-size:14px;color:#fff;font-weight:bold;">&#10003; New confirmed booking</td>
+    <td style="font-size:13px;color:rgba(255,255,255,0.7);text-align:right;font-family:monospace;">${refCode || ''}</td>
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:28px 32px 8px;">
+  <p style="margin:0 0 6px;font-size:22px;color:${BRAND.bark};font-family:Georgia,serif;">${guestName} is confirmed</p>
+  <p style="margin:0;font-size:14px;color:${BRAND.text};line-height:1.65;">Payment received and booking written to the system. Here are the details.</p>
+</td></tr>
+
+<tr><td style="padding:20px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};border-radius:8px;">
+    <tr>
+      <td style="padding:20px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">CHECK-IN</p>
+        <p style="margin:5px 0 0;font-size:15px;color:${BRAND.bark};font-weight:bold;">${fmtDate(checkIn)}</p>
+        <p style="margin:2px 0 0;font-size:12px;color:${BRAND.muted};">from 3:00 PM</p>
+      </td>
+      <td style="padding:20px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">CHECK-OUT</p>
+        <p style="margin:5px 0 0;font-size:15px;color:${BRAND.bark};font-weight:bold;">${fmtDate(checkOut)}</p>
+        <p style="margin:2px 0 0;font-size:12px;color:${BRAND.muted};">by 10:00 AM</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 24px 20px;">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">NIGHTS</p>
+        <p style="margin:5px 0 0;font-size:15px;color:${BRAND.bark};font-weight:bold;">${nights} night${nights > 1 ? 's' : ''}</p>
+      </td>
+      <td style="padding:0 24px 20px;">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">GUESTS</p>
+        <p style="margin:5px 0 0;font-size:15px;color:${BRAND.bark};font-weight:bold;">${guests} guest${guests > 1 ? 's' : ''}</p>
+      </td>
+    </tr>
+  </table>
+</td></tr>
+
+<tr><td style="padding:0 32px 20px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};border-radius:8px;">
+    <tr>
+      <td style="padding:16px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">GUEST EMAIL</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${email || '—'}</p>
+      </td>
+      <td style="padding:16px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">GUEST PHONE</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${phone || '—'}</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 24px 16px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">TOTAL</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${fmtAUD(total)} AUD</p>
+      </td>
+      <td style="padding:0 24px 16px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">PAID</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${fmtAUD(amountPaid)} AUD</p>
+      </td>
+    </tr>
+  </table>
+</td></tr>
+
+<tr><td style="padding:0 32px 20px;">
+  <p style="margin:0;font-size:12px;color:${BRAND.light};">Stripe: ${stripeId || '—'}</p>
+</td></tr>
+
+${footer(siteUrl)}
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
 module.exports = {
   confirmationEmail,
+  hostNotificationEmail,
   preArrivalEmail,
   checkInEmail,
   postCheckoutEmail,
