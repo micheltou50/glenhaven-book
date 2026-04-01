@@ -1,77 +1,73 @@
 // ── /api/availability ─────────────────────────────────────────
-// Fetches blocked date ranges from TWO sources:
-//   1. Google Sheet (via Apps Script) — direct bookings
-//   2. Airbnb iCal URL (if AIRBNB_ICAL_URL env var is set) — Airbnb bookings
-// Returns merged { success, ranges: [{start, end}] }
+// Reads booked date ranges from Supabase + optional Airbnb iCal.
+// Returns { success, ranges: [{start, end}] }
+
+const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, AIRBNB_ICAL_URL } = process.env;
+
+const sbHeaders = {
+  'apikey': SUPABASE_SERVICE_KEY,
+  'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+};
 
 exports.handler = async () => {
   const ranges = [];
 
-  // ── 1. Google Sheet bookings ──────────────────────────────
+  // ── 1. Supabase bookings ───────────────────────────────────
   try {
-    const url  = process.env.APPS_SCRIPT_URL + '?action=availability';
-    const res  = await fetch(url);
-    const data = await res.json();
-    if (data.success && Array.isArray(data.ranges)) {
-      data.ranges.forEach(r => ranges.push({ start: r.start, end: r.end }));
+    const url = `${SUPABASE_URL}/rest/v1/bookings?property_id=eq.${PROPERTY_ID}&status=neq.cancelled&select=checkin,checkout`;
+    const res = await fetch(url, { headers: sbHeaders });
+    const rows = await res.json();
+    if (Array.isArray(rows)) {
+      rows.forEach(r => {
+        if (r.checkin && r.checkout) ranges.push({ start: r.checkin, end: r.checkout });
+      });
     }
   } catch (err) {
-    console.error('Google Sheet availability error:', err.message);
-    // Continue — still try iCal
+    console.error('Supabase availability error:', err.message);
   }
 
-  // ── 2. Airbnb iCal ───────────────────────────────────────
-  const icalUrl = process.env.AIRBNB_ICAL_URL;
-  if (icalUrl) {
+  // ── 2. Airbnb iCal ─────────────────────────────────────────
+  if (AIRBNB_ICAL_URL) {
     try {
-      const res     = await fetch(icalUrl);
+      const res     = await fetch(AIRBNB_ICAL_URL);
       const icsText = await res.text();
-      const icalRanges = parseIcal(icsText);
-      icalRanges.forEach(r => ranges.push(r));
-      console.log('iCal parsed:', icalRanges.length, 'blocked ranges from Airbnb');
+      parseIcal(icsText).forEach(r => ranges.push(r));
     } catch (err) {
-      console.error('iCal fetch/parse error:', err.message);
-      // Non-fatal — sheet data still returned
+      console.error('iCal error:', err.message);
     }
-  } else {
-    console.log('AIRBNB_ICAL_URL not set — skipping iCal');
+  }
+
+  // ── 3. Price overrides ───────────────────────────────────────
+  let priceOverrides = {};
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/price_overrides?property_id=eq.${PROPERTY_ID}&select=date,price`;
+    const res = await fetch(url, { headers: sbHeaders });
+    const rows = await res.json();
+    if (Array.isArray(rows)) {
+      rows.forEach(r => { priceOverrides[r.date] = parseFloat(r.price); });
+    }
+  } catch (err) {
+    console.error('Price overrides error:', err.message);
   }
 
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    body: JSON.stringify({ success: true, ranges }),
+    body: JSON.stringify({ success: true, ranges, priceOverrides }),
   };
 };
 
-// ── iCal parser ───────────────────────────────────────────────
-// Handles both date-only (DTSTART;VALUE=DATE:20260101)
-// and datetime (DTSTART:20260101T150000Z) formats from Airbnb
 function parseIcal(icsText) {
   const ranges = [];
   const events = icsText.split('BEGIN:VEVENT');
-
   for (let i = 1; i < events.length; i++) {
-    const block = events[i];
-
-    // Match DTSTART with optional params (e.g. ;VALUE=DATE or ;TZID=...)
-    const startMatch = block.match(/DTSTART(?:[^:]*):(\d{8})/);
-    const endMatch   = block.match(/DTEND(?:[^:]*):(\d{8})/);
-
-    if (startMatch && endMatch) {
-      const start = formatIcalDate(startMatch[1]);
-      const end   = formatIcalDate(endMatch[1]);
-      if (start && end && start < end) {
-        ranges.push({ start, end });
-      }
+    const s = events[i].match(/DTSTART(?:[^:]*):(\d{8})/);
+    const e = events[i].match(/DTEND(?:[^:]*):(\d{8})/);
+    if (s && e) {
+      const start = s[1].replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+      const end   = e[1].replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+      if (start < end) ranges.push({ start, end });
     }
   }
-
   return ranges;
-}
-
-// Convert '20260101' → '2026-01-01'
-function formatIcalDate(raw) {
-  if (!raw || raw.length < 8) return null;
-  return raw.slice(0, 4) + '-' + raw.slice(4, 6) + '-' + raw.slice(6, 8);
 }

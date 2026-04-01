@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     .page-hero{background:var(--g100);padding:4rem 0 2rem;border-bottom:1px solid var(--g200)}
-    .rating-summary{display:flex;align-items:center;gap:3rem;margin:2.5rem 0;flex-wrap:wrap}
+    .rating-summary{display:none;align-items:center;gap:3rem;margin:2.5rem 0;flex-wrap:wrap}
     .big-rating{text-align:center}
     .big-rating .num{font-size:4rem;font-weight:800;letter-spacing:-.04em;line-height:1}
     .big-rating .stars{font-size:1.3rem;color:var(--green);margin:.25rem 0}
@@ -45,96 +45,16 @@
 
 <section class="section">
   <div class="container">
-    <div class="rating-summary">
+    <div class="rating-summary" id="ratingSummary">
       <div class="big-rating">
-        <div class="num">5.0</div>
-        <div class="stars">★★★★★</div>
-        <p>Guest favourite</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.5rem;flex:1;max-width:300px;">
-        <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
-          <span style="color:var(--g500);width:80px;">Cleanliness</span>
-          <div style="flex:1;height:6px;background:var(--g200);border-radius:3px;"><div style="width:100%;height:100%;background:var(--green);border-radius:3px;"></div></div>
-          <span style="font-weight:600;">5.0</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
-          <span style="color:var(--g500);width:80px;">Accuracy</span>
-          <div style="flex:1;height:6px;background:var(--g200);border-radius:3px;"><div style="width:100%;height:100%;background:var(--green);border-radius:3px;"></div></div>
-          <span style="font-weight:600;">5.0</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
-          <span style="color:var(--g500);width:80px;">Location</span>
-          <div style="flex:1;height:6px;background:var(--g200);border-radius:3px;"><div style="width:96%;height:100%;background:var(--green);border-radius:3px;"></div></div>
-          <span style="font-weight:600;">4.9</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
-          <span style="color:var(--g500);width:80px;">Value</span>
-          <div style="flex:1;height:6px;background:var(--g200);border-radius:3px;"><div style="width:100%;height:100%;background:var(--green);border-radius:3px;"></div></div>
-          <span style="font-weight:600;">5.0</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
-          <span style="color:var(--g500);width:80px;">Check-in</span>
-          <div style="flex:1;height:6px;background:var(--g200);border-radius:3px;"><div style="width:100%;height:100%;background:var(--green);border-radius:3px;"></div></div>
-          <span style="font-weight:600;">5.0</span>
-        </div>
+        <div class="num" id="avgRating">—</div>
+        <div class="stars" id="avgStars">☆☆☆☆☆</div>
+        <p id="reviewCount">Loading...</p>
       </div>
     </div>
 
-    <div class="reviews-grid">
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">SM</div>
-          <div><div class="rv-name">Sarah M.</div><div class="rv-date">February 2025 · 4 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"Glenhaven exceeded every expectation. The fireplace, the conservatory, the garden — it felt like a luxury escape without the price tag. We arrived stressed from Sydney and left completely rejuvenated. The beds are incredibly comfortable and the kitchen has everything you need. We'll absolutely be back."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">TR</div>
-          <div><div class="rv-name">Tom & Rebecca</div><div class="rv-date">January 2025 · 5 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"Perfect family getaway for 6 of us. The kids loved the garden and board games, the adults loved the fireplace and wine. 10 minutes from the Three Sisters — couldn't ask for a better base. The smart lock made check-in effortless. Host was incredibly responsive. Highly recommend."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">PK</div>
-          <div><div class="rv-name">Priya K.</div><div class="rv-date">March 2025 · 3 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"The conservatory in the morning with coffee is something I'll never forget. Incredibly peaceful, beautifully maintained, and Chaddy was so responsive. We did day trips to Echo Point and the Scenic Railway then came back to a warm cottage each evening. Pure bliss."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">JW</div>
-          <div><div class="rv-name">James W.</div><div class="rv-date">December 2024 · 7 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"Spent Christmas week here with extended family — 8 of us — and it was absolutely perfect. Plenty of room, a stunning garden for the kids, and the fireplace made Christmas morning magical. The property is even better in person than the photos suggest. Will be booking again for next year."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">AL</div>
-          <div><div class="rv-name">Amy L.</div><div class="rv-date">November 2024 · 3 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"Absolutely stunning property. We came for a girls' weekend and it was the perfect setting — beautiful, peaceful and well-equipped. The outdoor area is gorgeous and the fireplace really makes the evenings special. Would highly recommend to anyone visiting the Blue Mountains."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
-      <div class="rv-card">
-        <div class="rv-top">
-          <div class="rv-av">MC</div>
-          <div><div class="rv-name">Mark C.</div><div class="rv-date">October 2024 · 4 nights</div></div>
-          <div class="rv-stars">★★★★★</div>
-        </div>
-        <p class="rv-text">"We've stayed at a lot of places in the Blue Mountains over the years — Glenhaven is the best by far. The attention to detail is incredible. Great location, beautiful house, very responsive host. Can't recommend enough."</p>
-        <div class="rv-platform">✓ Verified Airbnb guest</div>
-      </div>
+    <div class="reviews-grid" id="reviewsGrid">
+      <p style="text-align:center;color:var(--g400);padding:2rem;grid-column:1/-1;">Loading reviews...</p>
     </div>
 
     <div class="text-center" style="margin-top:3rem;">
@@ -147,14 +67,5 @@
   <p>© 2025 Glenhaven · Katoomba, NSW, Australia</p>
   <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
 </div></div></footer>
-<script src="script.js"></script>
-<script>
-(function(){
-  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
-  if(b&&l){
-    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
-    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
-  }
-})();
-</script>
+<script type="module" src="js/pages/reviews.js"></script>
 </body></html>

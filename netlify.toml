@@ -1,6 +1,10 @@
 [build]
   functions = "netlify/functions"
 
+# Daily email sequence — 9 PM UTC = 7 AM AEST
+[functions."email-sequence"]
+  schedule = "0 21 * * *"
+
 # /api/book  →  /.netlify/functions/book  etc.
 [[redirects]]
   from   = "/api/*"
@@ -11,4 +15,10 @@
 [[redirects]]
   from   = "/calendar.ics"
   to     = "/.netlify/functions/calendar"
+  status = 200
+
+# /api/contact → contact-submit function
+[[redirects]]
+  from   = "/api/contact"
+  to     = "/.netlify/functions/contact-submit"
   status = 200

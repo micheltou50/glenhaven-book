@@ -1,32 +1,42 @@
 // ── /api/contact ──────────────────────────────────────────────
-// POST → sends contact form message via Apps Script email
+// POST → sends contact form message via Resend email
+
+const { RESEND_API_KEY, RESEND_FROM, HOST_EMAIL } = process.env;
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
 exports.handler = async (event) => {
-  const headers = {
-    'Content-Type'                : 'application/json',
-    'Access-Control-Allow-Origin' : '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
-
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
-  if (event.httpMethod !== 'POST')    return { statusCode: 405, headers, body: JSON.stringify({ success: false, error: 'Method not allowed' }) };
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ success: false, error: 'Method not allowed' }) };
 
-  const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-  if (!APPS_SCRIPT_URL) return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: 'APPS_SCRIPT_URL not set' }) };
+  if (!RESEND_API_KEY || !HOST_EMAIL) {
+    return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: 'Email not configured' }) };
+  }
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const payload = {
-      action  : 'contact',
-      name    : body.name    || '',
-      email   : body.email   || '',
-      topic   : body.topic   || 'General',
-      message : body.message || '',
-    };
 
-    const res  = await fetch(`${APPS_SCRIPT_URL}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
-    const data = await res.json();
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: RESEND_FROM || 'Glenhaven <noreply@resend.dev>',
+        to: HOST_EMAIL,
+        reply_to: body.email || undefined,
+        subject: `Contact: ${body.topic || 'General'} — ${body.name || 'Guest'}`,
+        html: `<h2>New Contact Message</h2>
+          <p><strong>Name:</strong> ${body.name || '—'}</p>
+          <p><strong>Email:</strong> ${body.email || '—'}</p>
+          <p><strong>Topic:</strong> ${body.topic || 'General'}</p>
+          <hr/>
+          <p>${(body.message || '').replace(/\n/g, '<br/>')}</p>`,
+      }),
+    });
 
     return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
   } catch (err) {

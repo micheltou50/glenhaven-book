@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leave a Review — Glenhaven</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .review-page { max-width: 560px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    .review-header { text-align: center; margin-bottom: 2.5rem; }
+    .review-header .logo { font-family: var(--heading); font-size: 1.6rem; font-weight: 800; color: var(--black); margin-bottom: .3rem; }
+    .review-header .logo em { font-style: normal; font-weight: 400; }
+    .review-header .sub { font-size: .85rem; color: var(--g400); }
+    .review-card { background: #fff; border: 1px solid var(--g200); border-radius: var(--r); padding: 2rem; }
+    .review-card h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: .4rem; }
+    .review-card .stay-info { font-size: .85rem; color: var(--g400); margin-bottom: 1.5rem; }
+    .stars { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+    .star { width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--g200); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; transition: all .15s; }
+    .star:hover, .star.on { background: #fef3c7; border-color: #f59e0b; transform: scale(1.08); }
+    .star.on { background: #fef3c7; border-color: #f59e0b; }
+    .rf-group { margin-bottom: 1.2rem; }
+    .rf-group label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .4rem; color: #444; }
+    .rf-group textarea { width: 100%; border: 1.5px solid var(--g200); border-radius: var(--r-sm); padding: .8rem 1rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; box-sizing: border-box; background: #fff; resize: vertical; min-height: 140px; }
+    .rf-group textarea:focus { border-color: var(--green); }
+    .rf-group .hint { font-size: .75rem; color: var(--g400); margin-top: .3rem; }
+    .rf-error { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--r-sm); padding: .75rem 1rem; color: #991b1b; font-size: .85rem; margin-bottom: 1rem; }
+    .rf-error.show { display: block; }
+    .rf-success { display: none; text-align: center; padding: 2rem 1rem; }
+    .rf-success.show { display: block; }
+    .rf-success h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .5rem; color: var(--green-d); }
+    .rf-success p { font-size: .9rem; color: var(--g500); line-height: 1.6; }
+    .rf-invalid { display: none; text-align: center; padding: 3rem 1rem; }
+    .rf-invalid.show { display: block; }
+    .rf-invalid h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .5rem; }
+    .rf-invalid p { font-size: .9rem; color: var(--g500); }
+  </style>
+</head>
+<body>
+
+<div class="review-page">
+  <div class="review-header">
+    <div class="logo">Glen<em>haven</em></div>
+    <div class="sub">Katoomba · Blue Mountains</div>
+  </div>
+
+  <!-- Invalid/expired link state -->
+  <div class="rf-invalid" id="stateInvalid">
+    <h2>Link not valid</h2>
+    <p>This review link is invalid or has expired. If you believe this is a mistake, please <a href="contact.html" style="color:var(--green);">contact us</a>.</p>
+  </div>
+
+  <!-- Already reviewed state -->
+  <div class="rf-invalid" id="stateAlready">
+    <h2>Already reviewed</h2>
+    <p>You've already submitted a review for this stay — thank you! Your feedback means a lot to us.</p>
+  </div>
+
+  <!-- Review form -->
+  <div class="review-card" id="stateForm" style="display:none;">
+    <h1>How was your stay?</h1>
+    <p class="stay-info" id="stayInfo"></p>
+
+    <div class="rf-group">
+      <label>Your rating</label>
+      <div class="stars" id="stars">
+        <div class="star" data-v="1">★</div>
+        <div class="star" data-v="2">★</div>
+        <div class="star" data-v="3">★</div>
+        <div class="star" data-v="4">★</div>
+        <div class="star" data-v="5">★</div>
+      </div>
+    </div>
+
+    <div class="rf-group">
+      <label>Your review</label>
+      <textarea id="reviewText" placeholder="What did you enjoy most about your stay at Glenhaven?"></textarea>
+      <div class="hint">A few sentences is perfect — what stood out, what you loved, anything future guests should know.</div>
+    </div>
+
+    <div class="rf-error" id="rfError"></div>
+
+    <button class="btn btn-primary btn-full" id="rfSubmit" onclick="submitReview()">Submit Review</button>
+  </div>
+
+  <!-- Success state -->
+  <div class="rf-success" id="stateSuccess">
+    <div style="font-size:2.5rem;margin-bottom:.75rem;">🙏</div>
+    <h2>Thank you!</h2>
+    <p>Your review has been submitted and will be published shortly. We really appreciate you taking the time.</p>
+    <a href="index.html" class="btn btn-white" style="margin-top:1.5rem;display:inline-block;">Back to Glenhaven</a>
+  </div>
+</div>
+
+<script type="module">
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  let rating = 0;
+  let bookingId = null;
+
+  // Star rating
+  document.querySelectorAll('.star').forEach(s => {
+    s.addEventListener('click', () => {
+      rating = parseInt(s.dataset.v);
+      document.querySelectorAll('.star').forEach((st, i) => {
+        st.classList.toggle('on', i < rating);
+      });
+    });
+  });
+
+  // Load booking info
+  async function init() {
+    if (!ref) {
+      document.getElementById('stateInvalid').classList.add('show');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/submit-review?ref=' + encodeURIComponent(ref));
+      const data = await res.json();
+
+      if (res.status === 409) {
+        document.getElementById('stateAlready').classList.add('show');
+        return;
+      }
+
+      if (!res.ok || data.error) {
+        document.getElementById('stateInvalid').classList.add('show');
+        return;
+      }
+
+      bookingId = data.bookingId;
+      document.getElementById('stayInfo').textContent = data.guestName + ' · ' + data.stayDate;
+      document.getElementById('stateForm').style.display = 'block';
+    } catch (err) {
+      document.getElementById('stateInvalid').classList.add('show');
+    }
+  }
+
+  // Submit review
+  window.submitReview = async function() {
+    const text = document.getElementById('reviewText').value.trim();
+    const errEl = document.getElementById('rfError');
+    errEl.classList.remove('show');
+
+    if (!rating) { errEl.textContent = 'Please select a star rating.'; errEl.classList.add('show'); return; }
+    if (text.length < 10) { errEl.textContent = 'Please write at least a short review.'; errEl.classList.add('show'); return; }
+
+    const btn = document.getElementById('rfSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch('/api/submit-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ref, rating, reviewText: text }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        errEl.textContent = data.error || 'Something went wrong. Please try again.';
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Submit Review';
+        return;
+      }
+
+      document.getElementById('stateForm').style.display = 'none';
+      document.getElementById('stateSuccess').classList.add('show');
+    } catch (err) {
+      errEl.textContent = 'Network error — please try again.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Submit Review';
+    }
+  };
+
+  init();
+</script>
+</body>
+</html>

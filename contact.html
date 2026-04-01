@@ -168,52 +168,7 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
-<script>
-loadSiteConfig();
 
-function submitContact() {
-  var name    = document.getElementById('cfName').value.trim();
-  var email   = document.getElementById('cfEmail').value.trim();
-  var topic   = document.getElementById('cfTopic').value;
-  var message = document.getElementById('cfMessage').value.trim();
-
-  if (!name || !email || !message) {
-    alert('Please fill in your name, email, and message.');
-    return;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert('Please enter a valid email address.');
-    return;
-  }
-
-  var btn = document.getElementById('cfBtn');
-  btn.textContent = 'Sending…';
-  btn.disabled = true;
-
-  // Send via the enquiry endpoint
-  fetch('/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: name,
-      email: email,
-      topic: topic || 'General',
-      message: message,
-    })
-  }).then(function() {
-    document.getElementById('cfSuccess').style.display = 'block';
-    btn.style.display = 'none';
-  }).catch(function() {
-    // Even if the API fails, show success and tell them to email directly
-    document.getElementById('cfSuccess').innerHTML = 'Thanks! If you do not hear back within 24 hours, please email us directly at <a href="mailto:micheltou50@gmail.com" style="color:var(--green);">micheltou50@gmail.com</a>';
-    document.getElementById('cfSuccess').style.display = 'block';
-    btn.style.display = 'none';
-  });
-}
-</script>
-<script>
-(function(){
-  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
-  if(b&&l){
-    b.addEve
+<script type="module" src="js/pages/contact.js"></script>
+</body>
+</html>

@@ -18,7 +18,20 @@
     .transport-card{background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:1rem}
     .transport-card h4{font-size:.85rem;font-weight:700;margin-bottom:.4rem}
     .transport-card p{font-size:.8rem;color:var(--g500);line-height:1.5}
-    @media(max-width:768px){.loc-layout{grid-template-columns:1fr}.map-full{height:320px}.transport-grid{grid-template-columns:1fr}}
+    @media(max-width:768px){.loc-layout{grid-template-columns:1fr}.map-full{height:320px}.transport-grid{grid-template-columns:1fr}.td-grid{grid-template-columns:1fr}}
+    .td-section{margin-bottom:2.5rem}
+    .td-cat{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+    .td-cat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .td-cat-label{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .td-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+    .td-card{background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:1.15rem;transition:border-color var(--tr)}
+    .td-card:hover{border-color:var(--green)}
+    .td-name{font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+    .td-desc{font-size:.84rem;color:var(--g500);line-height:1.55;margin-bottom:.6rem}
+    .td-meta{display:flex;gap:.85rem;font-size:.75rem;color:var(--g400);flex-wrap:wrap}
+    .td-tip{background:#ecf5e0;border-radius:var(--r);padding:.85rem 1.1rem;margin-top:1rem}
+    .td-tip-label{font-size:.72rem;font-weight:700;color:var(--green-d);margin-bottom:.2rem;letter-spacing:.04em;text-transform:uppercase}
+    .td-tip-text{font-size:.82rem;color:var(--green-d);line-height:1.55}
   </style>
 </head>
 <body>
@@ -88,8 +101,135 @@
         <p style="font-size:.78rem;color:var(--g400);margin-top:.6rem;">📍 Katoomba, NSW 2780 · Exact address provided after booking is confirmed.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="text-center" style="margin-top:3rem;">
+<!-- THINGS TO DO -->
+<section class="section" style="background:var(--g50);border-top:1px solid var(--g200);">
+  <div class="container">
+    <span class="eyebrow">Things to do</span>
+    <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:.5rem;">Our local picks</h2>
+    <p style="color:var(--g500);margin-bottom:2.5rem;max-width:560px;">Curated by us — the places and walks we'd tell a friend about. All within easy reach of the cottage.</p>
+
+    <!-- Walks -->
+    <div class="td-section">
+      <div class="td-cat">
+        <div class="td-cat-icon" style="background:#ecf5e0;">🥾</div>
+        <div class="td-cat-label" style="color:var(--green-d);">Walks and hikes</div>
+      </div>
+      <div class="td-grid">
+        <div class="td-card">
+          <div class="td-name">Three Sisters walk</div>
+          <p class="td-desc">The iconic lookout and walk — start at Echo Point, descend the Giant Stairway (800+ steps) through rainforest. Stunning.</p>
+          <div class="td-meta"><span>⏱ 2-3 hrs</span><span>▲ Moderate</span><span>8 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Prince Henry Cliff Walk</div>
+          <p class="td-desc">Spectacular clifftop trail connecting Echo Point to Gordon Falls Lookout. Multiple lookouts along the way.</p>
+          <div class="td-meta"><span>⏱ 1.5 hrs</span><span>▲ Easy-moderate</span><span>10 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Wentworth Falls circuit</div>
+          <p class="td-desc">Valley of the Waters — lush fern gullies, waterfalls, and a swimming hole at the base. Best after rain.</p>
+          <div class="td-meta"><span>⏱ 3-4 hrs</span><span>▲ Moderate-hard</span><span>15 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Grand Canyon track</div>
+          <p class="td-desc">Loop trail through a mossy slot canyon near Blackheath. Feels like another world. Family-friendly pace possible.</p>
+          <div class="td-meta"><span>⏱ 3 hrs</span><span>▲ Moderate</span><span>20 min drive</span></div>
+        </div>
+      </div>
+      <div class="td-tip">
+        <div class="td-tip-label">Host tip</div>
+        <p class="td-tip-text">Start walks early — carparks at Echo Point fill by 10 AM on weekends. Pack layers; it's always a few degrees cooler on the cliff edge.</p>
+      </div>
+    </div>
+
+    <!-- Eat & drink -->
+    <div class="td-section">
+      <div class="td-cat">
+        <div class="td-cat-icon" style="background:#fef3e2;">☕</div>
+        <div class="td-cat-label" style="color:#7c4a0b;">Eat and drink</div>
+      </div>
+      <div class="td-grid">
+        <div class="td-card">
+          <div class="td-name">The Yellow Deli</div>
+          <p class="td-desc">Rustic cafe with handmade bread, hearty soups and incredible mate lattes. Unlike anywhere else. Worth the queue.</p>
+          <div class="td-meta"><span>Katoomba</span><span>5 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Leura Garage</div>
+          <p class="td-desc">Wood-fired pizzas and cocktails in a converted mechanic's garage. Great vibe for dinner.</p>
+          <div class="td-meta"><span>Leura</span><span>8 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Silk's Brasserie</div>
+          <p class="td-desc">Fine dining in Leura. Modern Australian with local produce. Book ahead on weekends.</p>
+          <div class="td-meta"><span>Leura</span><span>8 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Anonymous Cafe</div>
+          <p class="td-desc">Katoomba local favourite for breakfast. Great coffee, big portions, relaxed atmosphere.</p>
+          <div class="td-meta"><span>Katoomba</span><span>5 min drive</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Family -->
+    <div class="td-section">
+      <div class="td-cat">
+        <div class="td-cat-icon" style="background:#e8effe;">🎪</div>
+        <div class="td-cat-label" style="color:#1e3a6e;">Family activities</div>
+      </div>
+      <div class="td-grid">
+        <div class="td-card">
+          <div class="td-name">Scenic World</div>
+          <p class="td-desc">Scenic Railway (steepest in the world), Skyway, Cableway, and Walkway. Kids love it. Half-day easy.</p>
+          <div class="td-meta"><span>⏱ Half day</span><span>12 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Everglades Gardens</div>
+          <p class="td-desc">Stunning 1930s heritage garden in Leura. Peaceful, beautiful any season. Picnic-friendly.</p>
+          <div class="td-meta"><span>⏱ 1-2 hrs</span><span>8 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Blue Mountains Cultural Centre</div>
+          <p class="td-desc">Gallery and exhibitions about the World Heritage area. Free entry. Rainy day winner.</p>
+          <div class="td-meta"><span>⏱ 1 hr</span><span>5 min drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Leuralla Toy Museum</div>
+          <p class="td-desc">Huge private collection of vintage toys, trains, and dolls in a gorgeous garden setting. Kids and nostalgic adults alike.</p>
+          <div class="td-meta"><span>⏱ 1-2 hrs</span><span>10 min drive</span></div>
+        </div>
+      </div>
+      <div class="td-tip">
+        <div class="td-tip-label">Rainy day?</div>
+        <p class="td-tip-text">Light the fireplace, play the board games in the living room, and cook something warm in the kitchen. Some of our best reviews mention doing absolutely nothing.</p>
+      </div>
+    </div>
+
+    <!-- Day trips -->
+    <div class="td-section">
+      <div class="td-cat">
+        <div class="td-cat-icon" style="background:#f0edfe;">🍷</div>
+        <div class="td-cat-label" style="color:#3C3489;">Day trips</div>
+      </div>
+      <div class="td-grid">
+        <div class="td-card">
+          <div class="td-name">Jenolan Caves</div>
+          <p class="td-desc">Ancient limestone caves with guided tours. The drive there through the mountains is spectacular in itself.</p>
+          <div class="td-meta"><span>⏱ Full day</span><span>1 hr drive</span></div>
+        </div>
+        <div class="td-card">
+          <div class="td-name">Megalong Valley</div>
+          <p class="td-desc">Horse riding, farm stays, and wide-open valley views. A completely different side of the mountains.</p>
+          <div class="td-meta"><span>⏱ Half day</span><span>25 min drive</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center" style="margin-top:2rem;">
       <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
     </div>
   </div>
@@ -99,14 +239,5 @@
   <p>© 2025 Glenhaven · Katoomba, NSW, Australia</p>
   <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
 </div></div></footer>
-<script src="script.js"></script>
-<script>
-(function(){
-  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
-  if(b&&l){
-    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
-    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
-  }
-})();
-</script>
+<script type="module" src="js/pages/simple.js"></script>
 </body></html>

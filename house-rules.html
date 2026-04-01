@@ -143,40 +143,6 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
-<script>
-function renderHouseRules(cfg) {
-  var hr = (cfg && cfg.houseRules) || {};
-  var ci = document.getElementById('timeCheckin');
-  var co = document.getElementById('timeCheckout');
-  if (ci && hr.checkin)  ci.textContent = hr.checkin;
-  if (co && hr.checkout) co.textContent = hr.checkout;
-  var cats = [
-    { id:'rulesGeneral', key:'general' },
-    { id:'rulesNoise',   key:'noise'   },
-    { id:'rulesSmoking', key:'smoking' },
-    { id:'rulesPets',    key:'pets'    },
-  ];
-  cats.forEach(function(c) {
-    var el = document.getElementById(c.id);
-    if (!el || !hr[c.key] || !hr[c.key].length) return;
-    el.innerHTML = hr[c.key].map(function(r) {
-      return '<li><span class="ri">✓</span>' + r + '</li>';
-    }).join('');
-  });
-}
-loadSiteConfig().then(function() {
-  if (window.SITE_CONFIG) renderHouseRules(window.SITE_CONFIG);
-});
-</script>
-<script>
-(function(){
-  var b=document.getElementById('navBurger'), l=document.getElementById('navLinks');
-  if(b&&l){
-    b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open');});
-    document.addEventListener('click',function(e){if(!b.contains(e.target)&&!l.contains(e.target))l.classList.remove('open');});
-  }
-})();
-</script>
+<script type="module" src="js/pages/house-rules.js"></script>
 </body>
 </html>

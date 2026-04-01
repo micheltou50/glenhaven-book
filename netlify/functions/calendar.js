@@ -1,25 +1,23 @@
 // ── /calendar.ics ─────────────────────────────────────────────
-// Generates an iCal feed of DIRECT bookings only.
-// Import this URL into Airbnb to block direct-booking dates.
-//
-// Privacy: exports dates only — no guest names, emails, or phones.
-// DTEND = checkout date (iCal exclusive end) — correct for accommodation.
+// Generates an iCal feed of DIRECT bookings from Supabase.
+// Import into Airbnb to block direct-booking dates.
+// Exports dates only — no guest names/emails/phones.
+
+const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID } = process.env;
 
 exports.handler = async () => {
   try {
-    const url  = process.env.APPS_SCRIPT_URL + '?action=directCalendar';
-    const res  = await fetch(url);
-    const data = await res.json();
-
-    const ranges = (data.success && Array.isArray(data.ranges)) ? data.ranges : [];
+    const url = `${SUPABASE_URL}/rest/v1/bookings?property_id=eq.${PROPERTY_ID}&platform=eq.Direct&status=neq.cancelled&select=checkin,checkout`;
+    const res = await fetch(url, {
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` },
+    });
+    const rows = await res.json();
+    const ranges = Array.isArray(rows) ? rows : [];
 
     const events = ranges.map((r, i) => {
-      // Strip dashes: 2026-04-02 → 20260402
-      const dtStart = r.start.replace(/-/g, '');
-      const dtEnd   = r.end.replace(/-/g, '');
-      // DTEND is checkout date exactly — iCal all-day end is exclusive,
-      // so this correctly blocks up to (but not including) the checkout day.
-      const uid = `${r.start}-${r.end}-${i}@glenhaven-book.netlify.app`;
+      const dtStart = r.checkin.replace(/-/g, '');
+      const dtEnd   = r.checkout.replace(/-/g, '');
+      const uid     = `${r.checkin}-${r.checkout}-${i}@glenhaven-book.netlify.app`;
       return [
         'BEGIN:VEVENT',
         `DTSTART;VALUE=DATE:${dtStart}`,
@@ -45,17 +43,13 @@ exports.handler = async () => {
     return {
       statusCode: 200,
       headers: {
-        'Content-Type'        : 'text/calendar; charset=utf-8',
-        'Content-Disposition' : 'inline; filename="glenhaven.ics"',
-        'Cache-Control'       : 'no-cache, no-store',
+        'Content-Type': 'text/calendar; charset=utf-8',
+        'Content-Disposition': 'inline; filename="glenhaven.ics"',
+        'Cache-Control': 'no-cache, no-store',
       },
       body: ical,
     };
-
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: 'Error generating calendar: ' + err.message,
-    };
+    return { statusCode: 500, body: 'Error generating calendar: ' + err.message };
   }
 };
