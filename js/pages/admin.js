@@ -299,6 +299,14 @@ function populateForm(cfg) {
   renderLocThingsToDo(loc.thingsToDo || []);
   // iCal feeds
   renderIcalFeeds(cfg.icalFeeds || []);
+  // Design
+  const ds = cfg.design || {};
+  setVal('dFontHeading', ds.fontHeading || '');
+  setVal('dFontBody', ds.fontBody || '');
+  setVal('dRadius', ds.radius || '');
+  setVal('dBtnStyle', ds.btnStyle || '');
+  setVal('dNavStyle', ds.navStyle || '');
+  setTimeout(updateDesignPreview, 100);
   // Attach change listeners
   ['eName','eTagline','eHeroHeadline','eHeroSub','eDescription','eBedrooms','eBathrooms','eMaxGuests',
    'pBaseRate','pFriSurcharge','pSatSurcharge','pCleaningFee','pExtraGuest','pBaseGuests','pPeakPct','pLowPct',
@@ -355,6 +363,13 @@ function readForm() {
       thingsToDo: currentLocThingsToDo(),
     },
     icalFeeds: currentIcalFeeds(),
+    design: {
+      fontHeading: gVal('dFontHeading'),
+      fontBody: gVal('dFontBody'),
+      radius: gVal('dRadius'),
+      btnStyle: gVal('dBtnStyle'),
+      navStyle: gVal('dNavStyle'),
+    },
   };
 }
 
@@ -584,19 +599,79 @@ window.removeTTDItem = function (ci, ii) { _locThingsToDo[ci].items.splice(ii, 1
 window.onColorInput = function (type, hex) {
   document.getElementById(type === 'primary' ? 'cPrimaryHex' : 'cAccentHex').value = hex;
   applySiteConfig({ colors: { primary: document.getElementById('cPrimary').value, accent: document.getElementById('cAccent').value } });
+  updateDesignPreview();
   markDirty();
 };
 window.onHexInput = function (type, hex) {
   if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
   document.getElementById(type === 'primary' ? 'cPrimary' : 'cAccent').value = hex;
   applySiteConfig({ colors: { primary: document.getElementById('cPrimary').value, accent: document.getElementById('cAccent').value } });
+  updateDesignPreview();
   markDirty();
 };
 window.applyPreset = function (primary, accent) {
   document.getElementById('cPrimary').value = primary; document.getElementById('cPrimaryHex').value = primary;
   document.getElementById('cAccent').value = accent;   document.getElementById('cAccentHex').value = accent;
   applySiteConfig({ colors: { primary, accent } });
+  updateDesignPreview();
   markDirty();
+};
+
+// ── DESIGN PREVIEW ──────────────────────────────────────────
+window.updateDesignPreview = function () {
+  const primary = document.getElementById('cPrimary').value;
+  const accent = document.getElementById('cAccent').value;
+  const fontHeading = document.getElementById('dFontHeading').value;
+  const fontBody = document.getElementById('dFontBody').value;
+  const radius = document.getElementById('dRadius').value;
+  const btnStyle = document.getElementById('dBtnStyle').value;
+  const navStyle = document.getElementById('dNavStyle').value;
+
+  const radiusMap = { sharp: '0px', subtle: '4px', rounded: '12px', pill: '20px' };
+  const btnRadiusMap = { pill: '9999px', rounded: '8px', square: '2px' };
+  const r = radiusMap[radius] || '12px';
+  const br = btnRadiusMap[btnStyle] || '9999px';
+  const hFont = fontHeading || 'Inter, sans-serif';
+  const bFont = fontBody || 'Inter, sans-serif';
+
+  // Load Google Fonts if needed
+  const fontsToLoad = [fontHeading, fontBody].filter(f => f && f !== 'Inter');
+  fontsToLoad.forEach(f => {
+    const id = 'gf-' + f.replace(/\s/g, '-');
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id; link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(f)}:wght@400;600;700;800&display=swap`;
+      document.head.appendChild(link);
+    }
+  });
+
+  // Preview elements
+  const nav = document.getElementById('dpNav');
+  const logo = document.getElementById('dpLogo');
+  const cta = document.getElementById('dpCta');
+  const hero = document.getElementById('dpHero');
+  const heading = document.getElementById('dpHeading');
+  const btnPrimary = document.getElementById('dpBtnPrimary');
+  const btnOutline = document.getElementById('dpBtnOutline');
+  const card1 = document.getElementById('dpCard1');
+  const card2 = document.getElementById('dpCard2');
+
+  if (heading) heading.style.fontFamily = hFont;
+  if (btnPrimary) { btnPrimary.style.background = primary; btnPrimary.style.borderRadius = br; btnPrimary.style.fontFamily = bFont; }
+  if (btnOutline) { btnOutline.style.color = primary; btnOutline.style.border = `1.5px solid ${primary}`; btnOutline.style.borderRadius = br; btnOutline.style.background = 'transparent'; btnOutline.style.fontFamily = bFont; }
+  if (card1) { card1.style.borderRadius = r; card1.style.border = `1px solid var(--g200)`; card1.style.fontFamily = bFont; }
+  if (card2) { card2.style.borderRadius = r; card2.style.border = `1px solid var(--g200)`; card2.style.fontFamily = bFont; }
+  if (logo) logo.querySelector('em').style.color = primary;
+  if (cta) cta.style.borderRadius = br;
+
+  if (nav) {
+    if (navStyle === 'dark') { nav.style.background = '#111'; nav.style.color = '#fff'; if (logo) logo.style.color = '#fff'; }
+    else if (navStyle === 'transparent') { nav.style.background = 'transparent'; nav.style.border = 'none'; if (logo) logo.style.color = '#111'; }
+    else { nav.style.background = '#fff'; nav.style.border = '1px solid var(--g200)'; if (logo) logo.style.color = '#111'; }
+  }
+
+  if (hero) hero.style.borderRadius = r;
 };
 
 // ── PREVIEW / PUBLISH ────────────────────────────────────────

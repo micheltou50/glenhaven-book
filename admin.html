@@ -575,9 +575,48 @@
 
     <!-- DESIGN -->
     <div class="tab-pane" id="tab-edit-design">
+      <!-- LIVE PREVIEW -->
+      <div class="edit-card" style="padding:0;overflow:hidden;">
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;">
+          <h3 style="margin:0;">👁 Live Preview</h3>
+          <span style="font-size:.72rem;color:var(--g400);font-weight:600;">Updates as you change settings below</span>
+        </div>
+        <div id="designPreview" style="padding:1.5rem;background:var(--g50);">
+          <div id="dpNav" style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;background:#fff;border-radius:8px;margin-bottom:1rem;border:1px solid var(--g200);">
+            <span style="font-weight:800;font-size:1rem;" id="dpLogo">Glen<em style="color:var(--green);font-style:normal;">haven</em></span>
+            <div style="display:flex;gap:.6rem;font-size:.75rem;color:var(--g500);align-items:center;">
+              <span>Gallery</span><span>Amenities</span>
+              <span id="dpCta" style="background:var(--black);color:#fff;padding:.35rem .8rem;border-radius:9999px;font-weight:600;font-size:.72rem;">Book Now</span>
+            </div>
+          </div>
+          <div id="dpHero" style="background:linear-gradient(135deg,#2d3748,#1a202c);border-radius:12px;padding:2rem 1.5rem;color:#fff;margin-bottom:1rem;">
+            <div id="dpBadge" style="display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.65rem;font-weight:700;background:rgba(255,255,255,.15);margin-bottom:.6rem;">📍 Katoomba · Blue Mountains</div>
+            <h2 id="dpHeading" style="font-size:1.3rem;font-weight:800;margin-bottom:.4rem;line-height:1.2;">Blue Mountains Cottage Escape</h2>
+            <p style="font-size:.78rem;opacity:.7;margin:0;">A peaceful timber retreat minutes from the Three Sisters.</p>
+          </div>
+          <div style="display:flex;gap:.6rem;margin-bottom:1rem;">
+            <button id="dpBtnPrimary" style="padding:.55rem 1.2rem;border:none;color:#fff;font-weight:600;font-size:.78rem;cursor:default;">Book Your Stay</button>
+            <button id="dpBtnOutline" style="padding:.55rem 1.2rem;background:transparent;font-weight:600;font-size:.78rem;cursor:default;">Learn More</button>
+          </div>
+          <div style="display:flex;gap:.6rem;">
+            <div id="dpCard1" style="flex:1;background:#fff;padding:.8rem;text-align:center;">
+              <div style="font-size:1.2rem;margin-bottom:.3rem;">🔥</div>
+              <div style="font-weight:700;font-size:.78rem;">Wood Fireplace</div>
+              <div style="font-size:.7rem;color:var(--g500);margin-top:.2rem;">Cosy crackling fire</div>
+            </div>
+            <div id="dpCard2" style="flex:1;background:#fff;padding:.8rem;text-align:center;">
+              <div style="font-size:1.2rem;margin-bottom:.3rem;">🌿</div>
+              <div style="font-weight:700;font-size:.78rem;">Conservatory</div>
+              <div style="font-size:.7rem;color:var(--g500);margin-top:.2rem;">Sun-drenched glass room</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLORS -->
       <div class="edit-card">
         <h3>🎨 Colors</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.25rem;">Changes apply across the entire site — buttons, links, highlights, and email templates. Use Preview to see before publishing.</p>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.25rem;">Changes apply across the entire site — buttons, links, highlights, and email templates.</p>
         <div class="field-row">
           <div class="field-group">
             <label>Primary Color</label>
@@ -605,6 +644,83 @@
             <button class="btn btn-sm btn-white" onclick="applyPreset('#374151','#f59e0b')">🖤 Charcoal & Gold</button>
             <button class="btn btn-sm btn-white" onclick="applyPreset('#7c3aed','#059669')">💜 Purple & Teal</button>
           </div>
+        </div>
+      </div>
+
+      <!-- FONT -->
+      <div class="edit-card">
+        <h3>🔤 Font</h3>
+        <div class="field-group">
+          <label>Heading Font</label>
+          <select id="dFontHeading" onchange="updateDesignPreview();markDirty();" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+            <option value="">Inter (default)</option>
+            <option value="Playfair Display">Playfair Display — Elegant serif</option>
+            <option value="DM Serif Display">DM Serif Display — Classic serif</option>
+            <option value="Lora">Lora — Warm serif</option>
+            <option value="Cormorant Garamond">Cormorant Garamond — Refined serif</option>
+            <option value="Montserrat">Montserrat — Modern geometric</option>
+            <option value="Poppins">Poppins — Rounded clean</option>
+            <option value="Raleway">Raleway — Thin & elegant</option>
+            <option value="Outfit">Outfit — Friendly modern</option>
+          </select>
+          <div class="field-hint">Used for all headings (h1, h2, h3)</div>
+        </div>
+        <div class="field-group">
+          <label>Body Font</label>
+          <select id="dFontBody" onchange="updateDesignPreview();markDirty();" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+            <option value="">Inter (default)</option>
+            <option value="DM Sans">DM Sans — Friendly geometric</option>
+            <option value="Source Sans 3">Source Sans 3 — Readable</option>
+            <option value="Nunito">Nunito — Rounded soft</option>
+            <option value="Lato">Lato — Warm humanist</option>
+            <option value="Open Sans">Open Sans — Neutral clean</option>
+            <option value="Karla">Karla — Quirky grotesque</option>
+          </select>
+          <div class="field-hint">Used for paragraphs, labels, and body text</div>
+        </div>
+      </div>
+
+      <!-- BORDER RADIUS -->
+      <div class="edit-card">
+        <h3>🔲 Corner Radius</h3>
+        <div class="field-group">
+          <label>Border Roundness</label>
+          <select id="dRadius" onchange="updateDesignPreview();markDirty();" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+            <option value="">Rounded (default)</option>
+            <option value="sharp">Sharp — 0px corners</option>
+            <option value="subtle">Subtle — 4px corners</option>
+            <option value="rounded">Rounded — 12px corners</option>
+            <option value="pill">Extra round — 20px corners</option>
+          </select>
+          <div class="field-hint">Controls cards, buttons, and input fields</div>
+        </div>
+      </div>
+
+      <!-- BUTTON STYLE -->
+      <div class="edit-card">
+        <h3>🔘 Button Style</h3>
+        <div class="field-group">
+          <label>Button Shape</label>
+          <select id="dBtnStyle" onchange="updateDesignPreview();markDirty();" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+            <option value="">Pill (default)</option>
+            <option value="pill">Pill — Fully rounded</option>
+            <option value="rounded">Rounded — Soft corners</option>
+            <option value="square">Square — Sharp corners</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- NAVBAR STYLE -->
+      <div class="edit-card">
+        <h3>🧭 Navbar</h3>
+        <div class="field-group">
+          <label>Navbar Style</label>
+          <select id="dNavStyle" onchange="updateDesignPreview();markDirty();" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+            <option value="">Light (default)</option>
+            <option value="light">Light — White background</option>
+            <option value="dark">Dark — Dark background</option>
+            <option value="transparent">Transparent — Blends with hero</option>
+          </select>
         </div>
       </div>
     </div>

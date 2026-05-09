@@ -104,6 +104,48 @@ export function applySiteConfig(cfg) {
     if (c.accent) root.style.setProperty('--warm', c.accent);
   }
 
+  // ── Design — fonts, radius, buttons, navbar ──
+  if (cfg.design) {
+    const d = cfg.design, root = document.documentElement;
+
+    if (d.fontHeading) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(d.fontHeading)}:wght@400;600;700;800&display=swap`;
+      document.head.appendChild(link);
+      root.style.setProperty('--font-heading', `'${d.fontHeading}', serif`);
+      document.querySelectorAll('h1,h2,h3').forEach(el => el.style.fontFamily = `'${d.fontHeading}', serif`);
+    }
+
+    if (d.fontBody) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(d.fontBody)}:wght@400;500;600;700&display=swap`;
+      document.head.appendChild(link);
+      document.body.style.fontFamily = `'${d.fontBody}', sans-serif`;
+    }
+
+    if (d.radius) {
+      const radiusMap = { sharp: '0px', subtle: '4px', rounded: '12px', pill: '20px' };
+      const r = radiusMap[d.radius];
+      if (r) { root.style.setProperty('--r-sm', r === '0px' ? '0px' : `${Math.max(parseInt(r) - 6, 0)}px`); root.style.setProperty('--r', r); root.style.setProperty('--r-lg', `${parseInt(r) + 4}px`); root.style.setProperty('--r-xl', `${parseInt(r) + 12}px`); }
+    }
+
+    if (d.btnStyle) {
+      const btnRadiusMap = { pill: '9999px', rounded: '8px', square: '2px' };
+      const br = btnRadiusMap[d.btnStyle];
+      if (br) root.style.setProperty('--r-full', br);
+    }
+
+    if (d.navStyle) {
+      const nav = document.querySelector('.navbar');
+      if (nav) {
+        if (d.navStyle === 'dark') { nav.style.background = '#111'; nav.style.borderBottom = 'none'; nav.querySelectorAll('.nav-links a:not(.nav-cta)').forEach(a => a.style.color = 'rgba(255,255,255,.7)'); const logo = nav.querySelector('.nav-logo'); if (logo) logo.style.color = '#fff'; }
+        else if (d.navStyle === 'transparent') { nav.style.background = 'transparent'; nav.style.borderBottom = 'none'; }
+      }
+    }
+  }
+
   // ── Text content ──
   if (cfg.property) {
     setEl('sitePropertyName', cfg.property.name);
