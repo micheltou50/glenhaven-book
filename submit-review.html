@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Leave a Review — Glenhaven</title>
+  <title id="siteReviewTitle">Leave a Review</title>
   <meta name="robots" content="noindex, nofollow"/>
   <link rel="stylesheet" href="style.css"/>
   <style>
@@ -39,8 +39,8 @@
 
 <div class="review-page">
   <div class="review-header">
-    <div class="logo">Glen<em>haven</em></div>
-    <div class="sub">Katoomba · Blue Mountains</div>
+    <div class="logo" id="siteReviewLogo">Property</div>
+    <div class="sub" id="siteReviewSub"></div>
   </div>
 
   <!-- Invalid/expired link state -->
@@ -73,7 +73,7 @@
 
     <div class="rf-group">
       <label>Your review</label>
-      <textarea id="reviewText" placeholder="What did you enjoy most about your stay at Glenhaven?"></textarea>
+      <textarea id="reviewText" placeholder="What did you enjoy most about your stay?"></textarea>
       <div class="hint">A few sentences is perfect — what stood out, what you loved, anything future guests should know.</div>
     </div>
 
@@ -87,7 +87,7 @@
     <div style="font-size:2.5rem;margin-bottom:.75rem;">🙏</div>
     <h2>Thank you!</h2>
     <p>Your review has been submitted and will be published shortly. We really appreciate you taking the time.</p>
-    <a href="index.html" class="btn btn-white" style="margin-top:1.5rem;display:inline-block;">Back to Glenhaven</a>
+    <a href="index.html" class="btn btn-white" style="margin-top:1.5rem;display:inline-block;" id="siteReviewBackLink">Back to site</a>
   </div>
 </div>
 
@@ -95,6 +95,20 @@
   const ref = new URLSearchParams(window.location.search).get('ref');
   let rating = 0;
   let bookingId = null;
+
+  // Load site config for branding
+  try {
+    const cfgRes = await fetch('/api/config');
+    if (cfgRes.ok) {
+      const cfg = await cfgRes.json();
+      const name = cfg.property?.name || 'Property';
+      const loc = cfg.contact?.location || '';
+      document.getElementById('siteReviewLogo').textContent = name;
+      document.getElementById('siteReviewSub').textContent = loc;
+      document.getElementById('siteReviewTitle').textContent = 'Leave a Review — ' + name;
+      document.getElementById('siteReviewBackLink').textContent = 'Back to ' + name;
+    }
+  } catch(e) {}
 
   // Star rating
   document.querySelectorAll('.star').forEach(s => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book — Glenhaven Blue Mountains</title>
+  <title id="siteBookTitle">Book Your Stay</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { background: var(--g50); }
@@ -22,7 +22,7 @@
 <header>
   <nav class="navbar">
     <div class="container nav-inner">
-      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <a href="index.html" class="nav-logo" id="siteNavLogo">Property</a>
       <ul class="nav-links"><li><a href="index.html">← Back to property</a></li></ul>
       <button class="nav-burger">☰</button>
     </div>
@@ -33,7 +33,7 @@
 <div class="bk-hero">
   <div class="container bk-hero-inner">
     <div class="bk-prop">
-      <img class="bk-thumb" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven" data-site-photo="0"/>
+      <img class="bk-thumb" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Property" id="siteThumbAlt" data-site-photo="0"/>
       <div class="bk-prop-info">
         <h3 id="sitePropertyName">Glenhaven — Blue Mountains Cottage</h3>
         <p><span id="siteTagline">Katoomba, NSW</span> · <span id="bkBedrooms">4</span> bedrooms · Up to <span id="bkMaxGuests">8</span> guests</p>
@@ -166,7 +166,7 @@
         <div id="sidebarContent" style="display:none;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem;">
             <div style="font-size:1.25rem;font-weight:800;" id="sdPrice">$320</div>
-            <div class="stars">★★★★★</div>
+            <div class="stars" id="siteBookRating">★★★★★</div>
           </div>
           <div style="font-size:.8rem;color:var(--g400);margin-bottom:1rem;" id="sdDates"></div>
           <div class="price-bk" id="sdBK" style="margin-bottom:1rem;"></div>

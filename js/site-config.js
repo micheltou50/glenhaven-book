@@ -160,6 +160,13 @@ export function applySiteConfig(cfg) {
       const metaEl = document.getElementById('siteMetaDesc') || document.querySelector('meta[name="description"]');
       if (metaEl) metaEl.setAttribute('content', cfg.property.description);
     }
+    // Page title updates
+    if (cfg.property.name) {
+      const bookTitle = document.getElementById('siteBookTitle');
+      if (bookTitle) bookTitle.textContent = 'Book — ' + cfg.property.name;
+      const thumbAlt = document.getElementById('siteThumbAlt');
+      if (thumbAlt) thumbAlt.alt = cfg.property.name;
+    }
     // Rating
     if (cfg.property.rating != null) {
       const r = parseFloat(cfg.property.rating);
@@ -168,6 +175,9 @@ export function applySiteConfig(cfg) {
       setEl('siteRating', r.toFixed(1) + '★');
       const starsEl = document.getElementById('siteStarsDisplay');
       if (starsEl) starsEl.innerHTML = stars.slice(0,5) + ` <span style="font-size:.8rem;font-weight:500;color:var(--g500);">${r.toFixed(1)}</span>`;
+      // Booking sidebar rating
+      const bookRating = document.getElementById('siteBookRating');
+      if (bookRating) bookRating.textContent = stars.slice(0,5);
     }
   }
   if (cfg.hero) {
@@ -200,8 +210,17 @@ export function applySiteConfig(cfg) {
 
   // ── Browser tab title ──
   if (cfg.property && cfg.property.name) {
-    if (!document.title.startsWith(cfg.property.name)) {
-      document.title = cfg.property.name + ' — ' + document.title.split('—').slice(1).join('—').trim();
+    const parts = document.title.split('—').map(s => s.trim());
+    const isHomepage = window.location.pathname === '/' || window.location.pathname.endsWith('/index.html') || window.location.pathname.endsWith('/index');
+    if (isHomepage) {
+      // Homepage: "PropertyName — Tagline"
+      const tagline = cfg.property.tagline || parts.slice(1).join(' — ');
+      document.title = cfg.property.name + (tagline ? ' — ' + tagline : '');
+    } else if (parts.length >= 2) {
+      // Subpages: "Page — PropertyName"
+      document.title = parts[0] + ' — ' + cfg.property.name;
+    } else if (!document.title.includes(cfg.property.name)) {
+      document.title = cfg.property.name;
     }
   }
 
@@ -324,9 +343,13 @@ export function applySiteConfig(cfg) {
 
   // ── Photos ──
   if (cfg.photos && cfg.photos.length) {
+    const propName = cfg.property?.name || '';
     document.querySelectorAll('[data-site-photo]').forEach(el => {
       const idx = parseInt(el.dataset.sitePhoto) || 0;
-      if (cfg.photos[idx]) el.src = cfg.photos[idx];
+      if (cfg.photos[idx]) {
+        el.src = cfg.photos[idx];
+        if (propName && el.alt) el.alt = el.alt.replace(/Glenhaven/gi, propName);
+      }
     });
   }
 }
