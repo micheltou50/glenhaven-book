@@ -43,7 +43,11 @@
     .tbl-search input { padding: .48rem .9rem; border: 1.5px solid var(--g200); border-radius: var(--r-full); font-size: .83rem; width: 220px; outline: none; }
     .tbl-search input:focus { border-color: var(--green); }
     table { width: 100%; border-collapse: collapse; font-size: .84rem; }
-    thead th { padding: .65rem 1rem; text-align: left; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--g400); background: var(--g50); border-bottom: 1px solid var(--g100); }
+    thead th { padding: .65rem 1rem; text-align: left; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--g400); background: var(--g50); border-bottom: 1px solid var(--g100); cursor: pointer; user-select: none; white-space: nowrap; transition: color .15s; }
+    thead th:hover { color: var(--black); }
+    thead th .sort-arrow { display: inline-block; margin-left: .3rem; font-size: .65rem; opacity: .35; transition: opacity .15s, transform .15s; }
+    thead th.sort-active .sort-arrow { opacity: 1; color: var(--green); }
+    thead th.sort-desc .sort-arrow { transform: rotate(180deg); }
     tbody td { padding: .75rem 1rem; border-bottom: 1px solid var(--g100); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover td { background: var(--g50); }
@@ -203,7 +207,7 @@
         </div>
         <div style="overflow-x:auto;">
           <table>
-            <thead><tr><th>Guest</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Guests</th><th>Total</th><th>Platform</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th onclick="sortTable('guestName')">Guest <span class="sort-arrow">▲</span></th><th onclick="sortTable('checkIn')">Check-in <span class="sort-arrow">▲</span></th><th onclick="sortTable('checkOut')">Check-out <span class="sort-arrow">▲</span></th><th onclick="sortTable('nights')">Nights <span class="sort-arrow">▲</span></th><th onclick="sortTable('guests')">Guests <span class="sort-arrow">▲</span></th><th onclick="sortTable('total')">Total <span class="sort-arrow">▲</span></th><th onclick="sortTable('platform')">Platform <span class="sort-arrow">▲</span></th><th onclick="sortTable('status')">Status <span class="sort-arrow">▲</span></th><th style="cursor:default;">Actions</th></tr></thead>
             <tbody id="bkTable"></tbody>
           </table>
         </div>

@@ -120,6 +120,7 @@ function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
 
 // ── BOOKINGS FROM SERVER ─────────────────────────────────────
 let allBK = [], fText = '', fStat = '';
+let sortCol = 'checkIn', sortAsc = false;
 
 async function loadAdminBookings() {
   try {
@@ -668,6 +669,24 @@ function renderTable() {
   const rows = allBK.filter(b => { const mt = !fText || (b.guestName || '').toLowerCase().includes(fText); const ms = !fStat || (b.status || 'CONFIRMED').toUpperCase() === fStat; return mt && ms; });
   if (!rows.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
+  rows.sort((a, b) => {
+    let va, vb;
+    if (sortCol === 'nights') {
+      va = Math.round((new Date(a.checkOut) - new Date(a.checkIn)) / 86400000) || 0;
+      vb = Math.round((new Date(b.checkOut) - new Date(b.checkIn)) / 86400000) || 0;
+    } else if (sortCol === 'total') {
+      va = a.total || 0; vb = b.total || 0;
+    } else if (sortCol === 'guests') {
+      va = a.guests || 0; vb = b.guests || 0;
+    } else if (sortCol === 'checkIn' || sortCol === 'checkOut') {
+      va = a[sortCol] || ''; vb = b[sortCol] || '';
+    } else {
+      va = (a[sortCol] || '').toString().toLowerCase(); vb = (b[sortCol] || '').toString().toLowerCase();
+    }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
   tbody.innerHTML = rows.map(b => {
     const n = Math.round((new Date(b.checkOut) - new Date(b.checkIn)) / 86400000) || '?';
     const st = (b.status || 'CONFIRMED').toUpperCase();
@@ -677,6 +696,15 @@ function renderTable() {
 window.filterTable = function (v) { fText = v.toLowerCase(); renderTable(); };
 window.filterStatus = function (v) { fStat = v; renderTable(); };
 window.delBooking = function (id) { if (!confirm('Delete this booking?')) return; deleteBooking(id); allBK = getBookings(); renderStats(); renderTable(); };
+window.sortTable = function (col) {
+  if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+  document.querySelectorAll('thead th').forEach(th => { th.classList.remove('sort-active', 'sort-desc'); });
+  const ths = document.querySelectorAll('thead th');
+  const colMap = ['guestName','checkIn','checkOut','nights','guests','total','platform','status'];
+  const idx = colMap.indexOf(col);
+  if (idx >= 0 && ths[idx]) { ths[idx].classList.add('sort-active'); if (!sortAsc) ths[idx].classList.add('sort-desc'); }
+  renderTable();
+};
 
 // ── BLOCK DATES ──────────────────────────────────────────────
 function renderBlockList() {
