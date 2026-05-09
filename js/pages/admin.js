@@ -365,22 +365,27 @@ function renderPhotos(photos) {
   ).join('');
 }
 async function uploadFile(file) {
-  const res = await fetch('/api/upload', {
+  const signRes = await fetch('/api/upload', {
     method: 'POST',
-    headers: {
-      'Content-Type': file.type,
-      'x-admin-password': adminPassword,
-      'x-file-name': file.name,
-      'x-content-type': file.type,
-    },
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+    body: JSON.stringify({ fileName: file.name }),
+  });
+  if (!signRes.ok) {
+    const err = await signRes.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to get upload URL');
+  }
+  const { uploadUrl, publicUrl } = await signRes.json();
+
+  const upRes = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type, 'x-upsert': 'true' },
     body: file,
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Upload failed');
+  if (!upRes.ok) {
+    const text = await upRes.text();
+    throw new Error('Upload to storage failed: ' + text);
   }
-  const data = await res.json();
-  return data.url;
+  return publicUrl;
 }
 
 async function handlePhotoFiles(files) {
