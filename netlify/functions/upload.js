@@ -32,7 +32,9 @@ exports.handler = async (event) => {
   const storagePath = `property/${safeName}`;
 
   try {
-    const fileBuffer = Buffer.from(event.body, 'base64');
+    const fileBuffer = event.isBase64Encoded
+      ? Buffer.from(event.body, 'base64')
+      : Buffer.from(event.body, 'binary');
 
     const uploadUrl = `${SUPABASE_URL}/storage/v1/object/photos/${storagePath}`;
     const res = await fetch(uploadUrl, {

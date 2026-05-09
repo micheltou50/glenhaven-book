@@ -365,22 +365,20 @@ function renderPhotos(photos) {
   ).join('');
 }
 async function uploadFile(file) {
-  const body = await new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(file);
-  });
   const res = await fetch('/api/upload', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': file.type,
       'x-admin-password': adminPassword,
       'x-file-name': file.name,
       'x-content-type': file.type,
     },
-    body: body,
+    body: file,
   });
-  if (!res.ok) throw new Error('Upload failed');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Upload failed');
+  }
   const data = await res.json();
   return data.url;
 }
