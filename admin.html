@@ -730,10 +730,61 @@
 
     <!-- REVIEWS -->
     <div class="tab-pane" id="tab-reviews">
-      <!-- IMPORT REVIEW -->
+      <!-- BULK IMPORT -->
       <div class="edit-card">
-        <h3 style="margin-bottom:.25rem;">➕ Import Review</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Add reviews from Airbnb, Booking.com, VRBO, or Google. Copy the guest name, rating, and review text from the platform.</p>
+        <h3 style="margin-bottom:.25rem;">📋 Bulk Import Reviews</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Go to your listing on Airbnb / Booking.com / VRBO → open all reviews → select and copy them → paste below. We'll parse the names, dates, and review text automatically.</p>
+        <div class="field-row">
+          <div class="field-group" style="flex:.5;">
+            <label>Platform</label>
+            <select id="bulkPlatform" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+              <option value="airbnb">🏠 Airbnb</option>
+              <option value="booking">🅱️ Booking.com</option>
+              <option value="vrbo">🏡 VRBO</option>
+              <option value="google">⭐ Google</option>
+            </select>
+          </div>
+          <div class="field-group" style="flex:.5;">
+            <label>Default Rating</label>
+            <select id="bulkRating" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">
+              <option value="5">★★★★★ (5) — used if not detected</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Paste reviews below</label>
+          <textarea id="bulkText" rows="8" placeholder="Select all reviews on your listing page, copy (Ctrl+C / Cmd+C), and paste here…" style="font-size:.82rem;line-height:1.6;"></textarea>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem;">
+          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="parseBulkReviews()">🔍 Parse Reviews</button>
+          <span id="bulkStatus" style="font-size:.8rem;color:var(--g400);"></span>
+        </div>
+
+        <!-- Parsed preview -->
+        <div id="bulkPreview" style="display:none;margin-top:1.25rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+            <h4 style="margin:0;font-size:.9rem;">Parsed Reviews</h4>
+            <span id="bulkCount" style="font-size:.78rem;color:var(--g400);"></span>
+          </div>
+          <div id="bulkList" style="max-height:400px;overflow-y:auto;"></div>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+            <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="importAllParsed()">✅ Import All</button>
+            <button class="btn btn-sm btn-white" onclick="document.getElementById('bulkPreview').style.display='none';">Cancel</button>
+            <span id="importProgress" style="font-size:.8rem;color:var(--g400);"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SINGLE IMPORT -->
+      <div class="edit-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.chevron').textContent=this.nextElementSibling.style.display==='none'?'▸':'▾';">
+          <h3 style="margin:0;">➕ Add Single Review</h3>
+          <span class="chevron" style="font-size:.8rem;color:var(--g400);">▸</span>
+        </div>
+        <div style="display:none;">
+          <p style="font-size:.84rem;color:var(--g500);margin:.75rem 0 1rem;">Manually add one review at a time.</p>
         <div class="field-row">
           <div class="field-group" style="flex:.6;">
             <label>Platform</label>
@@ -773,6 +824,7 @@
         <div style="display:flex;gap:.5rem;align-items:center;margin-top:.75rem;">
           <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="addReview()">Add Review</button>
           <span id="rvStatus" style="font-size:.8rem;color:var(--g400);"></span>
+        </div>
         </div>
       </div>
 

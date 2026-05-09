@@ -1082,6 +1082,264 @@ window.rejectReview = async function (id) {
   }
 };
 
+// ── BULK REVIEW PARSER ──────────────────────────────────────
+let _parsedReviews = [];
+
+window.parseBulkReviews = function () {
+  const raw = document.getElementById('bulkText').value.trim();
+  const platform = document.getElementById('bulkPlatform').value;
+  const defaultRating = +document.getElementById('bulkRating').value;
+  const status = document.getElementById('bulkStatus');
+
+  if (!raw) { status.textContent = '⚠️ Paste some reviews first'; return; }
+
+  let reviews = [];
+  if (platform === 'airbnb') reviews = parseAirbnbReviews(raw, defaultRating);
+  else if (platform === 'booking') reviews = parseBookingReviews(raw, defaultRating);
+  else if (platform === 'vrbo') reviews = parseVrboReviews(raw, defaultRating);
+  else reviews = parseGenericReviews(raw, defaultRating);
+
+  if (!reviews.length) {
+    // Fallback: try generic parser
+    reviews = parseGenericReviews(raw, defaultRating);
+  }
+
+  if (!reviews.length) {
+    status.textContent = '⚠️ Could not parse any reviews. Try the single import below.';
+    return;
+  }
+
+  _parsedReviews = reviews.map(r => ({ ...r, platform, include: true }));
+  status.textContent = `Found ${reviews.length} review${reviews.length > 1 ? 's' : ''}`;
+  renderBulkPreview();
+};
+
+function parseAirbnbReviews(text, defaultRating) {
+  const reviews = [];
+  // Airbnb copy pattern: Name\nDate (e.g. "March 2024" or "3 weeks ago")\nReview text
+  // Also handles: Name\nLocation\nDate\nRating\nReview text
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+  const datePattern = /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
+  const relDatePattern = /^\d+\s+(day|week|month|year)s?\s+ago$/i;
+  const ratingPattern = /^(\d+(\.\d+)?)\s*\/?\s*5?$/;
+  const starsPattern = /^[★☆]{1,5}$/;
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    // Skip common noise
+    if (/^(show more|read more|report|helpful|response from|translate|show original|verified|hosted by)/i.test(line)) { i++; continue; }
+    if (/^\d+$/.test(line)) { i++; continue; } // bare numbers
+
+    // Check if this looks like a name (short, no period at end, not a date)
+    const isName = line.length > 1 && line.length < 40 && !datePattern.test(line) && !relDatePattern.test(line) && !ratingPattern.test(line) && !starsPattern.test(line) && !/[.!?]$/.test(line) && !/^\d/.test(line);
+
+    if (isName) {
+      const name = line;
+      let date = '';
+      let rating = defaultRating;
+      let reviewText = '';
+      let j = i + 1;
+
+      // Scan ahead for date, rating, then review text
+      while (j < lines.length && j < i + 5) {
+        if (datePattern.test(lines[j]) || relDatePattern.test(lines[j])) {
+          date = lines[j]; j++; continue;
+        }
+        if (ratingPattern.test(lines[j])) {
+          rating = Math.round(parseFloat(lines[j])); j++; continue;
+        }
+        if (starsPattern.test(lines[j])) {
+          rating = (lines[j].match(/★/g) || []).length; j++; continue;
+        }
+        // Skip location-like lines (e.g. "Sydney, Australia")
+        if (lines[j].length < 35 && /,/.test(lines[j]) && !lines[j].includes('.')) { j++; continue; }
+        break;
+      }
+
+      // Collect review text until next name-like line
+      const textParts = [];
+      while (j < lines.length) {
+        const next = lines[j];
+        if (/^(show more|read more|report|helpful|response from|translate|show original)/i.test(next)) { j++; continue; }
+        // Check if next line starts a new review (short name-like line followed by a date)
+        const nextIsName = next.length > 1 && next.length < 40 && !datePattern.test(next) && !relDatePattern.test(next) && !/[.!?]$/.test(next) && !/^\d/.test(next);
+        if (nextIsName && j + 1 < lines.length && (datePattern.test(lines[j + 1]) || relDatePattern.test(lines[j + 1]))) break;
+        textParts.push(next);
+        j++;
+      }
+
+      reviewText = textParts.join(' ').trim();
+      if (reviewText.length > 10) {
+        reviews.push({ guest_name: name, rating, stay_date: date, review_text: reviewText });
+      }
+      i = j;
+    } else {
+      i++;
+    }
+  }
+  return reviews;
+}
+
+function parseBookingReviews(text, defaultRating) {
+  const reviews = [];
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+  // Booking.com pattern: often has "Scored X.X" or "X.X" ratings, "Reviewed: date", guest name, country
+  const scorePattern = /^(?:scored?\s*)?(\d+(?:\.\d+)?)\s*$/i;
+  const reviewedPattern = /^reviewed:?\s*(.+)$/i;
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Look for a score
+    let score = null;
+    let scoreMatch = line.match(scorePattern);
+    if (scoreMatch && parseFloat(scoreMatch[1]) <= 10) {
+      score = Math.round(parseFloat(scoreMatch[1]) / 2); // Convert 10-scale to 5-scale
+    }
+
+    // Look for "Reviewed: date" pattern
+    let dateMatch = line.match(reviewedPattern);
+
+    if (score !== null || dateMatch) {
+      let rating = score || defaultRating;
+      let date = dateMatch ? dateMatch[1] : '';
+      let name = '';
+      let reviewText = '';
+
+      // Look around for name and review text
+      let j = i + 1;
+      // Scan for remaining fields
+      while (j < lines.length && j < i + 8) {
+        if (!date && reviewedPattern.test(lines[j])) {
+          date = lines[j].match(reviewedPattern)[1]; j++; continue;
+        }
+        if (score === null && scorePattern.test(lines[j])) {
+          rating = Math.round(parseFloat(lines[j].match(scorePattern)[1]) / 2); j++; continue;
+        }
+        // Skip country names, "Couple", "Solo traveller", etc.
+        if (/^(couple|solo|family|group|business|friends)/i.test(lines[j])) { j++; continue; }
+        if (!name && lines[j].length < 30 && !/[.!?]$/.test(lines[j]) && !/^\d/.test(lines[j])) {
+          name = lines[j]; j++; continue;
+        }
+        break;
+      }
+
+      // Collect review text
+      const textParts = [];
+      while (j < lines.length) {
+        if (scorePattern.test(lines[j]) || reviewedPattern.test(lines[j])) break;
+        if (/^(helpful|not helpful|show more|read more)/i.test(lines[j])) { j++; continue; }
+        textParts.push(lines[j]);
+        j++;
+      }
+      reviewText = textParts.join(' ').trim();
+      if (reviewText.length > 10 && name) {
+        reviews.push({ guest_name: name, rating: Math.min(5, Math.max(1, rating)), stay_date: date, review_text: reviewText });
+      }
+      i = j;
+    } else {
+      i++;
+    }
+  }
+  return reviews;
+}
+
+function parseVrboReviews(text, defaultRating) {
+  // VRBO is similar to Airbnb pattern
+  return parseAirbnbReviews(text, defaultRating);
+}
+
+function parseGenericReviews(text, defaultRating) {
+  const reviews = [];
+  // Split by double newlines as review separators
+  const blocks = text.split(/\n\s*\n/).filter(b => b.trim().length > 20);
+
+  for (const block of blocks) {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+    if (!lines.length) continue;
+
+    // First short line is likely the name
+    let name = '';
+    let date = '';
+    let rating = defaultRating;
+    let textStart = 0;
+
+    const datePattern = /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
+
+    if (lines[0].length < 40 && !/[.!?]$/.test(lines[0])) {
+      name = lines[0];
+      textStart = 1;
+      if (lines[1] && datePattern.test(lines[1])) { date = lines[1]; textStart = 2; }
+    }
+
+    const reviewText = lines.slice(textStart).join(' ').trim();
+    if (reviewText.length > 10) {
+      reviews.push({ guest_name: name || 'Guest', rating, stay_date: date, review_text: reviewText });
+    }
+  }
+  return reviews;
+}
+
+function renderBulkPreview() {
+  const preview = document.getElementById('bulkPreview');
+  const list = document.getElementById('bulkList');
+  const count = document.getElementById('bulkCount');
+  preview.style.display = 'block';
+  const included = _parsedReviews.filter(r => r.include);
+  count.textContent = `${included.length} of ${_parsedReviews.length} selected`;
+
+  list.innerHTML = _parsedReviews.map((r, i) => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const pm = platformMeta[r.platform] || platformMeta.direct;
+    return `<div style="border:1px solid ${r.include ? 'var(--g200)' : '#fca5a5'};border-radius:var(--r);padding:1rem;margin-bottom:.5rem;opacity:${r.include ? 1 : .4};transition:all .15s;">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+        <input type="checkbox" ${r.include ? 'checked' : ''} onchange="toggleParsedReview(${i},this.checked)" style="accent-color:var(--green);"/>
+        <strong style="font-size:.85rem;">${r.guest_name}</strong>
+        <span style="font-size:.75rem;color:var(--g400);">${r.stay_date}</span>
+        <span style="color:var(--green);font-size:.8rem;margin-left:auto;">${stars}</span>
+        <span style="font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:100px;background:${pm.bg};color:${pm.color};">${pm.icon} ${pm.label}</span>
+      </div>
+      <p style="font-size:.82rem;color:var(--g600);line-height:1.5;margin:0;">"${r.review_text.slice(0, 200)}${r.review_text.length > 200 ? '…' : ''}"</p>
+    </div>`;
+  }).join('');
+}
+
+window.toggleParsedReview = function (i, checked) {
+  _parsedReviews[i].include = checked;
+  renderBulkPreview();
+};
+
+window.importAllParsed = async function () {
+  const toImport = _parsedReviews.filter(r => r.include);
+  if (!toImport.length) return;
+  const progress = document.getElementById('importProgress');
+
+  for (let i = 0; i < toImport.length; i++) {
+    progress.textContent = `Importing ${i + 1} of ${toImport.length}…`;
+    const r = toImport[i];
+    try {
+      await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+        body: JSON.stringify({ guest_name: r.guest_name, rating: r.rating, review_text: r.review_text, stay_date: r.stay_date, platform: r.platform }),
+      });
+    } catch (e) { console.error('Import failed:', r.guest_name, e); }
+  }
+
+  progress.textContent = `✅ ${toImport.length} review${toImport.length > 1 ? 's' : ''} imported!`;
+  _parsedReviews = [];
+  document.getElementById('bulkText').value = '';
+  setTimeout(() => {
+    document.getElementById('bulkPreview').style.display = 'none';
+    progress.textContent = '';
+  }, 2000);
+  await loadReviews();
+};
+
 window.addReview = async function () {
   const name = document.getElementById('rvName').value.trim();
   const text = document.getElementById('rvText').value.trim();
