@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Glenhaven — Blue Mountains Cottage Escape, Katoomba</title>
-  <meta name="description" content="A peaceful 4-bedroom timber cottage in Katoomba near the Three Sisters. Book direct and save — no platform fees."/>
+  <meta name="description" id="siteMetaDesc" content="A peaceful 4-bedroom timber cottage in Katoomba near the Three Sisters. Book direct and save — no platform fees."/>
   <link rel="stylesheet" href="style.css"/>
   <style>
     /* ── HERO ── */
@@ -121,7 +121,7 @@
       <div class="hero-stat"><strong id="siteMaxGuests">8</strong><span>Guests</span></div>
       <div class="hero-stat"><strong id="siteBeds">4</strong><span>Bedrooms</span></div>
       <div class="hero-stat"><strong id="siteBaths">2.5</strong><span>Bathrooms</span></div>
-      <div class="hero-stat"><strong>5.0★</strong><span>Rating</span></div>
+      <div class="hero-stat"><strong id="siteRating">5.0★</strong><span>Rating</span></div>
     </div>
 
     <!-- SEARCH BOX — display only, clicking opens the MiniCal panel -->
@@ -239,7 +239,7 @@
         <div class="sticky-wrap">
           <div class="sticky-card" id="stickyCard">
             <div class="sticky-price">from $<span id="stickyFromPrice">320</span> <span>/ night</span></div>
-            <div class="stars" style="margin-bottom:.9rem;">★★★★★ <span style="font-size:.8rem;font-weight:500;color:var(--g500);">5.0</span></div>
+            <div class="stars" style="margin-bottom:.9rem;" id="siteStarsDisplay">★★★★★ <span style="font-size:.8rem;font-weight:500;color:var(--g500);">5.0</span></div>
             <div id="stickyUrgency" class="urgency"><div class="urgency-dot"></div><span>Popular dates are filling fast</span></div>
             <div class="s-dates">
               <div class="s-df">
@@ -284,7 +284,7 @@
     <div class="bd-banner reveal">
       <span class="eyebrow" style="color:rgba(255,255,255,.5);">Skip the middleman</span>
       <h2>Book Direct & Save</h2>
-      <p>No Airbnb service fees. No VRBO surcharges. Book directly and keep more money for experiences that matter.</p>
+      <p>No platform service fees or surcharges. Book directly and keep more money for experiences that matter.</p>
       <div class="perks">
         <div class="perk">✓ No platform fees</div>
         <div class="perk">✓ Direct host contact</div>
@@ -334,7 +334,7 @@
           <button class="nl-btn">→</button>
         </div>
         <ul style="margin-top:1rem;">
-          <li><a href="mailto:info@stayops.com.au">info@stayops.com.au</a></li>
+          <li><a href="mailto:info@stayops.com.au" id="siteContactEmail">info@stayops.com.au</a></li>
         </ul>
       </div>
     </div>

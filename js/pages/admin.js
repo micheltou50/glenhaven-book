@@ -263,7 +263,7 @@ function populateForm(cfg) {
   if (!cfg) return;
   const p = cfg.property || {}, h = cfg.hero || {}, pr = cfg.pricing || {}, c = cfg.colors || {};
   setVal('eName', p.name); setVal('eTagline', p.tagline); setVal('eHeroHeadline', h.headline); setVal('eHeroSub', h.subheadline); setVal('eHeroDesc', h.description);
-  setVal('eDescription', p.description); setVal('eBedrooms', p.bedrooms); setVal('eBathrooms', p.bathrooms); setVal('eMaxGuests', p.guests);
+  setVal('eDescription', p.description); setVal('eBedrooms', p.bedrooms); setVal('eBathrooms', p.bathrooms); setVal('eMaxGuests', p.guests); setVal('eRating', p.rating);
   const hr = cfg.houseRules || {};
   setVal('eCheckin', hr.checkin || ''); setVal('eCheckout', hr.checkout || '');
   setVal('eRulesGeneral', (hr.general || []).join('\n'));
@@ -329,7 +329,7 @@ function populateForm(cfg) {
 
 function readForm() {
   return {
-    property: { name: gVal('eName') || 'Glenhaven', tagline: gVal('eTagline'), description: gVal('eDescription'), bedrooms: nVal('eBedrooms'), bathrooms: nVal('eBathrooms'), guests: nVal('eMaxGuests') },
+    property: { name: gVal('eName') || 'Property', tagline: gVal('eTagline'), description: gVal('eDescription'), bedrooms: nVal('eBedrooms'), bathrooms: nVal('eBathrooms'), guests: nVal('eMaxGuests'), rating: nVal('eRating') },
     houseRules: {
       checkin: gVal('eCheckin'), checkout: gVal('eCheckout'),
       general: gVal('eRulesGeneral').split('\n').map(s => s.trim()).filter(Boolean),

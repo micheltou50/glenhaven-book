@@ -155,6 +155,20 @@ export function applySiteConfig(cfg) {
     setEl('siteBaths',        cfg.property.bathrooms != null ? cfg.property.bathrooms : null);
     setEl('siteMaxGuests',    cfg.property.guests    != null ? cfg.property.guests    : null);
     if (cfg.property.guests != null) CONFIG.MAX_GUESTS = cfg.property.guests;
+    // Meta description
+    if (cfg.property.description) {
+      const metaEl = document.getElementById('siteMetaDesc') || document.querySelector('meta[name="description"]');
+      if (metaEl) metaEl.setAttribute('content', cfg.property.description);
+    }
+    // Rating
+    if (cfg.property.rating != null) {
+      const r = parseFloat(cfg.property.rating);
+      const full = Math.floor(r);
+      const stars = '★'.repeat(full) + (r % 1 >= 0.5 ? '★' : '') + '☆'.repeat(5 - Math.ceil(r));
+      setEl('siteRating', r.toFixed(1) + '★');
+      const starsEl = document.getElementById('siteStarsDisplay');
+      if (starsEl) starsEl.innerHTML = stars.slice(0,5) + ` <span style="font-size:.8rem;font-weight:500;color:var(--g500);">${r.toFixed(1)}</span>`;
+    }
   }
   if (cfg.hero) {
     setEl('siteHeroHeadline', cfg.hero.headline);
