@@ -151,12 +151,25 @@ function markDirty() {
 }
 
 // ── LOGIN ────────────────────────────────────────────────────
-window.doLogin = function () {
+window.doLogin = async function () {
   const pwd = document.getElementById('loginPwd').value.trim();
   if (!pwd) return;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Checking…';
+  try {
+    const res = await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-password': pwd }, body: '{"_ping":true}' });
+    if (res.status === 401) {
+      alert('Incorrect password');
+      btn.disabled = false; btn.textContent = 'Login';
+      return;
+    }
+  } catch (e) {
+    // Network error — allow offline access, password will be checked on publish
+  }
   adminPassword = pwd;
   sessionStorage.setItem(ADMIN_PWD_KEY, pwd);
   document.getElementById('loginOverlay').style.display = 'none';
+  btn.disabled = false; btn.textContent = 'Login';
   init();
 };
 

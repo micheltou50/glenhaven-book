@@ -60,6 +60,10 @@ exports.handler = async (event) => {
     try { config = JSON.parse(event.body); }
     catch { return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
+    if (config._ping) {
+      return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true, ping: true }) };
+    }
+
     try {
       // Upsert: insert or update by property_id
       const url = `${SUPABASE_URL}/rest/v1/site_config?on_conflict=property_id`;
