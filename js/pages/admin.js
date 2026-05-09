@@ -994,6 +994,14 @@ async function loadReviews() {
   }
 }
 
+const platformMeta = {
+  airbnb:  { label: 'Airbnb',      icon: '🏠', color: '#FF5A5F', bg: '#FFF1F2' },
+  booking: { label: 'Booking.com', icon: '🅱️', color: '#003580', bg: '#EBF0F9' },
+  vrbo:    { label: 'VRBO',        icon: '🏡', color: '#3C67F0', bg: '#EEF2FF' },
+  google:  { label: 'Google',      icon: '⭐', color: '#EA4335', bg: '#FEF2F2' },
+  direct:  { label: 'Direct',      icon: '✉️', color: 'var(--green)', bg: 'var(--green-p)' },
+};
+
 function renderReviews() {
   const el = document.getElementById('reviewsList');
   const empty = document.getElementById('reviewsEmpty');
@@ -1012,6 +1020,7 @@ function renderReviews() {
     const statusBg = r.status === 'approved' ? 'var(--green-p)' : r.status === 'rejected' ? '#fef2f2' : '#fef9ec';
     const initials = (r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    const pm = platformMeta[r.platform] || platformMeta.direct;
 
     return `<div style="border:1px solid var(--g100);border-radius:var(--r);padding:1.25rem;margin-bottom:.75rem;">
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
@@ -1020,17 +1029,19 @@ function renderReviews() {
           <div style="font-weight:700;font-size:.88rem;">${r.guest_name || '—'}</div>
           <div style="font-size:.75rem;color:var(--g400);">${r.stay_date || ''} · ${date}</div>
         </div>
+        <span style="font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:100px;background:${pm.bg};color:${pm.color};">${pm.icon} ${pm.label}</span>
         <div style="color:var(--green);font-size:.85rem;">${stars}</div>
         <span style="font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-full);background:${statusBg};color:${statusColor};text-transform:uppercase;letter-spacing:.04em;">${r.status}</span>
       </div>
       <p style="font-size:.85rem;color:var(--g600);line-height:1.6;margin:0 0 .75rem;">"${r.review_text}"</p>
-      ${r.status === 'pending' ? `
-        <div style="display:flex;gap:.5rem;">
+      <div style="display:flex;gap:.5rem;">
+        ${r.status === 'pending' ? `
           <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="approveReview('${r.id}')">Approve</button>
-          <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>
-        </div>` : r.status === 'rejected' ? `
-        <button class="btn btn-sm btn-white" onclick="approveReview('${r.id}')">Approve</button>` : `
-        <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>`}
+          <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>` : r.status === 'rejected' ? `
+          <button class="btn btn-sm btn-white" onclick="approveReview('${r.id}')">Approve</button>` : `
+          <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>`}
+        <button class="btn btn-sm btn-white" style="color:#dc2626;border-color:#fca5a5;" onclick="deleteReview('${r.id}')">Delete</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1068,6 +1079,49 @@ window.rejectReview = async function (id) {
     await loadReviews();
   } catch (err) {
     alert('Failed to reject: ' + err.message);
+  }
+};
+
+window.addReview = async function () {
+  const name = document.getElementById('rvName').value.trim();
+  const text = document.getElementById('rvText').value.trim();
+  const rating = document.getElementById('rvRating').value;
+  const platform = document.getElementById('rvPlatform').value;
+  const stayDate = document.getElementById('rvStayDate').value.trim();
+  const status = document.getElementById('rvStatus');
+
+  if (!name || !text) { status.textContent = '⚠️ Name and review text required'; return; }
+
+  status.textContent = 'Adding…';
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify({ guest_name: name, rating: +rating, review_text: text, stay_date: stayDate, platform }),
+    });
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+    status.textContent = '✅ Review added!';
+    document.getElementById('rvName').value = '';
+    document.getElementById('rvText').value = '';
+    document.getElementById('rvStayDate').value = '';
+    await loadReviews();
+    setTimeout(() => { status.textContent = ''; }, 2000);
+  } catch (err) {
+    status.textContent = '❌ ' + err.message;
+  }
+};
+
+window.deleteReview = async function (id) {
+  if (!confirm('Delete this review permanently?')) return;
+  try {
+    const res = await fetch(`/api/reviews?id=${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': adminPassword },
+    });
+    if (!res.ok) throw new Error('Failed');
+    await loadReviews();
+  } catch (err) {
+    alert('Failed to delete: ' + err.message);
   }
 };
 

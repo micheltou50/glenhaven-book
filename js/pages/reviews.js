@@ -30,11 +30,21 @@ async function loadPublicReviews() {
     if (countEl) countEl.textContent = reviews.length + ' review' + (reviews.length !== 1 ? 's' : '');
     if (starsEl) starsEl.textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
 
+    // Platform metadata
+    const pmeta = {
+      airbnb:  { label: 'Airbnb',       icon: '🏠', verified: 'Verified Airbnb guest' },
+      booking: { label: 'Booking.com',  icon: '🅱️', verified: 'Verified Booking.com guest' },
+      vrbo:    { label: 'VRBO',         icon: '🏡', verified: 'Verified VRBO guest' },
+      google:  { label: 'Google',       icon: '⭐', verified: 'Google review' },
+      direct:  { label: 'Direct',       icon: '✉️', verified: 'Verified direct guest' },
+    };
+
     // Render cards
     grid.innerHTML = reviews.map(r => {
       const initials = (r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
       const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
       const date = r.stay_date || '';
+      const pm = pmeta[r.platform] || pmeta.direct;
 
       return `<div class="rv-card">
         <div class="rv-top">
@@ -46,7 +56,7 @@ async function loadPublicReviews() {
           <div class="rv-stars">${stars}</div>
         </div>
         <p class="rv-text">"${r.review_text}"</p>
-        <div class="rv-platform">✓ Verified direct guest</div>
+        <div class="rv-platform">${pm.icon} ✓ ${pm.verified}</div>
       </div>`;
     }).join('');
 

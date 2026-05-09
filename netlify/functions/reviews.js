@@ -13,7 +13,7 @@ const sbHeaders = {
 const corsHeaders = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, x-admin-password',
 };
 
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
     if (!isAdmin) filter += '&status=eq.approved';
 
     try {
-      const url = `${SUPABASE_URL}/rest/v1/reviews?${filter}&order=created_at.desc&select=id,guest_name,rating,review_text,stay_date,status,created_at`;
+      const url = `${SUPABASE_URL}/rest/v1/reviews?${filter}&order=created_at.desc&select=id,guest_name,rating,review_text,stay_date,status,platform,created_at`;
       const res = await fetch(url, { headers: sbHeaders });
       const rows = await res.json();
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true, reviews: Array.isArray(rows) ? rows : [] }) };
@@ -60,6 +60,68 @@ exports.handler = async (event) => {
         method: 'PATCH',
         headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Supabase returned ' + res.status);
+      return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
+    } catch (err) {
+      return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) };
+    }
+  }
+
+  // ── POST — add review (admin only) ──────────────────────────
+  if (event.httpMethod === 'POST') {
+    const adminPwd = event.headers?.['x-admin-password'] || '';
+    if (!adminPwd || adminPwd !== ADMIN_PASSWORD) {
+      return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Unauthorized' }) };
+    }
+
+    let body;
+    try { body = JSON.parse(event.body); }
+    catch { return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
+
+    const { guest_name, rating, review_text, stay_date, platform } = body;
+    if (!guest_name || !rating || !review_text) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'guest_name, rating, and review_text required' }) };
+    }
+
+    const row = {
+      property_id: PROPERTY_ID,
+      guest_name,
+      rating: Math.min(5, Math.max(1, parseInt(rating))),
+      review_text,
+      stay_date: stay_date || null,
+      platform: platform || 'direct',
+      status: 'approved',
+    };
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
+        method: 'POST',
+        headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+        body: JSON.stringify(row),
+      });
+      if (!res.ok) throw new Error('Supabase returned ' + res.status);
+      const created = await res.json();
+      return { statusCode: 201, headers: corsHeaders, body: JSON.stringify({ success: true, review: created[0] || created }) };
+    } catch (err) {
+      return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) };
+    }
+  }
+
+  // ── DELETE — remove review (admin only) ────────────────────
+  if (event.httpMethod === 'DELETE') {
+    const adminPwd = event.headers?.['x-admin-password'] || '';
+    if (!adminPwd || adminPwd !== ADMIN_PASSWORD) {
+      return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Unauthorized' }) };
+    }
+
+    const id = event.queryStringParameters?.id;
+    if (!id) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'id required' }) };
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
       });
       if (!res.ok) throw new Error('Supabase returned ' + res.status);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
