@@ -1,7 +1,7 @@
 /* ── utils.js — pure utility functions ── */
 
 export function setEl(id, val) {
-  if (val == null) return;
+  if (val == null || val === '') return;
   const el = document.getElementById(id);
   if (el) el.textContent = String(val);
 }

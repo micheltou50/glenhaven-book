@@ -228,8 +228,30 @@ export function applySiteConfig(cfg) {
 
   // ── Nav logo ──
   if (cfg.property && cfg.property.name) {
+    const name = cfg.property.name;
+    // Create styled logo: split name for two-tone effect
+    let part1, part2;
+    const spaceIdx = name.lastIndexOf(' ');
+    if (spaceIdx > 0 && name.split(' ').length === 2) {
+      // Two words: "Glen Haven" → "Glen " + "Haven"
+      part1 = name.slice(0, spaceIdx + 1);
+      part2 = name.slice(spaceIdx + 1);
+    } else if (spaceIdx < 0) {
+      // Single word: split near middle at lowercase transition
+      const mid = Math.floor(name.length * 0.45);
+      part1 = name.slice(0, mid);
+      part2 = name.slice(mid);
+    } else {
+      // Multi-word: just use plain
+      part1 = name;
+      part2 = '';
+    }
+    const logoHTML = part1 + (part2 ? '<em>' + part2 + '</em>' : '');
     document.querySelectorAll('.nav-logo').forEach(el => {
-      el.textContent = cfg.property.name;
+      el.innerHTML = logoHTML;
+    });
+    document.querySelectorAll('.footer-logo').forEach(el => {
+      el.innerHTML = logoHTML;
     });
   }
 
