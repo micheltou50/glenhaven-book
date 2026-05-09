@@ -264,6 +264,8 @@ function populateForm(cfg) {
   const p = cfg.property || {}, h = cfg.hero || {}, pr = cfg.pricing || {}, c = cfg.colors || {};
   setVal('eName', p.name); setVal('eTagline', p.tagline); setVal('eHeroHeadline', h.headline); setVal('eHeroSub', h.subheadline); setVal('eHeroDesc', h.description);
   setVal('eDescription', p.description); setVal('eBedrooms', p.bedrooms); setVal('eBathrooms', p.bathrooms); setVal('eMaxGuests', p.guests); setVal('eRating', p.rating);
+  // Hero photo
+  if (h.photoUrl) setVal('eHeroPhoto', h.photoUrl);
   const hr = cfg.houseRules || {};
   setVal('eCheckin', hr.checkin || ''); setVal('eCheckout', hr.checkout || '');
   setVal('eRulesGeneral', (hr.general || []).join('\n'));
@@ -288,6 +290,7 @@ function populateForm(cfg) {
   setVal('eStoryEyebrow', st.eyebrow); setVal('eStoryHeading', st.heading);
   setVal('eStoryQuote', st.blockquote); setVal('eStoryNearby', st.nearby);
   setVal('eStoryBadges', (st.badges || []).join('\n'));
+  if (st.photoUrl) setVal('eStoryPhoto', st.photoUrl);
   // Highlights
   renderHighlights(cfg.highlights || []);
   // Footer
@@ -339,7 +342,7 @@ function readForm() {
       smoking: gVal('eRulesSmoking').split('\n').map(s => s.trim()).filter(Boolean),
       pets:    gVal('eRulesPets').split('\n').map(s => s.trim()).filter(Boolean),
     },
-    hero: { headline: gVal('eHeroHeadline'), subheadline: gVal('eHeroSub'), description: gVal('eHeroDesc') },
+    hero: { headline: gVal('eHeroHeadline'), subheadline: gVal('eHeroSub'), description: gVal('eHeroDesc'), photoUrl: gVal('eHeroPhoto') || null },
     pricing: {
       baseRate: nVal('pBaseRate'), friSurcharge: nVal('pFriSurcharge'), satSurcharge: nVal('pSatSurcharge'),
       cleaningFee: nVal('pCleaningFee'), extraGuest: nVal('pExtraGuest'), baseGuests: nVal('pBaseGuests'),
@@ -355,6 +358,7 @@ function readForm() {
       eyebrow: gVal('eStoryEyebrow'), heading: gVal('eStoryHeading'),
       blockquote: gVal('eStoryQuote'), nearby: gVal('eStoryNearby'),
       badges: gVal('eStoryBadges').split('\n').map(s => s.trim()).filter(Boolean),
+      photoUrl: gVal('eStoryPhoto') || null,
     },
     highlights: currentHighlights(),
     footer: { tagline: gVal('eFooterTagline'), copyright: gVal('eFooterCopyright') },
@@ -422,7 +426,50 @@ function renderPhotos(photos) {
       markDirty();
     });
   });
+  // Update photo picker grids for hero and story
+  renderPhotoPickerGrid('heroPhotoGrid', 'eHeroPhoto', 'heroPhotoPreview');
+  renderPhotoPickerGrid('storyPhotoGrid', 'eStoryPhoto', 'storyPhotoPreview');
 }
+
+function renderPhotoPickerGrid(gridId, inputId, previewId) {
+  const grid = document.getElementById(gridId);
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  if (!grid || !input) return;
+  const selected = input.value;
+  grid.innerHTML = _photos.map((url, i) => {
+    const isSelected = url === selected;
+    return `<div style="cursor:pointer;border:3px solid ${isSelected ? 'var(--green)' : 'transparent'};border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;position:relative;" onclick="selectPickerPhoto('${gridId}','${inputId}','${previewId}',${i})">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+      ${isSelected ? '<div style="position:absolute;top:4px;right:4px;background:var(--green);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;">✓</div>' : ''}
+    </div>`;
+  }).join('');
+  // Show preview if a URL is set
+  if (preview) {
+    if (selected) {
+      preview.innerHTML = `<img src="${selected}" style="width:120px;height:80px;object-fit:cover;border-radius:var(--r);border:1px solid var(--g200);" />`;
+    } else {
+      preview.innerHTML = '<span style="font-size:.8rem;color:var(--g400);">No photo selected — will use default from gallery</span>';
+    }
+  }
+  // Listen for manual URL input changes
+  if (!input._pickerBound) {
+    input.addEventListener('input', () => {
+      renderPhotoPickerGrid(gridId, inputId, previewId);
+      markDirty();
+    });
+    input._pickerBound = true;
+  }
+}
+
+window.selectPickerPhoto = function(gridId, inputId, previewId, idx) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.value = _photos[idx] || '';
+  renderPhotoPickerGrid(gridId, inputId, previewId);
+  markDirty();
+};
+
 async function uploadFile(file) {
   const signRes = await fetch('/api/upload', {
     method: 'POST',

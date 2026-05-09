@@ -267,6 +267,15 @@
           <div class="field-group"><label>Hero Description (below headline)</label><textarea id="eHeroDesc" rows="2" placeholder="A peaceful 2-storey timber retreat minutes from the Three Sisters…"></textarea><div class="field-hint">The subtitle paragraph shown in the hero banner</div></div>
         </div>
         <div class="field-row single">
+          <div class="field-group">
+            <label>Hero Photo</label>
+            <div class="field-hint" style="margin-bottom:.5rem;">Click a photo to use as the homepage hero background, or paste a URL.</div>
+            <div id="heroPhotoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem;margin-bottom:.5rem;"></div>
+            <input type="url" id="eHeroPhoto" placeholder="Or paste a custom image URL…" style="width:100%;padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;box-sizing:border-box;"/>
+            <div id="heroPhotoPreview" style="margin-top:.5rem;"></div>
+          </div>
+        </div>
+        <div class="field-row single">
           <div class="field-group"><label>Property Description</label><textarea id="eDescription" rows="4" placeholder="A peaceful 2-storey timber retreat…"></textarea><div class="field-hint">Used in the story section on the homepage</div></div>
         </div>
         <div class="field-row three">
@@ -464,6 +473,15 @@
         </div>
         <div class="field-row single">
           <div class="field-group"><label>Badges (one per line)</label><textarea id="eStoryBadges" rows="3" placeholder="Self check-in&#10;Smart lock&#10;PID-STRA-82540"></textarea><div class="field-hint">Small green badges shown below the story text</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Story Photo</label>
+            <div class="field-hint" style="margin-bottom:.5rem;">Click a photo below to use it in the story section, or paste a custom URL.</div>
+            <div id="storyPhotoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem;margin-bottom:.5rem;"></div>
+            <input type="url" id="eStoryPhoto" placeholder="Or paste a custom image URL…" style="width:100%;padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;box-sizing:border-box;"/>
+            <div id="storyPhotoPreview" style="margin-top:.5rem;"></div>
+          </div>
         </div>
       </div>
 

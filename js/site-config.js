@@ -183,6 +183,11 @@ export function applySiteConfig(cfg) {
   if (cfg.hero) {
     setEl('siteHeroHeadline', cfg.hero.headline);
     setEl('siteHeroSub',      cfg.hero.subheadline);
+    // Hero photo override
+    if (cfg.hero.photoUrl) {
+      const heroImg = document.querySelector('[data-site-photo="0"]');
+      if (heroImg) heroImg.src = cfg.hero.photoUrl;
+    }
   }
 
   // ── From price display ──
@@ -267,6 +272,11 @@ export function applySiteConfig(cfg) {
     const badgeEl = document.getElementById('siteStoryBadges');
     if (badgeEl && cfg.story.badges && cfg.story.badges.length) {
       badgeEl.innerHTML = cfg.story.badges.map(b => `<span class="badge badge-green">${b}</span>`).join('');
+    }
+    // Story photo override
+    if (cfg.story.photoUrl) {
+      const storyImg = document.querySelector('[data-site-photo="1"]');
+      if (storyImg) storyImg.src = cfg.story.photoUrl;
     }
   }
 
