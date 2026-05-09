@@ -1,6 +1,6 @@
 /* ── pages/contact.js — contact.html entry module ── */
 
-import { loadSiteConfig } from '../site-config.js';
+import { loadSiteConfig, getSiteConfig } from '../site-config.js';
 import { initNavBurger } from '../ui.js';
 
 loadSiteConfig();
@@ -32,9 +32,13 @@ window.submitContact = function () {
     document.getElementById('cfSuccess').style.display = 'block';
     btn.style.display = 'none';
   }).catch(() => {
+    const cfg = getSiteConfig();
+    const fallbackEmail = cfg?.contact?.email || 'the host';
+    const emailLink = fallbackEmail.includes('@')
+      ? `<a href="mailto:${fallbackEmail}" style="color:var(--green);">${fallbackEmail}</a>`
+      : fallbackEmail;
     document.getElementById('cfSuccess').innerHTML =
-      'Thanks! If you do not hear back within 24 hours, please email us directly at ' +
-      '<a href="mailto:info@stayops.com.au" style="color:var(--green);">info@stayops.com.au</a>';
+      'Thanks! If you do not hear back within 24 hours, please email us directly at ' + emailLink;
     document.getElementById('cfSuccess').style.display = 'block';
     btn.style.display = 'none';
   });

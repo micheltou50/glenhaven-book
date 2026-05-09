@@ -66,27 +66,27 @@
   <div class="container" style="max-width:760px;">
 
     <!-- Summary cards -->
-    <div class="policy-cards">
+    <div class="policy-cards" id="sitePolicyCards">
       <div class="policy-card">
         <div class="pc-icon">✅</div>
         <h4>Full refund</h4>
-        <p>Cancel more than 7 days before check-in for a complete refund</p>
-      </div>
-      <div class="policy-card">
-        <div class="pc-icon">⚡</div>
-        <h4>50% refund</h4>
-        <p>Cancel 3–7 days before check-in for a 50% refund of total paid</p>
+        <p>Cancel within 48 hours of booking (if check-in is 14+ days away)</p>
       </div>
       <div class="policy-card">
         <div class="pc-icon">🔒</div>
         <h4>No refund</h4>
-        <p>Cancellations within 72 hours of check-in are non-refundable</p>
+        <p>All other cancellations are non-refundable, including no-shows</p>
+      </div>
+      <div class="policy-card">
+        <div class="pc-icon">🛡️</div>
+        <h4>Host cancellation</h4>
+        <p>If the host cancels, you receive a 100% full refund automatically</p>
       </div>
     </div>
 
     <!-- Timeline -->
     <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Refund timeline</h2>
-    <div class="policy-timeline">
+    <div class="policy-timeline" id="sitePolicyTimeline">
 
       <div class="pt-item">
         <div class="pt-dot green">✓</div>
@@ -109,12 +109,12 @@
     </div>
 
     <!-- FAQ -->
-    <div class="policy-faq">
+    <div class="policy-faq" id="sitePolicyFaq">
       <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Common questions</h2>
 
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">How do I cancel my booking? <span class="faq-arrow">▾</span></div>
-        <div class="faq-a">Email us at <a href="mailto:info@stayops.com.au" style="color:var(--green);">info@stayops.com.au</a> with your booking reference and we'll process the cancellation promptly. You can also use the cancel link in your booking confirmation email.</div>
+        <div class="faq-a">Email us at <a href="mailto:info@stayops.com.au" class="sitePolicyEmail" style="color:var(--green);">info@stayops.com.au</a> with your booking reference and we'll process the cancellation promptly. You can also use the cancel link in your booking confirmation email.</div>
       </div>
 
       <div class="faq-item" onclick="this.classList.toggle('open')">
@@ -141,7 +141,7 @@
 
     <div style="text-align:center;margin-top:3rem;">
       <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
-      <p style="font-size:.8rem;color:var(--g400);margin-top:.75rem;">Questions? <a href="mailto:info@stayops.com.au" style="color:var(--green);">Contact us</a></p>
+      <p style="font-size:.8rem;color:var(--g400);margin-top:.75rem;">Questions? <a href="mailto:info@stayops.com.au" class="sitePolicyEmail" style="color:var(--green);">Contact us</a></p>
     </div>
 
   </div>

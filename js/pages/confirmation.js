@@ -10,9 +10,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadSiteConfig();
   const cfg = getSiteConfig();
   // Update property reference on confirmation page
-  const propEl = document.getElementById('cfmProperty');
-  if (propEl && cfg && cfg.property) {
-    propEl.textContent = cfg.property.name || 'Property';
+  if (cfg) {
+    const propEl = document.getElementById('cfmProperty');
+    if (propEl && cfg.property) {
+      propEl.textContent = cfg.property.name || 'Property';
+    }
+    // Update check-in time from house rules
+    const ciTimeEl = document.getElementById('cfmCheckinTime');
+    if (ciTimeEl && cfg.houseRules && cfg.houseRules.checkin) {
+      ciTimeEl.textContent = cfg.houseRules.checkin;
+    }
   }
 });
 

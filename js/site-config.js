@@ -189,6 +189,8 @@ export function applySiteConfig(cfg) {
   if (cfg.pricing && cfg.pricing.baseRate != null) {
     const fp = document.getElementById('stickyFromPrice');
     if (fp) fp.textContent = cfg.pricing.baseRate;
+    const mp = document.getElementById('mobFromPrice');
+    if (mp) mp.textContent = cfg.pricing.baseRate;
   }
 
   // ── Guest fee note (booking.html) ──
@@ -300,6 +302,13 @@ export function applySiteConfig(cfg) {
     if (emailEl && cfg.contact.email) {
       emailEl.textContent = cfg.contact.email;
       emailEl.href = 'mailto:' + cfg.contact.email;
+    }
+    // Update all email links with .sitePolicyEmail class
+    if (cfg.contact.email) {
+      document.querySelectorAll('.sitePolicyEmail').forEach(el => {
+        el.href = 'mailto:' + cfg.contact.email;
+        if (el.textContent.includes('@')) el.textContent = cfg.contact.email;
+      });
     }
   }
 

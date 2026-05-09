@@ -277,6 +277,8 @@ function populateForm(cfg) {
   setVal('pXmas', hp['12-25']); setVal('pBoxing', hp['12-26']); setVal('pNYE', hp['12-31']); setVal('pNYD', hp['01-01']); setVal('pGoodFri', hp['04-18']); setVal('pEasterSun', hp['04-20']);
   const mn = pr.minNights || {};
   setVal('pMinWeekday', mn.weekday); setVal('pMinWeekend', mn.weekend); setVal('pMinPeak', mn.peak);
+  const ld = pr.losDiscounts || {};
+  setVal('pLos3', ld.nights3); setVal('pLos5', ld.nights5); setVal('pLos7', ld.nights7);
   if (c.primary) { document.getElementById('cPrimary').value = c.primary; document.getElementById('cPrimaryHex').value = c.primary; }
   if (c.accent)  { document.getElementById('cAccent').value = c.accent;   document.getElementById('cAccentHex').value = c.accent; }
   renderPhotos(cfg.photos || []);
@@ -900,7 +902,10 @@ window.addBlock = function () {
 window.removeBlock = function (id) { deleteBlock(id); renderBlockList(); };
 
 // ── ICAL ─────────────────────────────────────────────────────
-window.copyIcal = function () { navigator.clipboard.writeText('https://glenhaven.stayops.com.au/calendar.ics').then(() => alert('Copied!')); };
+const icalUrl = window.location.origin + '/calendar.ics';
+const icalEl = document.getElementById('icalExportUrl');
+if (icalEl) icalEl.textContent = icalUrl;
+window.copyIcal = function () { navigator.clipboard.writeText(icalUrl).then(() => alert('Copied!')); };
 
 let _icalFeeds = [];
 function currentIcalFeeds() { return [..._icalFeeds]; }
