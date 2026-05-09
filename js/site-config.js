@@ -223,6 +223,34 @@ export function applySiteConfig(cfg) {
     }
   }
 
+  // ── Amenities page ──
+  if (cfg.amenities && cfg.amenities.length) {
+    const amEl = document.getElementById('siteAmenities');
+    if (amEl) {
+      // Support both categorized array and legacy flat array
+      if (typeof cfg.amenities[0] === 'string') {
+        amEl.innerHTML = `<div class="am-cat"><h3>✅ Amenities</h3><div class="am-grid-full">${cfg.amenities.map(a => `<div class="am-item"><span class="am-icon">✓</span>${a}</div>`).join('')}</div></div>`;
+      } else {
+        amEl.innerHTML = cfg.amenities.map(cat => {
+          const catIcon = cat.category.match(/^\p{Emoji}/u)?.[0] || '';
+          const catName = cat.category.replace(/^\p{Emoji}\s*/u, '');
+          return `<div class="am-cat"><h3>${catIcon ? catIcon + ' ' : ''}${catName}</h3><div class="am-grid-full">${(cat.items || []).map(item => {
+            const icon = item.match(/^\p{Emoji}/u)?.[0] || '✓';
+            const name = item.replace(/^\p{Emoji}\s*/u, '');
+            return `<div class="am-item"><span class="am-icon">${icon}</span>${name}</div>`;
+          }).join('')}</div></div>`;
+        }).join('');
+      }
+      // Update amenity count
+      const total = typeof cfg.amenities[0] === 'string' ? cfg.amenities.length : cfg.amenities.reduce((s, c) => s + (c.items || []).length, 0);
+      document.querySelectorAll('#siteAmenityCount').forEach(el => el.textContent = total);
+    } else {
+      // No amenities grid on this page, just update count
+      const total = typeof cfg.amenities[0] === 'string' ? cfg.amenities.length : cfg.amenities.reduce((s, c) => s + (c.items || []).length, 0);
+      document.querySelectorAll('#siteAmenityCount').forEach(el => el.textContent = total);
+    }
+  }
+
   // ── Footer ──
   if (cfg.footer) {
     setEl('siteFooterTagline', cfg.footer.tagline);

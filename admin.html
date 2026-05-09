@@ -441,12 +441,8 @@
     <div class="tab-pane" id="tab-edit-amenities">
       <div class="edit-card">
         <h3>✅ Amenities</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">These are saved with your config and shown on the Amenities page. Click × to remove, then Publish to go live.</p>
-        <div class="amenity-list" id="amenityList"></div>
-        <div class="amenity-add">
-          <input type="text" id="amenityInput" placeholder="e.g. Wood fireplace" onkeydown="if(event.key==='Enter')addAmenity()"/>
-          <button class="btn btn-sm btn-black" onclick="addAmenity()">Add</button>
-        </div>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Organized by category. Use emoji icons at the start of each item (e.g. "🔥 Wood fireplace"). These appear on the Amenities page.</p>
+        <div id="amenityList"></div>
       </div>
     </div>
 

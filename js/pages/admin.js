@@ -39,7 +39,14 @@ const DEFAULT_CONFIG = {
     smoking: ['No smoking inside the property','Smoking permitted in the garden only','Please dispose of cigarette butts responsibly'],
     pets: ['Well-behaved pets welcome — please advise in advance','Pets must not be left alone in the property','Please keep pets off the furniture'],
   },
-  amenities:['Wood fireplace','Glass conservatory','Private garden','Full kitchen','Washer & dryer','Fast WiFi','Smart TV','BBQ grill','Free parking','Self check-in','Pet friendly','Air conditioning'],
+  amenities:[
+    { category:'🏡 Living Spaces', items:['🔥 Wood fireplace','🌿 Glass conservatory','📺 Smart TV (55")','📻 Bluetooth speaker','🎲 Board games','📚 Book library','🪑 Dining table (seats 10)','🛋️ Large sofa'] },
+    { category:'🍳 Kitchen & Dining', items:['🍳 Full kitchen','☕ Coffee maker (espresso)','🍵 Kettle','🥂 Wine glasses','🍽️ Full crockery set','🔪 Chef\'s knife set','🧊 Large fridge/freezer','♨️ Oven & stovetop','🍞 Toaster'] },
+    { category:'🛏️ Bedrooms (4)', items:['🛏️ Master: Queen bed','🛏️ Bedroom 2: Queen bed','🛏️ Bedroom 3: Queen bed','🛏️ Bedroom 4: 2x Single beds','🪴 Bedside tables & lamps','🧺 Wardrobe in each room','🪟 Block-out curtains','🌡️ Heating in all rooms'] },
+    { category:'🚿 Bathrooms (2.5)', items:['🛁 Freestanding bath','🚿 Rainfall shower','🚿 Second shower (ensuite)','🪥 Hairdryer','🧴 Shampoo & conditioner','🧼 Body wash & soap','🧻 Towels provided'] },
+    { category:'🌳 Outdoor', items:['🏡 Private garden','🪑 Outdoor dining table','🔥 BBQ / grill','🌿 Lawn area','🚗 Free off-street parking (2 cars)','🌳 Mature trees & shade','💡 Outdoor lighting'] },
+    { category:'⚙️ Essentials & Technology', items:['📶 Fast WiFi (100+ Mbps)','🔐 Smart lock / self check-in','🌡️ Central heating','🫧 Washer & dryer','🔌 EV charger (7kW)','🧯 Fire extinguisher','🔋 Smoke & CO detectors','🩹 First aid kit'] },
+  ],
   story: {
     eyebrow: 'Our Story',
     heading: 'A cottage that feels like home',
@@ -487,21 +494,64 @@ window.removePhoto = function (i) { _photos.splice(i, 1); renderPhotos(_photos);
 
 // ── AMENITIES ────────────────────────────────────────────────
 let _amenities = [];
-function currentAmenities() { return [..._amenities]; }
+function currentAmenities() { return _amenities.map(c => ({ category: c.category, items: [...c.items] })); }
 function renderAmenities(list) {
-  _amenities = [...list];
-  document.getElementById('amenityList').innerHTML = _amenities.map((a, i) =>
-    `<span class="amenity-tag">${a}<button onclick="removeAmenity(${i})">×</button></span>`
-  ).join('');
+  // Handle legacy flat array format
+  if (list.length && typeof list[0] === 'string') {
+    _amenities = [{ category: '✅ General', items: [...list] }];
+  } else {
+    _amenities = list.map(c => ({ category: c.category, items: [...(c.items || [])] }));
+  }
+  const el = document.getElementById('amenityList');
+  const total = _amenities.reduce((s, c) => s + c.items.length, 0);
+  el.innerHTML = _amenities.map((cat, ci) =>
+    `<div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;margin-bottom:.75rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+        <input type="text" value="${cat.category}" onchange="renameAmenityCategory(${ci},this.value)" style="font-weight:700;font-size:.9rem;border:none;background:transparent;padding:0;outline:none;flex:1;"/>
+        <button class="btn btn-sm btn-white" style="color:#dc2626;border-color:#fca5a5;font-size:.72rem;padding:.2rem .5rem;" onclick="removeAmenityCategory(${ci})">Remove category</button>
+      </div>
+      <div class="amenity-list">${cat.items.map((a, ai) =>
+        `<span class="amenity-tag">${a}<button onclick="removeAmenityItem(${ci},${ai})">×</button></span>`
+      ).join('')}</div>
+      <div class="amenity-add">
+        <input type="text" id="amInput_${ci}" placeholder="e.g. 🔥 Wood fireplace" onkeydown="if(event.key==='Enter')addAmenityItem(${ci})"/>
+        <button class="btn btn-sm btn-black" onclick="addAmenityItem(${ci})">Add</button>
+      </div>
+    </div>`
+  ).join('') + `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;">
+    <button class="btn btn-sm btn-white" onclick="addAmenityCategory()">+ Add Category</button>
+    <span style="font-size:.78rem;color:var(--g400);">${total} amenities total</span>
+  </div>`;
 }
-window.addAmenity = function () {
-  const v = document.getElementById('amenityInput').value.trim();
+window.addAmenityItem = function (ci) {
+  const input = document.getElementById('amInput_' + ci);
+  const v = input.value.trim();
   if (!v) return;
-  _amenities.push(v); renderAmenities(_amenities);
-  document.getElementById('amenityInput').value = '';
+  _amenities[ci].items.push(v);
+  renderAmenities(_amenities);
   markDirty();
 };
-window.removeAmenity = function (i) { _amenities.splice(i, 1); renderAmenities(_amenities); markDirty(); };
+window.removeAmenityItem = function (ci, ai) { _amenities[ci].items.splice(ai, 1); renderAmenities(_amenities); markDirty(); };
+window.renameAmenityCategory = function (ci, name) { _amenities[ci].category = name; markDirty(); };
+window.removeAmenityCategory = function (ci) {
+  if (!confirm('Remove this category and all its amenities?')) return;
+  _amenities.splice(ci, 1); renderAmenities(_amenities); markDirty();
+};
+window.addAmenityCategory = function () {
+  _amenities.push({ category: '🏠 New Category', items: [] });
+  renderAmenities(_amenities); markDirty();
+};
+// Legacy compat
+window.addAmenity = function () {
+  const v = document.getElementById('amenityInput')?.value?.trim();
+  if (!v) return;
+  if (!_amenities.length) _amenities.push({ category: '✅ General', items: [] });
+  _amenities[0].items.push(v);
+  renderAmenities(_amenities);
+  if (document.getElementById('amenityInput')) document.getElementById('amenityInput').value = '';
+  markDirty();
+};
+window.removeAmenity = function (i) { /* legacy noop */ };
 
 // ── HIGHLIGHTS ──────────────────────────────────────────────
 let _highlights = [];
