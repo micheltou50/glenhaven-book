@@ -93,10 +93,18 @@ function onDateChange(checkIn, checkOut) {
     scoEl.value = sharedCO;
   } else {
     scoEl.value = '';
-    if (sharedCI) {
-      const nx = new Date(sharedCI); nx.setDate(nx.getDate() + 1);
-      scoEl.min = nx.toISOString().split('T')[0];
-    }
+  }
+
+  // Update sticky card date display
+  const sCI = document.getElementById('stickyTxtCI');
+  const sCO = document.getElementById('stickyTxtCO');
+  if (sCI) {
+    sCI.textContent = sharedCI ? fmtShort(sharedCI) : 'Add date';
+    sCI.className = 's-display-txt' + (sharedCI ? ' set' : '');
+  }
+  if (sCO) {
+    sCO.textContent = sharedCO ? fmtShort(sharedCO) : 'Add date';
+    sCO.className = 's-display-txt' + (sharedCO ? ' set' : '');
   }
 
   updateHeroCalHint();
@@ -163,30 +171,36 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
 });
 
-// Sticky card input listeners
-document.getElementById('s-ci').addEventListener('change', function () {
-  const ci = this.value;
-  if (ci) {
-    sharedCI = ci;
-    sharedCO = null;
-    document.getElementById('s-co').value = '';
-    const nx = new Date(ci); nx.setDate(nx.getDate() + 1);
-    document.getElementById('s-co').min = nx.toISOString().split('T')[0];
-    if (mainCal) { mainCal.ci = ci; mainCal.co = null; mainCal.renderDays(); }
-    onDateChange(ci, null);
-  }
-  updateStickyCard();
-});
+// Sticky card date fields — open the MiniCal panel
+function stickyCalOpen() {
+  const card = document.getElementById('stickyCard');
+  const panel = document.getElementById('heroCal');
+  const rect = card.getBoundingClientRect();
+  // Position the calendar panel relative to the sticky card
+  let topPos = rect.top;
+  if (topPos + 500 > window.innerHeight) topPos = Math.max(8, rect.bottom - 510);
+  panel.style.top = topPos + 'px';
+  panel.style.left = Math.max(8, rect.left - 420) + 'px';
+  panel.classList.add('open');
+  heroCalIsOpen = true;
 
-document.getElementById('s-co').addEventListener('change', function () {
-  const co = this.value;
-  if (co) {
-    sharedCO = co;
-    if (mainCal) { mainCal.co = co; mainCal.renderDays(); }
-    onDateChange(sharedCI, co);
+  if (!heroCalInst) {
+    heroCalInst = new MiniCal('heroCalMount', {
+      onSelect({ checkIn, checkOut }) {
+        sharedCI = checkIn  ? checkIn  : sharedCI;
+        sharedCO = checkOut ? checkOut : null;
+        if (checkIn && checkOut) { sharedCI = checkIn; sharedCO = checkOut; }
+        if (mainCal) mainCal.setRange(sharedCI, sharedCO);
+        onDateChange(checkIn, checkOut);
+      }
+    });
   }
-  updateStickyCard();
-});
+  heroCalInst.setRange(sharedCI, sharedCO);
+  updateHeroCalHint();
+}
+
+document.getElementById('stickyDispCI').addEventListener('click', (e) => { e.stopPropagation(); stickyCalOpen(); });
+document.getElementById('stickyDispCO').addEventListener('click', (e) => { e.stopPropagation(); stickyCalOpen(); });
 
 document.getElementById('s-g').addEventListener('change', updateStickyCard);
 
@@ -218,15 +232,14 @@ document.getElementById('hg').addEventListener('change', updateStickyCard);
 document.addEventListener('click', (e) => {
   const panel  = document.getElementById('heroCal');
   const search = document.getElementById('heroSearch');
+  const sticky = document.getElementById('stickyDates');
   const path = e.composedPath ? e.composedPath() : [];
-  const inside = path.includes(panel) || path.includes(search);
+  const inside = path.includes(panel) || path.includes(search) || path.includes(sticky);
   if (heroCalIsOpen && !inside) heroCalClose();
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && heroCalIsOpen) heroCalClose(); });
 
-// Set date minimums
-document.getElementById('s-ci').min = todayISO();
-document.getElementById('s-co').min = todayISO();
+// Hidden inputs don't need min — MiniCal handles date validation
 
 // Load config then update displays
 loadSiteConfig().then(() => {

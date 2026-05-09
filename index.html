@@ -76,7 +76,8 @@
     .s-df{padding:.6rem .75rem;}
     .s-df:first-child{border-right:1px solid var(--g200);}
     .s-df label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-bottom:.2rem;}
-    .s-df input[type=date]{width:100%;border:none;font-size:.85rem;outline:none;background:transparent;color:#111;cursor:pointer;}
+    .s-df .s-display-txt{display:block;font-size:.85rem;color:#999;cursor:pointer;line-height:1.4;}
+    .s-df .s-display-txt.set{color:#111;font-weight:500;}
     .s-guests{border:1.5px solid var(--g200);border-radius:10px;padding:.6rem .75rem;margin-bottom:.85rem;}
     .s-guests label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#111;margin-bottom:.2rem;}
     .s-guests select{width:100%;border:none;font-size:.85rem;outline:none;background:transparent;}
@@ -241,14 +242,16 @@
             <div class="sticky-price">from $<span id="stickyFromPrice">320</span> <span>/ night</span></div>
             <div class="stars" style="margin-bottom:.9rem;" id="siteStarsDisplay">★★★★★ <span style="font-size:.8rem;font-weight:500;color:var(--g500);">5.0</span></div>
             <div id="stickyUrgency" class="urgency"><div class="urgency-dot"></div><span>Popular dates are filling fast</span></div>
-            <div class="s-dates">
-              <div class="s-df">
+            <input type="hidden" id="s-ci"/>
+            <input type="hidden" id="s-co"/>
+            <div class="s-dates" style="cursor:pointer;" id="stickyDates">
+              <div class="s-df" id="stickyDispCI">
                 <label>Check-in</label>
-                <input type="date" id="s-ci"/>
+                <span class="s-display-txt" id="stickyTxtCI">Add date</span>
               </div>
-              <div class="s-df">
+              <div class="s-df" id="stickyDispCO">
                 <label>Check-out</label>
-                <input type="date" id="s-co"/>
+                <span class="s-display-txt" id="stickyTxtCO">Add date</span>
               </div>
             </div>
             <div class="s-guests">
