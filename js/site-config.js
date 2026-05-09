@@ -229,7 +229,7 @@ export function applySiteConfig(cfg) {
   // ── Nav logo ──
   if (cfg.property && cfg.property.name) {
     document.querySelectorAll('.nav-logo').forEach(el => {
-      el.innerHTML = cfg.property.name;
+      el.textContent = cfg.property.name;
     });
   }
 
