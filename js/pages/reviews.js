@@ -1,9 +1,11 @@
 /* ── pages/reviews.js — reviews.html entry module ── */
 
 import { initNavBurger } from '../ui.js';
+import { loadSiteConfig } from '../site-config.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNavBurger();
+  await loadSiteConfig();
   loadPublicReviews();
 });
 

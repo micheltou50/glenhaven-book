@@ -3,8 +3,18 @@
 import { getParam, fmtDate, fmtAUD } from '../utils.js';
 import { saveBooking } from '../availability.js';
 import { initNavBurger } from '../ui.js';
+import { loadSiteConfig, getSiteConfig } from '../site-config.js';
 
-document.addEventListener('DOMContentLoaded', () => initNavBurger());
+document.addEventListener('DOMContentLoaded', async () => {
+  initNavBurger();
+  await loadSiteConfig();
+  const cfg = getSiteConfig();
+  // Update property reference on confirmation page
+  const propEl = document.getElementById('cfmProperty');
+  if (propEl && cfg && cfg.property) {
+    propEl.textContent = cfg.property.name || 'Property';
+  }
+});
 
 const status = getParam('booking');
 let pending = null;
