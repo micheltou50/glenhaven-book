@@ -297,6 +297,8 @@ function populateForm(cfg) {
   renderLocPlaces(loc.places || []);
   renderLocTransport(loc.transport || []);
   renderLocThingsToDo(loc.thingsToDo || []);
+  // iCal feeds
+  renderIcalFeeds(cfg.icalFeeds || []);
   // Attach change listeners
   ['eName','eTagline','eHeroHeadline','eHeroSub','eDescription','eBedrooms','eBathrooms','eMaxGuests',
    'pBaseRate','pFriSurcharge','pSatSurcharge','pCleaningFee','pExtraGuest','pBaseGuests','pPeakPct','pLowPct',
@@ -352,6 +354,7 @@ function readForm() {
       transport: currentLocTransport(),
       thingsToDo: currentLocThingsToDo(),
     },
+    icalFeeds: currentIcalFeeds(),
   };
 }
 
@@ -741,6 +744,37 @@ window.removeBlock = function (id) { deleteBlock(id); renderBlockList(); };
 
 // ── ICAL ─────────────────────────────────────────────────────
 window.copyIcal = function () { navigator.clipboard.writeText('https://glenhaven.stayops.com.au/calendar.ics').then(() => alert('Copied!')); };
+
+let _icalFeeds = [];
+function currentIcalFeeds() { return [..._icalFeeds]; }
+function renderIcalFeeds(feeds) {
+  _icalFeeds = [...feeds];
+  const el = document.getElementById('icalFeedList');
+  if (!el) return;
+  if (!_icalFeeds.length) { el.innerHTML = '<p style="font-size:.84rem;color:var(--g400);font-style:italic;">No external calendars added yet.</p>'; return; }
+  el.innerHTML = _icalFeeds.map((f, i) =>
+    `<div style="display:flex;align-items:center;gap:.75rem;background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:.75rem 1rem;">
+      <div style="flex-shrink:0;width:36px;height:36px;border-radius:8px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:1rem;">📅</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:.88rem;">${f.name}</div>
+        <div style="font-size:.75rem;color:var(--g400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.url}</div>
+      </div>
+      <button class="btn btn-sm" style="color:#ef4444;border:1px solid #fca5a5;background:#fff;" onclick="removeIcalFeed(${i})">Remove</button>
+    </div>`
+  ).join('');
+}
+window.addIcalFeed = function () {
+  const name = document.getElementById('icalFeedName').value.trim();
+  const url = document.getElementById('icalFeedUrl').value.trim();
+  if (!name || !url) { alert('Enter both a name and URL'); return; }
+  if (!url.startsWith('http')) { alert('URL must start with http:// or https://'); return; }
+  _icalFeeds.push({ name, url });
+  renderIcalFeeds(_icalFeeds);
+  document.getElementById('icalFeedName').value = '';
+  document.getElementById('icalFeedUrl').value = '';
+  markDirty();
+};
+window.removeIcalFeed = function (i) { _icalFeeds.splice(i, 1); renderIcalFeeds(_icalFeeds); markDirty(); };
 
 // ── EXPORT ───────────────────────────────────────────────────
 window.exportCSV = function () {

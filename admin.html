@@ -628,24 +628,46 @@
 
     <!-- ICAL -->
     <div class="tab-pane" id="tab-ical">
+      <!-- EXPORT -->
       <div class="edit-card">
-        <h3>🔄 iCal Calendar Sync</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1.2rem;">Your direct booking calendar is automatically exported for Airbnb to import. No manual action needed — Airbnb syncs every few hours.</p>
-        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem;">
-          <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.4rem;">Your iCal Export URL</div>
+        <h3>📤 Export — Your Calendar</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Give this URL to Airbnb, Booking.com, or any platform so they can import your direct bookings.</p>
+        <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-bottom:1rem;">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.35rem;">Your iCal Export URL</div>
           <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
             <code style="font-size:.82rem;color:var(--green-d);flex:1;word-break:break-all;">https://glenhaven.stayops.com.au/calendar.ics</code>
             <button class="btn btn-sm btn-white" onclick="copyIcal()">Copy</button>
           </div>
         </div>
-        <hr style="margin:1.25rem 0;border:none;border-top:1px solid var(--g100);">
-        <h4 style="font-size:.88rem;font-weight:700;margin-bottom:.75rem;">How to add to Airbnb:</h4>
-        <ol style="padding-left:1.2rem;font-size:.84rem;color:var(--g600);line-height:2;">
-          <li>Go to your Airbnb listing → <strong>Calendar</strong></li>
-          <li>Click <strong>Availability Settings</strong> → <strong>Sync calendars</strong></li>
-          <li>Click <strong>Import Calendar</strong> and paste the URL above</li>
-          <li>Airbnb will sync within a few hours automatically</li>
-        </ol>
+        <details style="font-size:.84rem;color:var(--g600);">
+          <summary style="cursor:pointer;font-weight:600;margin-bottom:.5rem;">How to add to Airbnb</summary>
+          <ol style="padding-left:1.2rem;line-height:2;margin-top:.5rem;">
+            <li>Go to your Airbnb listing → <strong>Calendar</strong></li>
+            <li>Click <strong>Availability Settings</strong> → <strong>Sync calendars</strong></li>
+            <li>Click <strong>Import Calendar</strong> and paste the URL above</li>
+            <li>Airbnb will sync within a few hours automatically</li>
+          </ol>
+        </details>
+      </div>
+
+      <!-- IMPORT -->
+      <div class="edit-card">
+        <h3>📥 Import — External Calendars</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Add iCal feeds from other platforms. Dates from these calendars will be blocked on your booking page.</p>
+        <div id="icalFeedList" style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;"></div>
+        <div style="border:2px dashed var(--g300);border-radius:var(--r);padding:1rem;">
+          <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:.5rem;align-items:end;">
+            <div class="field-group" style="margin:0;">
+              <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.3rem;">Name</label>
+              <input type="text" id="icalFeedName" placeholder="e.g. Airbnb" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;"/>
+            </div>
+            <div class="field-group" style="margin:0;">
+              <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.3rem;">iCal URL</label>
+              <input type="url" id="icalFeedUrl" placeholder="https://www.airbnb.com/calendar/ical/…" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;"/>
+            </div>
+            <button class="btn btn-sm btn-black" onclick="addIcalFeed()" style="height:36px;">Add</button>
+          </div>
+        </div>
       </div>
     </div>
 

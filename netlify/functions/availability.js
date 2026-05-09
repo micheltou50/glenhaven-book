@@ -1,5 +1,5 @@
 // ── /api/availability ─────────────────────────────────────────
-// Reads booked date ranges from Supabase + optional Airbnb iCal.
+// Reads booked date ranges from Supabase + all configured iCal feeds.
 // Returns { success, ranges: [{start, end}] }
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, AIRBNB_ICAL_URL } = process.env;
@@ -26,16 +26,44 @@ exports.handler = async () => {
     console.error('Supabase availability error:', err.message);
   }
 
-  // ── 2. Airbnb iCal ─────────────────────────────────────────
-  if (AIRBNB_ICAL_URL) {
-    try {
-      const res     = await fetch(AIRBNB_ICAL_URL);
-      const icsText = await res.text();
-      parseIcal(icsText).forEach(r => ranges.push(r));
-    } catch (err) {
-      console.error('iCal error:', err.message);
+  // ── 2. iCal feeds from site config ─────────────────────────
+  let icalFeeds = [];
+  try {
+    const cfgUrl = `${SUPABASE_URL}/rest/v1/site_config?property_id=eq.${PROPERTY_ID}&select=config&limit=1`;
+    const cfgRes = await fetch(cfgUrl, { headers: sbHeaders });
+    const cfgRows = await cfgRes.json();
+    if (Array.isArray(cfgRows) && cfgRows[0] && cfgRows[0].config && cfgRows[0].config.icalFeeds) {
+      icalFeeds = cfgRows[0].config.icalFeeds;
     }
+  } catch (err) {
+    console.error('Config fetch error:', err.message);
   }
+
+  // Legacy: also check AIRBNB_ICAL_URL env var
+  if (AIRBNB_ICAL_URL) {
+    icalFeeds.push({ name: 'Airbnb (env)', url: AIRBNB_ICAL_URL });
+  }
+
+  // Fetch all iCal feeds in parallel
+  const feedResults = await Promise.allSettled(
+    icalFeeds.map(async (feed) => {
+      try {
+        const res = await fetch(feed.url, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) throw new Error(`${feed.name}: HTTP ${res.status}`);
+        const icsText = await res.text();
+        return { name: feed.name, ranges: parseIcal(icsText) };
+      } catch (err) {
+        console.error(`iCal feed "${feed.name}" error:`, err.message);
+        return { name: feed.name, ranges: [] };
+      }
+    })
+  );
+
+  feedResults.forEach(r => {
+    if (r.status === 'fulfilled' && r.value.ranges.length) {
+      r.value.ranges.forEach(range => ranges.push(range));
+    }
+  });
 
   // ── 3. Price overrides ───────────────────────────────────────
   let priceOverrides = {};
