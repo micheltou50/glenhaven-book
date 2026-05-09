@@ -375,12 +375,44 @@ function readForm() {
 
 // ── PHOTOS ───────────────────────────────────────────────────
 let _photos = [];
+let _dragIdx = null;
 function currentPhotos() { return [..._photos]; }
 function renderPhotos(photos) {
   _photos = [...photos];
-  document.getElementById('photoGrid').innerHTML = _photos.map((url, i) =>
-    `<div class="photo-item"><img src="${url}" onerror="this.parentElement.style.background='var(--g200)'"/><button class="photo-del" onclick="removePhoto(${i})">×</button><div class="photo-idx">${i === 0 ? 'Hero' : '#' + (i + 1)}</div></div>`
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = _photos.map((url, i) =>
+    `<div class="photo-item" draggable="true" data-idx="${i}"><img src="${url}" draggable="false" onerror="this.parentElement.style.background='var(--g200)'"/><button class="photo-del" onclick="event.stopPropagation();removePhoto(${i})">×</button><div class="photo-idx">${i === 0 ? 'Hero' : '#' + (i + 1)}</div></div>`
   ).join('');
+  // attach drag listeners
+  grid.querySelectorAll('.photo-item').forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      _dragIdx = +el.dataset.idx;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', _dragIdx);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      grid.querySelectorAll('.photo-item').forEach(c => c.classList.remove('drag-over'));
+      _dragIdx = null;
+    });
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (+el.dataset.idx !== _dragIdx) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', (e) => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const toIdx = +el.dataset.idx;
+      if (_dragIdx == null || _dragIdx === toIdx) return;
+      const moved = _photos.splice(_dragIdx, 1)[0];
+      _photos.splice(toIdx, 0, moved);
+      renderPhotos(_photos);
+      markDirty();
+    });
+  });
 }
 async function uploadFile(file) {
   const signRes = await fetch('/api/upload', {

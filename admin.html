@@ -72,7 +72,10 @@
     .color-swatch { width: 36px; height: 36px; border-radius: var(--r-sm); border: 2px solid var(--g200); cursor: pointer; flex-shrink: 0; overflow: hidden; padding: 0; display: flex; }
     .color-swatch input[type=color] { width: 48px; height: 48px; border: none; margin: -6px; cursor: pointer; }
     .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; margin-bottom: 1rem; }
-    .photo-item { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 4/3; background: var(--g100); border: 1.5px solid var(--g200); }
+    .photo-item { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 4/3; background: var(--g100); border: 1.5px solid var(--g200); cursor: grab; transition: transform .15s, opacity .15s, box-shadow .15s; }
+    .photo-item:active { cursor: grabbing; }
+    .photo-item.dragging { opacity: .35; transform: scale(.95); }
+    .photo-item.drag-over { box-shadow: 0 0 0 3px var(--green); transform: scale(1.03); border-color: var(--green); }
     .photo-item img { width: 100%; height: 100%; object-fit: cover; }
     .photo-item .photo-del { position: absolute; top: .35rem; right: .35rem; background: rgba(0,0,0,.65); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 1rem; cursor: pointer; line-height: 1; }
     .photo-item .photo-idx { position: absolute; bottom: .35rem; left: .35rem; background: rgba(0,0,0,.55); color: #fff; font-size: .68rem; font-weight: 700; padding: .15rem .45rem; border-radius: 100px; }
