@@ -21,7 +21,7 @@
     .tag-green { background: #dcfce7; color: #166534; }
     .tag-yellow { background: #fef3c7; color: #92400e; }
     .tag-red { background: #fee2e2; color: #991b1b; }
-    .policy-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; margin: 2.5rem 0; }
+    .policy-cards { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.25rem; margin: 2.5rem 0; }
     .policy-card { background: #fff; border: 1px solid var(--g200); border-radius: var(--r); padding: 1.5rem; text-align: center; }
     .policy-card .pc-icon { font-size: 1.8rem; margin-bottom: .75rem; }
     .policy-card h4 { font-size: .85rem; font-weight: 700; margin-bottom: .4rem; }
@@ -57,8 +57,8 @@
 <section class="page-hero">
   <div class="container">
     <div class="badge badge-green" style="margin-bottom:1rem;">Cancellation Policy</div>
-    <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:.5rem;" id="sitePolicyHeading" data-edit-field="policy.heading" data-edit-label="Heading">Book with confidence</h1>
-    <p style="color:var(--g500);font-size:1rem;max-width:580px;" id="sitePolicySub" data-edit-field="policy.subtitle" data-edit-label="Subtitle" data-edit-type="textarea">We understand plans change. Our policy is designed to be fair to both guests and hosts.</p>
+    <h1 style="font-size:2.2rem;font-weight:800;margin-bottom:.5rem;" id="sitePolicyHeading">Book with confidence</h1>
+    <p style="color:var(--g500);font-size:1rem;max-width:580px;" id="sitePolicySub">We understand plans change. Our cancellation policy is simple and transparent.</p>
   </div>
 </section>
 
@@ -70,17 +70,12 @@
       <div class="policy-card">
         <div class="pc-icon">✅</div>
         <h4>Full refund</h4>
-        <p>Cancel within 48 hours of booking (if check-in is 14+ days away)</p>
+        <p>Cancel 14 or more days before check-in for a full refund</p>
       </div>
       <div class="policy-card">
         <div class="pc-icon">🔒</div>
         <h4>No refund</h4>
-        <p>All other cancellations are non-refundable, including no-shows</p>
-      </div>
-      <div class="policy-card">
-        <div class="pc-icon">🛡️</div>
-        <h4>Host cancellation</h4>
-        <p>If the host cancels, you receive a 100% full refund automatically</p>
+        <p>Cancellations less than 14 days before check-in are non-refundable</p>
       </div>
     </div>
 
@@ -92,8 +87,8 @@
         <div class="pt-dot green">✓</div>
         <div class="pt-body">
           <span class="pt-tag tag-green">Full refund</span>
-          <h3>Within 48 hours of booking</h3>
-          <p>Cancel within 48 hours of making your reservation for a 100% refund, as long as check-in is at least 14 days away. Refund processed within 5–10 business days to your original payment method.</p>
+          <h3>14+ days before check-in</h3>
+          <p>Cancel at least 14 days before your check-in date for a 100% refund. Refund processed within 5–10 business days to your original payment method.</p>
         </div>
       </div>
 
@@ -101,8 +96,8 @@
         <div class="pt-dot red">✗</div>
         <div class="pt-body">
           <span class="pt-tag tag-red">No refund</span>
-          <h3>All other cancellations</h3>
-          <p>Cancellations made after the 48-hour window, or when check-in is less than 14 days away, are non-refundable. This includes no-shows and early departures.</p>
+          <h3>Less than 14 days before check-in</h3>
+          <p>Cancellations made less than 14 days before check-in are non-refundable. This includes no-shows and early departures.</p>
         </div>
       </div>
 
@@ -125,11 +120,6 @@
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">What if I need to change my dates instead of cancelling? <span class="faq-arrow">▾</span></div>
         <div class="faq-a">Date changes are treated as a cancellation of the original booking and a new booking. If your original booking qualifies for a full refund, we'll apply the full amount to your new booking. Get in touch and we'll do our best to accommodate you.</div>
-      </div>
-
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">What if the host needs to cancel my booking? <span class="faq-arrow">▾</span></div>
-        <div class="faq-a">In the rare event that we need to cancel, you will receive a 100% full refund regardless of how close to your check-in date. We will also do our best to find alternative accommodation and provide a discount on a future stay.</div>
       </div>
 
       <div class="faq-item" onclick="this.classList.toggle('open')">

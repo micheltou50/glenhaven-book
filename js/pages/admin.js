@@ -64,21 +64,19 @@ const DEFAULT_CONFIG = {
   ],
   policy: {
     heading: 'Book with confidence',
-    subtitle: 'We understand plans change. Our policy is designed to be fair to both guests and hosts.',
+    subtitle: 'We understand plans change. Our cancellation policy is simple and transparent.',
     cards: [
-      { icon: '✅', title: 'Full refund', description: 'Cancel within 48 hours of booking (if check-in is 14+ days away)' },
-      { icon: '🔒', title: 'No refund', description: 'All other cancellations are non-refundable, including no-shows' },
-      { icon: '🛡️', title: 'Host cancellation', description: 'If the host cancels, you receive a 100% full refund automatically' },
+      { icon: '✅', title: 'Full refund', description: 'Cancel 14 or more days before check-in for a full refund' },
+      { icon: '🔒', title: 'No refund', description: 'Cancellations less than 14 days before check-in are non-refundable' },
     ],
     timeline: [
-      { color: 'green', tag: 'Full refund', title: 'Within 48 hours of booking', description: 'Cancel within 48 hours of making your reservation for a 100% refund, as long as check-in is at least 14 days away. Refund processed within 5–10 business days to your original payment method.' },
-      { color: 'red', tag: 'No refund', title: 'All other cancellations', description: 'Cancellations made after the 48-hour window, or when check-in is less than 14 days away, are non-refundable. This includes no-shows and early departures.' },
+      { color: 'green', tag: 'Full refund', title: '14+ days before check-in', description: 'Cancel at least 14 days before your check-in date for a 100% refund. Refund processed within 5–10 business days to your original payment method.' },
+      { color: 'red', tag: 'No refund', title: 'Less than 14 days before check-in', description: 'Cancellations made less than 14 days before check-in are non-refundable. This includes no-shows and early departures.' },
     ],
     faq: [
       { question: 'How do I cancel my booking?', answer: 'Email us with your booking reference and we\'ll process the cancellation promptly. You can also use the cancel link in your booking confirmation email.' },
       { question: 'How long does a refund take?', answer: 'Refunds are processed within 2 business days of your cancellation request. Depending on your bank, funds typically appear within 5–10 business days.' },
       { question: 'What if I need to change my dates instead of cancelling?', answer: 'Date changes are treated as a cancellation of the original booking and a new booking. If your original booking qualifies for a full refund, we\'ll apply the full amount to your new booking.' },
-      { question: 'What if the host needs to cancel my booking?', answer: 'In the rare event that we need to cancel, you will receive a 100% full refund regardless of how close to your check-in date. We will also do our best to find alternative accommodation.' },
       { question: 'Is travel insurance recommended?', answer: 'Yes — we always recommend travel insurance for unexpected situations like illness, flight cancellations, or family emergencies. Our cancellation policy is fixed, but travel insurance can cover circumstances outside our policy window.' },
     ],
   },
@@ -333,6 +331,9 @@ function populateForm(cfg) {
   _policy = cfg.policy || deepClone(DEFAULT_CONFIG.policy);
   setVal('ePolicyHeading', _policy.heading);
   setVal('ePolicySub', _policy.subtitle);
+  renderPolicyCards();
+  renderPolicyTimeline();
+  renderPolicyFaq();
   // iCal feeds
   renderIcalFeeds(cfg.icalFeeds || []);
   // Design
@@ -415,13 +416,159 @@ function readForm() {
 let _policy = null;
 function currentPolicy() {
   if (!_policy) _policy = deepClone(DEFAULT_CONFIG.policy);
-  // Update heading/subtitle from form if fields exist
+  // Read heading/subtitle from form
   const h = document.getElementById('ePolicyHeading');
   const s = document.getElementById('ePolicySub');
   if (h) _policy.heading = h.value;
   if (s) _policy.subtitle = s.value;
+  // Read cards from form
+  _policy.cards = readPolicyCards();
+  // Read timeline from form
+  _policy.timeline = readPolicyTimeline();
+  // Read FAQ from form
+  _policy.faq = readPolicyFaq();
   return _policy;
 }
+
+function renderPolicyCards() {
+  const wrap = document.getElementById('policyCardsEditor');
+  if (!wrap || !_policy) return;
+  const cards = _policy.cards || [];
+  wrap.innerHTML = cards.map((c, i) => `
+    <div class="policy-card-edit" style="border:1px solid var(--g200);border-radius:8px;padding:1rem;margin-bottom:.75rem;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+        <strong style="font-size:.82rem;">Card ${i + 1}</strong>
+        <button class="btn btn-white btn-sm" style="color:#ef4444;border-color:#ef4444;padding:.2rem .5rem;font-size:.7rem;" onclick="removePolicyCard(${i})">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field-group" style="flex:0 0 60px;"><label>Icon</label><input type="text" id="pCard${i}Icon" value="${c.icon || ''}" style="text-align:center;font-size:1.2rem;"/></div>
+        <div class="field-group"><label>Title</label><input type="text" id="pCard${i}Title" value="${escAdmin(c.title || '')}"/></div>
+      </div>
+      <div class="field-row single">
+        <div class="field-group"><label>Description</label><input type="text" id="pCard${i}Desc" value="${escAdmin(c.description || '')}"/></div>
+      </div>
+    </div>
+  `).join('');
+  // Attach dirty listeners
+  wrap.querySelectorAll('input').forEach(el => { if (!el._gl) { el.addEventListener('input', markDirty); el._gl = true; } });
+}
+function readPolicyCards() {
+  const wrap = document.getElementById('policyCardsEditor');
+  if (!wrap) return _policy ? _policy.cards : [];
+  const items = wrap.querySelectorAll('.policy-card-edit');
+  return Array.from(items).map((_, i) => ({
+    icon: gVal('pCard' + i + 'Icon'),
+    title: gVal('pCard' + i + 'Title'),
+    description: gVal('pCard' + i + 'Desc'),
+  }));
+}
+window.addPolicyCard = function () {
+  if (!_policy) _policy = deepClone(DEFAULT_CONFIG.policy);
+  _policy.cards = readPolicyCards();
+  _policy.cards.push({ icon: '📌', title: 'New card', description: 'Description here' });
+  renderPolicyCards();
+  markDirty();
+};
+window.removePolicyCard = function (i) {
+  _policy.cards = readPolicyCards();
+  _policy.cards.splice(i, 1);
+  renderPolicyCards();
+  markDirty();
+};
+
+function renderPolicyTimeline() {
+  const wrap = document.getElementById('policyTimelineEditor');
+  if (!wrap || !_policy) return;
+  const items = _policy.timeline || [];
+  wrap.innerHTML = items.map((t, i) => `
+    <div class="policy-tl-edit" style="border:1px solid var(--g200);border-radius:8px;padding:1rem;margin-bottom:.75rem;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+        <strong style="font-size:.82rem;">Step ${i + 1}</strong>
+        <button class="btn btn-white btn-sm" style="color:#ef4444;border-color:#ef4444;padding:.2rem .5rem;font-size:.7rem;" onclick="removePolicyTimeline(${i})">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field-group" style="flex:0 0 100px;"><label>Color</label>
+          <select id="pTl${i}Color"><option value="green"${t.color === 'green' ? ' selected' : ''}>Green</option><option value="yellow"${t.color === 'yellow' ? ' selected' : ''}>Yellow</option><option value="red"${t.color === 'red' ? ' selected' : ''}>Red</option></select>
+        </div>
+        <div class="field-group" style="flex:0 0 120px;"><label>Tag label</label><input type="text" id="pTl${i}Tag" value="${escAdmin(t.tag || '')}"/></div>
+        <div class="field-group"><label>Title</label><input type="text" id="pTl${i}Title" value="${escAdmin(t.title || '')}"/></div>
+      </div>
+      <div class="field-row single">
+        <div class="field-group"><label>Description</label><textarea id="pTl${i}Desc" rows="2">${escAdmin(t.description || '')}</textarea></div>
+      </div>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('input,textarea,select').forEach(el => { if (!el._gl) { el.addEventListener('input', markDirty); el._gl = true; } });
+}
+function readPolicyTimeline() {
+  const wrap = document.getElementById('policyTimelineEditor');
+  if (!wrap) return _policy ? _policy.timeline : [];
+  const items = wrap.querySelectorAll('.policy-tl-edit');
+  return Array.from(items).map((_, i) => ({
+    color: gVal('pTl' + i + 'Color'),
+    tag: gVal('pTl' + i + 'Tag'),
+    title: gVal('pTl' + i + 'Title'),
+    description: gVal('pTl' + i + 'Desc'),
+  }));
+}
+window.addPolicyTimeline = function () {
+  if (!_policy) _policy = deepClone(DEFAULT_CONFIG.policy);
+  _policy.timeline = readPolicyTimeline();
+  _policy.timeline.push({ color: 'green', tag: 'New step', title: 'Step title', description: 'Description here' });
+  renderPolicyTimeline();
+  markDirty();
+};
+window.removePolicyTimeline = function (i) {
+  _policy.timeline = readPolicyTimeline();
+  _policy.timeline.splice(i, 1);
+  renderPolicyTimeline();
+  markDirty();
+};
+
+function renderPolicyFaq() {
+  const wrap = document.getElementById('policyFaqEditor');
+  if (!wrap || !_policy) return;
+  const items = _policy.faq || [];
+  wrap.innerHTML = items.map((f, i) => `
+    <div class="policy-faq-edit" style="border:1px solid var(--g200);border-radius:8px;padding:1rem;margin-bottom:.75rem;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+        <strong style="font-size:.82rem;">Q${i + 1}</strong>
+        <button class="btn btn-white btn-sm" style="color:#ef4444;border-color:#ef4444;padding:.2rem .5rem;font-size:.7rem;" onclick="removePolicyFaq(${i})">Remove</button>
+      </div>
+      <div class="field-row single">
+        <div class="field-group"><label>Question</label><input type="text" id="pFaq${i}Q" value="${escAdmin(f.question || '')}"/></div>
+      </div>
+      <div class="field-row single">
+        <div class="field-group"><label>Answer</label><textarea id="pFaq${i}A" rows="2">${escAdmin(f.answer || '')}</textarea></div>
+      </div>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('input,textarea').forEach(el => { if (!el._gl) { el.addEventListener('input', markDirty); el._gl = true; } });
+}
+function readPolicyFaq() {
+  const wrap = document.getElementById('policyFaqEditor');
+  if (!wrap) return _policy ? _policy.faq : [];
+  const items = wrap.querySelectorAll('.policy-faq-edit');
+  return Array.from(items).map((_, i) => ({
+    question: gVal('pFaq' + i + 'Q'),
+    answer: gVal('pFaq' + i + 'A'),
+  }));
+}
+window.addPolicyFaq = function () {
+  if (!_policy) _policy = deepClone(DEFAULT_CONFIG.policy);
+  _policy.faq = readPolicyFaq();
+  _policy.faq.push({ question: 'New question?', answer: 'Answer here.' });
+  renderPolicyFaq();
+  markDirty();
+};
+window.removePolicyFaq = function (i) {
+  _policy.faq = readPolicyFaq();
+  _policy.faq.splice(i, 1);
+  renderPolicyFaq();
+  markDirty();
+};
+
+function escAdmin(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 // ── PHOTOS ───────────────────────────────────────────────────
 let _photos = [];

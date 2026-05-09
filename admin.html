@@ -584,17 +584,37 @@
     <div class="tab-pane" id="tab-edit-policy">
       <div class="edit-card">
         <h3>📋 Cancellation Policy</h3>
-        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Configure the cancellation policy page heading and subtitle. For detailed policy rules (cards, timeline, FAQ), use the <strong>live editor</strong> on the policy page itself.</p>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Edit every part of the cancellation policy page — heading, summary cards, refund timeline, and FAQ.</p>
         <div class="field-row single">
           <div class="field-group"><label>Page heading</label><input type="text" id="ePolicyHeading" placeholder="Book with confidence"/></div>
         </div>
         <div class="field-row single">
           <div class="field-group"><label>Subtitle</label><input type="text" id="ePolicySub" placeholder="We understand plans change…"/></div>
         </div>
-        <div style="margin-top:1rem;padding:1rem;background:var(--g100);border-radius:8px;">
-          <p style="font-size:.82rem;color:var(--g500);margin:0;"><strong>Tip:</strong> To edit policy cards, refund timeline, and FAQ items, open the cancellation policy page and add <code>?edit=true</code> to the URL. You can click on any element to edit it live.</p>
-          <a href="cancellation-policy.html?edit=true" target="_blank" style="display:inline-block;margin-top:.5rem;font-size:.82rem;color:var(--green);font-weight:600;">Open Live Editor →</a>
-        </div>
+      </div>
+
+      <!-- Policy Cards -->
+      <div class="edit-card">
+        <h3>Summary Cards</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">The cards shown at the top of the policy page.</p>
+        <div id="policyCardsEditor"></div>
+        <button class="btn btn-white btn-sm" style="margin-top:.75rem;" onclick="addPolicyCard()">+ Add Card</button>
+      </div>
+
+      <!-- Timeline -->
+      <div class="edit-card">
+        <h3>Refund Timeline</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">The timeline steps explaining your refund rules.</p>
+        <div id="policyTimelineEditor"></div>
+        <button class="btn btn-white btn-sm" style="margin-top:.75rem;" onclick="addPolicyTimeline()">+ Add Step</button>
+      </div>
+
+      <!-- FAQ -->
+      <div class="edit-card">
+        <h3>FAQ</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Common questions displayed on the policy page.</p>
+        <div id="policyFaqEditor"></div>
+        <button class="btn btn-white btn-sm" style="margin-top:.75rem;" onclick="addPolicyFaq()">+ Add Question</button>
       </div>
     </div>
 
