@@ -62,7 +62,7 @@ const DEFAULT_CONFIG = {
   contact: {
     heading: "We'd love to hear from you",
     subtitle: 'Questions about the property, a booking, or just want to say hello — we usually respond within a few hours.',
-    email: 'stay@glenhaven.au',
+    email: 'info@stayops.com.au',
     location: 'Katoomba, NSW 2780\nBlue Mountains, Australia',
     responseTime: 'We typically respond within 2–4 hours during business hours (9am–8pm AEST).',
   },

@@ -34,7 +34,7 @@ window.submitContact = function () {
   }).catch(() => {
     document.getElementById('cfSuccess').innerHTML =
       'Thanks! If you do not hear back within 24 hours, please email us directly at ' +
-      '<a href="mailto:micheltou50@gmail.com" style="color:var(--green);">micheltou50@gmail.com</a>';
+      '<a href="mailto:info@stayops.com.au" style="color:var(--green);">info@stayops.com.au</a>';
     document.getElementById('cfSuccess').style.display = 'block';
     btn.style.display = 'none';
   });
