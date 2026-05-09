@@ -156,6 +156,88 @@ export function applySiteConfig(cfg) {
     });
   }
 
+  // ── Hero description ──
+  setEl('siteHeroDesc', cfg.hero && cfg.hero.description);
+
+  // ── Story section ──
+  if (cfg.story) {
+    setEl('siteStoryEyebrow', cfg.story.eyebrow);
+    setEl('siteStoryHeading', cfg.story.heading);
+    setEl('siteStoryQuote', cfg.story.blockquote);
+    setEl('siteStoryNearby', cfg.story.nearby);
+    const badgeEl = document.getElementById('siteStoryBadges');
+    if (badgeEl && cfg.story.badges && cfg.story.badges.length) {
+      badgeEl.innerHTML = cfg.story.badges.map(b => `<span class="badge badge-green">${b}</span>`).join('');
+    }
+  }
+
+  // ── Highlights ──
+  if (cfg.highlights && cfg.highlights.length) {
+    const hlEl = document.getElementById('siteHighlights');
+    if (hlEl) {
+      hlEl.innerHTML = cfg.highlights.map(h =>
+        `<div class="hl-card reveal"><span class="hl-icon">${h.icon}</span><h3>${h.title}</h3><p>${h.description}</p></div>`
+      ).join('');
+    }
+  }
+
+  // ── Footer ──
+  if (cfg.footer) {
+    setEl('siteFooterTagline', cfg.footer.tagline);
+    setEl('siteFooterCopyright', cfg.footer.copyright);
+  }
+
+  // ── Contact page ──
+  if (cfg.contact) {
+    setEl('siteContactHeading', cfg.contact.heading);
+    setEl('siteContactSub', cfg.contact.subtitle);
+    setEl('siteContactLocation', cfg.contact.location);
+    setEl('siteContactResponse', cfg.contact.responseTime);
+    const emailEl = document.getElementById('siteContactEmail');
+    if (emailEl && cfg.contact.email) {
+      emailEl.textContent = cfg.contact.email;
+      emailEl.href = 'mailto:' + cfg.contact.email;
+    }
+  }
+
+  // ── Location page ──
+  if (cfg.location) {
+    setEl('siteLocHeading', cfg.location.heading);
+    setEl('siteLocSub', cfg.location.subtitle);
+    setEl('siteLocDesc', cfg.location.description);
+    setEl('siteLocMapCaption', cfg.location.mapCaption);
+    const mapEl = document.getElementById('siteLocMap');
+    if (mapEl && cfg.location.mapUrl) mapEl.src = cfg.location.mapUrl;
+
+    const placesEl = document.getElementById('siteLocPlaces');
+    if (placesEl && cfg.location.places && cfg.location.places.length) {
+      placesEl.innerHTML = cfg.location.places.map(p =>
+        `<div class="loc-place"><span class="loc-name">${p.icon} ${p.name}</span><span class="loc-dist">${p.distance}</span></div>`
+      ).join('');
+    }
+
+    const transEl = document.getElementById('siteLocTransport');
+    if (transEl && cfg.location.transport && cfg.location.transport.length) {
+      transEl.innerHTML = cfg.location.transport.map(t =>
+        `<div class="transport-card"><h4>${t.icon} ${t.title}</h4><p>${t.description}</p></div>`
+      ).join('');
+    }
+
+    const tdEl = document.getElementById('siteLocThingsToDo');
+    if (tdEl && cfg.location.thingsToDo && cfg.location.thingsToDo.length) {
+      tdEl.innerHTML = cfg.location.thingsToDo.map(cat => {
+        let html = `<div class="td-section"><div class="td-cat"><div class="td-cat-icon" style="background:${cat.bgColor}">${cat.icon}</div><div class="td-cat-label" style="color:${cat.labelColor}">${cat.category}</div></div><div class="td-grid">`;
+        html += (cat.items || []).map(it =>
+          `<div class="td-card"><div class="td-name">${it.name}</div><p class="td-desc">${it.description}</p><div class="td-meta">${(it.meta || []).map(m => `<span>${m}</span>`).join('')}</div></div>`
+        ).join('');
+        html += '</div>';
+        if (cat.tip) html += `<div class="td-tip"><div class="td-tip-label">${cat.tip.label}</div><p class="td-tip-text">${cat.tip.text}</p></div>`;
+        html += '</div>';
+        return html;
+      }).join('');
+    }
+  }
+
   // ── Photos ──
   if (cfg.photos && cfg.photos.length) {
     document.querySelectorAll('[data-site-photo]').forEach(el => {

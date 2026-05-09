@@ -50,8 +50,8 @@
 <div class="page-hero">
   <div class="container">
     <span class="eyebrow">Getting around</span>
-    <h1>Heart of the Blue Mountains</h1>
-    <p style="margin-top:.5rem;color:var(--g500);">Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD</p>
+    <h1 id="siteLocHeading">Heart of the Blue Mountains</h1>
+    <p style="margin-top:.5rem;color:var(--g500);" id="siteLocSub">Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD</p>
   </div>
 </div>
 
@@ -60,8 +60,8 @@
     <div class="loc-layout">
       <div>
         <h2>Nearby attractions</h2>
-        <p style="color:var(--g500);margin-top:.4rem;">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
-        <div class="loc-places">
+        <p style="color:var(--g500);margin-top:.4rem;" id="siteLocDesc">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
+        <div class="loc-places" id="siteLocPlaces">
           <div class="loc-place"><span class="loc-name">🏔️ Three Sisters Lookout</span><span class="loc-dist">8 min drive</span></div>
           <div class="loc-place"><span class="loc-name">🌅 Echo Point</span><span class="loc-dist">10 min drive</span></div>
           <div class="loc-place"><span class="loc-name">☕ Katoomba Town Centre</span><span class="loc-dist">5 min drive</span></div>
@@ -74,7 +74,7 @@
         </div>
 
         <h3 style="margin-top:2rem;">Getting here</h3>
-        <div class="transport-grid">
+        <div class="transport-grid" id="siteLocTransport">
           <div class="transport-card">
             <h4>🚗 By car</h4>
             <p>Take the Western Motorway (M4) from Sydney. Journey time ~90 minutes. Free off-street parking for 2 cars.</p>
@@ -96,9 +96,9 @@
 
       <div>
         <div class="map-full">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3317.8!2d150.3124!3d-33.7142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b0ce94dc8fc7bab%3A0xc46c02a87bb4a9b7!2sKatoomba%20NSW%202780!5e0!3m2!1sen!2sau&markers=color:red%7C-33.7142,150.3124" allowfullscreen="" loading="lazy"></iframe>
+          <iframe id="siteLocMap" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3317.8!2d150.3124!3d-33.7142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b0ce94dc8fc7bab%3A0xc46c02a87bb4a9b7!2sKatoomba%20NSW%202780!5e0!3m2!1sen!2sau&markers=color:red%7C-33.7142,150.3124" allowfullscreen="" loading="lazy"></iframe>
         </div>
-        <p style="font-size:.78rem;color:var(--g400);margin-top:.6rem;">📍 Katoomba, NSW 2780 · Exact address provided after booking is confirmed.</p>
+        <p style="font-size:.78rem;color:var(--g400);margin-top:.6rem;" id="siteLocMapCaption">📍 Katoomba, NSW 2780 · Exact address provided after booking is confirmed.</p>
       </div>
     </div>
   </div>
@@ -111,6 +111,7 @@
     <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:.5rem;">Our local picks</h2>
     <p style="color:var(--g500);margin-bottom:2.5rem;max-width:560px;">Curated by us — the places and walks we'd tell a friend about. All within easy reach of the cottage.</p>
 
+    <div id="siteLocThingsToDo">
     <!-- Walks -->
     <div class="td-section">
       <div class="td-cat">
@@ -228,6 +229,7 @@
         </div>
       </div>
     </div>
+    </div>
 
     <div class="text-center" style="margin-top:2rem;">
       <a href="booking.html" class="btn btn-primary btn-lg">Book Your Stay</a>
@@ -236,7 +238,7 @@
 </section>
 
 <footer class="footer"><div class="container"><div class="footer-bot">
-  <p>© 2025 Glenhaven · Katoomba, NSW, Australia</p>
+  <p id="siteFooterCopyright">© 2025 Glenhaven · Katoomba, NSW, Australia</p>
   <div class="footer-links"><a href="index.html">Home</a><a href="booking.html">Book</a></div>
 </div></div></footer>
 <script type="module" src="js/pages/simple.js"></script>

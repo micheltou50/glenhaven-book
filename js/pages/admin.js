@@ -17,7 +17,7 @@ let isDirty = false;
 
 const DEFAULT_CONFIG = {
   property: { name:'Glenhaven', tagline:'A Quintessential Katoomba Cottage', description:'A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden.', bedrooms:4, bathrooms:2.5, guests:8 },
-  hero: { headline:'Blue Mountains\nCottage Escape', subheadline:'📍 Katoomba · Blue Mountains · NSW Australia' },
+  hero: { headline:'Blue Mountains\nCottage Escape', subheadline:'📍 Katoomba · Blue Mountains · NSW Australia', description:'A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden — the perfect mountain getaway.' },
   pricing: { baseRate:320, baseGuests:2, extraGuest:40, cleaningFee:150, maxGuests:8, friSurcharge:60, satSurcharge:80, peakPct:25, lowPct:-10, minNights:{weekday:2,weekend:3,peak:4}, losDiscounts:{nights3:5,nights5:10,nights7:15}, holidayPrices:{'12-25':550,'12-26':550,'01-01':650,'12-31':650,'04-18':480,'04-20':480} },
   colors: { primary:'#1a6640', accent:'#b45309' },
   photos: [
@@ -40,6 +40,80 @@ const DEFAULT_CONFIG = {
     pets: ['Well-behaved pets welcome — please advise in advance','Pets must not be left alone in the property','Please keep pets off the furniture'],
   },
   amenities:['Wood fireplace','Glass conservatory','Private garden','Full kitchen','Washer & dryer','Fast WiFi','Smart TV','BBQ grill','Free parking','Self check-in','Pet friendly','Air conditioning'],
+  story: {
+    eyebrow: 'Our Story',
+    heading: 'A cottage that feels like home',
+    blockquote: '"Tucked away on a quiet Katoomba street, Glenhaven was lovingly restored to preserve the warmth and character of its original timber bones — while adding every modern comfort a family could wish for."',
+    nearby: 'Everything you need is within reach — the Three Sisters, Echo Point, Katoomba\'s cafés and galleries, the Scenic Railway — all just minutes away.',
+    badges: ['Self check-in', 'Smart lock', 'PID-STRA-82540'],
+  },
+  highlights: [
+    { icon: '🔥', title: 'Wood Fireplace', description: 'Cosy up beside a crackling real wood fire after a day in the mountains.' },
+    { icon: '🌿', title: 'Conservatory', description: 'Sun-drenched glass room perfect for morning coffee surrounded by greenery.' },
+    { icon: '🌲', title: 'Quiet Location', description: 'Peaceful street away from traffic — just birdsong and mountain air.' },
+    { icon: '🏡', title: 'Private Garden', description: 'Expansive outdoor space and entertaining area for the whole group.' },
+    { icon: '🏔️', title: 'Iconic Views', description: '10 minutes from the Three Sisters, Echo Point and all the best lookouts.' },
+    { icon: '🔐', title: 'Smart Lock', description: 'Self check-in any time — a door code is sent before your arrival.' },
+  ],
+  footer: {
+    tagline: 'A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.',
+    copyright: '© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540',
+  },
+  contact: {
+    heading: "We'd love to hear from you",
+    subtitle: 'Questions about the property, a booking, or just want to say hello — we usually respond within a few hours.',
+    email: 'stay@glenhaven.au',
+    location: 'Katoomba, NSW 2780\nBlue Mountains, Australia',
+    responseTime: 'We typically respond within 2–4 hours during business hours (9am–8pm AEST).',
+  },
+  location: {
+    heading: 'Heart of the Blue Mountains',
+    subtitle: 'Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD',
+    description: 'Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.',
+    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3317.8!2d150.3124!3d-33.7142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b0ce94dc8fc7bab%3A0xc46c02a87bb4a9b7!2sKatoomba%20NSW%202780!5e0!3m2!1sen!2sau&markers=color:red%7C-33.7142,150.3124',
+    mapCaption: '📍 Katoomba, NSW 2780 · Exact address provided after booking is confirmed.',
+    places: [
+      { icon: '🏔️', name: 'Three Sisters Lookout', distance: '8 min drive' },
+      { icon: '🌅', name: 'Echo Point', distance: '10 min drive' },
+      { icon: '☕', name: 'Katoomba Town Centre', distance: '5 min drive' },
+      { icon: '🌲', name: 'Blue Mountains National Park', distance: '10 min drive' },
+      { icon: '🚂', name: 'Katoomba Train Station', distance: '6 min drive' },
+      { icon: '🎢', name: 'Scenic World', distance: '12 min drive' },
+      { icon: '🍷', name: 'Leura Village', distance: '8 min drive' },
+      { icon: '🌊', name: 'Wentworth Falls', distance: '15 min drive' },
+      { icon: '🌆', name: 'Sydney CBD', distance: '~1.5 hr drive' },
+    ],
+    transport: [
+      { icon: '🚗', title: 'By car', description: 'Take the Western Motorway (M4) from Sydney. Journey time ~90 minutes. Free off-street parking for 2 cars.' },
+      { icon: '🚂', title: 'By train', description: 'Blue Mountains Line from Central Station to Katoomba. Trains run hourly. Journey ~2 hours.' },
+      { icon: '🚌', title: 'Local bus', description: 'Blue Mountains Bus Company connects Katoomba to major sights. Bus stop 3 min walk from property.' },
+      { icon: '✈️', title: 'By air', description: 'Sydney Airport (SYD) is ~2 hrs away by car. Hire car recommended for exploring the mountains.' },
+    ],
+    thingsToDo: [
+      { category: 'Walks and hikes', icon: '🥾', bgColor: '#ecf5e0', labelColor: 'var(--green-d)', items: [
+        { name: 'Three Sisters walk', description: 'The iconic lookout and walk — start at Echo Point, descend the Giant Stairway (800+ steps) through rainforest. Stunning.', meta: ['⏱ 2-3 hrs','▲ Moderate','8 min drive'] },
+        { name: 'Prince Henry Cliff Walk', description: 'Spectacular clifftop trail connecting Echo Point to Gordon Falls Lookout. Multiple lookouts along the way.', meta: ['⏱ 1.5 hrs','▲ Easy-moderate','10 min drive'] },
+        { name: 'Wentworth Falls circuit', description: 'Valley of the Waters — lush fern gullies, waterfalls, and a swimming hole at the base. Best after rain.', meta: ['⏱ 3-4 hrs','▲ Moderate-hard','15 min drive'] },
+        { name: 'Grand Canyon track', description: 'Loop trail through a mossy slot canyon near Blackheath. Feels like another world. Family-friendly pace possible.', meta: ['⏱ 3 hrs','▲ Moderate','20 min drive'] },
+      ], tip: { label: 'Host tip', text: 'Start walks early — carparks at Echo Point fill by 10 AM on weekends. Pack layers; it\'s always a few degrees cooler on the cliff edge.' } },
+      { category: 'Eat and drink', icon: '☕', bgColor: '#fef3e2', labelColor: '#7c4a0b', items: [
+        { name: 'The Yellow Deli', description: 'Rustic cafe with handmade bread, hearty soups and incredible mate lattes. Unlike anywhere else. Worth the queue.', meta: ['Katoomba','5 min drive'] },
+        { name: 'Leura Garage', description: 'Wood-fired pizzas and cocktails in a converted mechanic\'s garage. Great vibe for dinner.', meta: ['Leura','8 min drive'] },
+        { name: 'Silk\'s Brasserie', description: 'Fine dining in Leura. Modern Australian with local produce. Book ahead on weekends.', meta: ['Leura','8 min drive'] },
+        { name: 'Anonymous Cafe', description: 'Katoomba local favourite for breakfast. Great coffee, big portions, relaxed atmosphere.', meta: ['Katoomba','5 min drive'] },
+      ] },
+      { category: 'Family activities', icon: '🎪', bgColor: '#e8effe', labelColor: '#1e3a6e', items: [
+        { name: 'Scenic World', description: 'Scenic Railway (steepest in the world), Skyway, Cableway, and Walkway. Kids love it. Half-day easy.', meta: ['⏱ Half day','12 min drive'] },
+        { name: 'Everglades Gardens', description: 'Stunning 1930s heritage garden in Leura. Peaceful, beautiful any season. Picnic-friendly.', meta: ['⏱ 1-2 hrs','8 min drive'] },
+        { name: 'Blue Mountains Cultural Centre', description: 'Gallery and exhibitions about the World Heritage area. Free entry. Rainy day winner.', meta: ['⏱ 1 hr','5 min drive'] },
+        { name: 'Leuralla Toy Museum', description: 'Huge private collection of vintage toys, trains, and dolls in a gorgeous garden setting. Kids and nostalgic adults alike.', meta: ['⏱ 1-2 hrs','10 min drive'] },
+      ], tip: { label: 'Rainy day?', text: 'Light the fireplace, play the board games in the living room, and cook something warm in the kitchen. Some of our best reviews mention doing absolutely nothing.' } },
+      { category: 'Day trips', icon: '🍷', bgColor: '#f0edfe', labelColor: '#3C3489', items: [
+        { name: 'Jenolan Caves', description: 'Ancient limestone caves with guided tours. The drive there through the mountains is spectacular in itself.', meta: ['⏱ Full day','1 hr drive'] },
+        { name: 'Megalong Valley', description: 'Horse riding, farm stays, and wide-open valley views. A completely different side of the mountains.', meta: ['⏱ Half day','25 min drive'] },
+      ] },
+    ],
+  },
 };
 
 function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -167,7 +241,7 @@ function nVal(id) { const v = parseFloat(gVal(id)); return isNaN(v) ? null : v; 
 function populateForm(cfg) {
   if (!cfg) return;
   const p = cfg.property || {}, h = cfg.hero || {}, pr = cfg.pricing || {}, c = cfg.colors || {};
-  setVal('eName', p.name); setVal('eTagline', p.tagline); setVal('eHeroHeadline', h.headline); setVal('eHeroSub', h.subheadline);
+  setVal('eName', p.name); setVal('eTagline', p.tagline); setVal('eHeroHeadline', h.headline); setVal('eHeroSub', h.subheadline); setVal('eHeroDesc', h.description);
   setVal('eDescription', p.description); setVal('eBedrooms', p.bedrooms); setVal('eBathrooms', p.bathrooms); setVal('eMaxGuests', p.guests);
   const hr = cfg.houseRules || {};
   setVal('eCheckin', hr.checkin || ''); setVal('eCheckout', hr.checkout || '');
@@ -186,10 +260,37 @@ function populateForm(cfg) {
   if (c.accent)  { document.getElementById('cAccent').value = c.accent;   document.getElementById('cAccentHex').value = c.accent; }
   renderPhotos(cfg.photos || []);
   renderAmenities(cfg.amenities || []);
+  // Story
+  const st = cfg.story || {};
+  setVal('eStoryEyebrow', st.eyebrow); setVal('eStoryHeading', st.heading);
+  setVal('eStoryQuote', st.blockquote); setVal('eStoryNearby', st.nearby);
+  setVal('eStoryBadges', (st.badges || []).join('\n'));
+  // Highlights
+  renderHighlights(cfg.highlights || []);
+  // Footer
+  const ft = cfg.footer || {};
+  setVal('eFooterTagline', ft.tagline); setVal('eFooterCopyright', ft.copyright);
+  // Contact
+  const ct = cfg.contact || {};
+  setVal('eContactHeading', ct.heading); setVal('eContactSub', ct.subtitle);
+  setVal('eContactEmail', ct.email); setVal('eContactLocation', ct.location);
+  setVal('eContactResponse', ct.responseTime);
+  // Location
+  const loc = cfg.location || {};
+  setVal('eLocHeading', loc.heading); setVal('eLocSub', loc.subtitle);
+  setVal('eLocDesc', loc.description); setVal('eLocMapUrl', loc.mapUrl);
+  setVal('eLocMapCaption', loc.mapCaption);
+  renderLocPlaces(loc.places || []);
+  renderLocTransport(loc.transport || []);
+  renderLocThingsToDo(loc.thingsToDo || []);
   // Attach change listeners
   ['eName','eTagline','eHeroHeadline','eHeroSub','eDescription','eBedrooms','eBathrooms','eMaxGuests',
    'pBaseRate','pFriSurcharge','pSatSurcharge','pCleaningFee','pExtraGuest','pBaseGuests','pPeakPct','pLowPct',
-   'pXmas','pBoxing','pNYE','pNYD','pGoodFri','pEasterSun','pMinWeekday','pMinWeekend','pMinPeak'].forEach(id => {
+   'pXmas','pBoxing','pNYE','pNYD','pGoodFri','pEasterSun','pMinWeekday','pMinWeekend','pMinPeak',
+   'eHeroDesc','eStoryEyebrow','eStoryHeading','eStoryQuote','eStoryNearby','eStoryBadges',
+   'eFooterTagline','eFooterCopyright',
+   'eContactHeading','eContactSub','eContactEmail','eContactLocation','eContactResponse',
+   'eLocHeading','eLocSub','eLocDesc','eLocMapUrl','eLocMapCaption'].forEach(id => {
     const el = document.getElementById(id);
     if (el && !el._gl) { el.addEventListener('input', markDirty); el._gl = true; }
   });
@@ -205,7 +306,7 @@ function readForm() {
       smoking: gVal('eRulesSmoking').split('\n').map(s => s.trim()).filter(Boolean),
       pets:    gVal('eRulesPets').split('\n').map(s => s.trim()).filter(Boolean),
     },
-    hero: { headline: gVal('eHeroHeadline'), subheadline: gVal('eHeroSub') },
+    hero: { headline: gVal('eHeroHeadline'), subheadline: gVal('eHeroSub'), description: gVal('eHeroDesc') },
     pricing: {
       baseRate: nVal('pBaseRate'), friSurcharge: nVal('pFriSurcharge'), satSurcharge: nVal('pSatSurcharge'),
       cleaningFee: nVal('pCleaningFee'), extraGuest: nVal('pExtraGuest'), baseGuests: nVal('pBaseGuests'),
@@ -217,6 +318,26 @@ function readForm() {
     colors: { primary: document.getElementById('cPrimary').value, accent: document.getElementById('cAccent').value },
     photos: currentPhotos(),
     amenities: currentAmenities(),
+    story: {
+      eyebrow: gVal('eStoryEyebrow'), heading: gVal('eStoryHeading'),
+      blockquote: gVal('eStoryQuote'), nearby: gVal('eStoryNearby'),
+      badges: gVal('eStoryBadges').split('\n').map(s => s.trim()).filter(Boolean),
+    },
+    highlights: currentHighlights(),
+    footer: { tagline: gVal('eFooterTagline'), copyright: gVal('eFooterCopyright') },
+    contact: {
+      heading: gVal('eContactHeading'), subtitle: gVal('eContactSub'),
+      email: gVal('eContactEmail'), location: gVal('eContactLocation'),
+      responseTime: gVal('eContactResponse'),
+    },
+    location: {
+      heading: gVal('eLocHeading'), subtitle: gVal('eLocSub'),
+      description: gVal('eLocDesc'), mapUrl: gVal('eLocMapUrl'),
+      mapCaption: gVal('eLocMapCaption'),
+      places: currentLocPlaces(),
+      transport: currentLocTransport(),
+      thingsToDo: currentLocThingsToDo(),
+    },
   };
 }
 
@@ -255,6 +376,130 @@ window.addAmenity = function () {
   markDirty();
 };
 window.removeAmenity = function (i) { _amenities.splice(i, 1); renderAmenities(_amenities); markDirty(); };
+
+// ── HIGHLIGHTS ──────────────────────────────────────────────
+let _highlights = [];
+function currentHighlights() { return _highlights.map(h => ({...h})); }
+function renderHighlights(list) {
+  _highlights = list.map(h => ({...h}));
+  const el = document.getElementById('highlightList');
+  if (!el) return;
+  el.innerHTML = _highlights.map((h, i) =>
+    `<div style="display:flex;align-items:flex-start;gap:.75rem;padding:.85rem;border:1px solid var(--g200);border-radius:var(--r);margin-bottom:.5rem;">
+      <span style="font-size:1.5rem;">${h.icon}</span>
+      <div style="flex:1;"><strong style="font-size:.88rem;">${h.title}</strong><p style="font-size:.8rem;color:var(--g500);margin:.2rem 0 0;">${h.description}</p></div>
+      <button class="t-act" onclick="editHighlight(${i})">Edit</button>
+      <button class="t-act" onclick="removeHighlight(${i})">×</button>
+    </div>`
+  ).join('');
+}
+window.addHighlight = function () {
+  const icon = gVal('hlIcon'), title = gVal('hlTitle'), desc = gVal('hlDesc');
+  if (!title) return;
+  _highlights.push({ icon: icon || '✨', title, description: desc });
+  renderHighlights(_highlights); markDirty();
+  ['hlIcon','hlTitle','hlDesc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+};
+window.removeHighlight = function (i) { _highlights.splice(i, 1); renderHighlights(_highlights); markDirty(); };
+window.editHighlight = function (i) {
+  const h = _highlights[i];
+  document.getElementById('hlIcon').value = h.icon;
+  document.getElementById('hlTitle').value = h.title;
+  document.getElementById('hlDesc').value = h.description;
+  _highlights.splice(i, 1); renderHighlights(_highlights); markDirty();
+};
+
+// ── LOCATION PLACES ─────────────────────────────────────────
+let _locPlaces = [];
+function currentLocPlaces() { return _locPlaces.map(p => ({...p})); }
+function renderLocPlaces(list) {
+  _locPlaces = list.map(p => ({...p}));
+  const el = document.getElementById('locPlacesList');
+  if (!el) return;
+  el.innerHTML = _locPlaces.map((p, i) =>
+    `<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;border:1px solid var(--g200);border-radius:var(--r);margin-bottom:.35rem;">
+      <span>${p.icon}</span><span style="flex:1;font-size:.85rem;font-weight:500;">${p.name}</span><span style="font-size:.8rem;color:var(--g500);">${p.distance}</span>
+      <button class="t-act" onclick="removeLocPlace(${i})">×</button>
+    </div>`
+  ).join('');
+}
+window.addLocPlace = function () {
+  const icon = gVal('lpIcon'), name = gVal('lpName'), dist = gVal('lpDist');
+  if (!name) return;
+  _locPlaces.push({ icon: icon || '📍', name, distance: dist });
+  renderLocPlaces(_locPlaces); markDirty();
+  ['lpIcon','lpName','lpDist'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+};
+window.removeLocPlace = function (i) { _locPlaces.splice(i, 1); renderLocPlaces(_locPlaces); markDirty(); };
+
+// ── LOCATION TRANSPORT ──────────────────────────────────────
+let _locTransport = [];
+function currentLocTransport() { return _locTransport.map(t => ({...t})); }
+function renderLocTransport(list) {
+  _locTransport = list.map(t => ({...t}));
+  const el = document.getElementById('locTransportList');
+  if (!el) return;
+  el.innerHTML = _locTransport.map((t, i) =>
+    `<div style="display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .75rem;border:1px solid var(--g200);border-radius:var(--r);margin-bottom:.35rem;">
+      <span>${t.icon}</span><div style="flex:1;"><strong style="font-size:.85rem;">${t.title}</strong><p style="font-size:.8rem;color:var(--g500);margin:.15rem 0 0;">${t.description}</p></div>
+      <button class="t-act" onclick="removeLocTransport(${i})">×</button>
+    </div>`
+  ).join('');
+}
+window.addLocTransport = function () {
+  const icon = gVal('ltIcon'), title = gVal('ltTitle'), desc = gVal('ltDesc');
+  if (!title) return;
+  _locTransport.push({ icon: icon || '🚗', title, description: desc });
+  renderLocTransport(_locTransport); markDirty();
+  ['ltIcon','ltTitle','ltDesc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+};
+window.removeLocTransport = function (i) { _locTransport.splice(i, 1); renderLocTransport(_locTransport); markDirty(); };
+
+// ── LOCATION THINGS TO DO ───────────────────────────────────
+let _locThingsToDo = [];
+function currentLocThingsToDo() { return JSON.parse(JSON.stringify(_locThingsToDo)); }
+function renderLocThingsToDo(list) {
+  _locThingsToDo = JSON.parse(JSON.stringify(list));
+  const el = document.getElementById('locTTDList');
+  if (!el) return;
+  el.innerHTML = _locThingsToDo.map((cat, ci) => {
+    let items = (cat.items || []).map((it, ii) =>
+      `<div style="display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .6rem;background:var(--g50);border-radius:4px;margin:.25rem 0;">
+        <span style="flex:1;font-size:.82rem;"><strong>${it.name}</strong> — ${it.description}</span>
+        <button class="t-act" onclick="removeTTDItem(${ci},${ii})">×</button>
+      </div>`
+    ).join('');
+    return `<div style="border:1px solid var(--g200);border-radius:var(--r);padding:1rem;margin-bottom:.75rem;">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+        <span style="font-size:1.2rem;">${cat.icon}</span>
+        <strong style="flex:1;">${cat.category}</strong>
+        <button class="t-act" onclick="removeTTDCat(${ci})">Remove category</button>
+      </div>
+      ${items}
+      <div style="display:flex;gap:.4rem;margin-top:.5rem;">
+        <input type="text" id="ttdName${ci}" placeholder="Place name" style="flex:1;padding:.4rem .6rem;border:1px solid var(--g200);border-radius:4px;font-size:.82rem;">
+        <input type="text" id="ttdDesc${ci}" placeholder="Description" style="flex:2;padding:.4rem .6rem;border:1px solid var(--g200);border-radius:4px;font-size:.82rem;">
+        <button class="btn btn-sm btn-white" onclick="addTTDItem(${ci})">+ Item</button>
+      </div>
+      ${cat.tip ? `<div style="margin-top:.5rem;padding:.5rem;background:#ecf5e0;border-radius:4px;font-size:.8rem;"><strong>${cat.tip.label}:</strong> ${cat.tip.text}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+window.addTTDCat = function () {
+  const cat = gVal('ttdCatName'), icon = gVal('ttdCatIcon');
+  if (!cat) return;
+  _locThingsToDo.push({ category: cat, icon: icon || '📌', bgColor: '#f0f0f0', labelColor: '#333', items: [] });
+  renderLocThingsToDo(_locThingsToDo); markDirty();
+  ['ttdCatName','ttdCatIcon'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+};
+window.removeTTDCat = function (ci) { _locThingsToDo.splice(ci, 1); renderLocThingsToDo(_locThingsToDo); markDirty(); };
+window.addTTDItem = function (ci) {
+  const name = gVal('ttdName' + ci), desc = gVal('ttdDesc' + ci);
+  if (!name) return;
+  _locThingsToDo[ci].items.push({ name, description: desc, meta: [] });
+  renderLocThingsToDo(_locThingsToDo); markDirty();
+};
+window.removeTTDItem = function (ci, ii) { _locThingsToDo[ci].items.splice(ii, 1); renderLocThingsToDo(_locThingsToDo); markDirty(); };
 
 // ── COLORS ───────────────────────────────────────────────────
 window.onColorInput = function (type, hex) {
@@ -392,7 +637,7 @@ window.addBlock = function () {
 window.removeBlock = function (id) { deleteBlock(id); renderBlockList(); };
 
 // ── ICAL ─────────────────────────────────────────────────────
-window.copyIcal = function () { navigator.clipboard.writeText('https://glenhaven-book.netlify.app/calendar.ics').then(() => alert('Copied!')); };
+window.copyIcal = function () { navigator.clipboard.writeText('https://glenhaven.stayops.com.au/calendar.ics').then(() => alert('Copied!')); };
 
 // ── EXPORT ───────────────────────────────────────────────────
 window.exportCSV = function () {

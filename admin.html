@@ -135,9 +135,13 @@
       <a href="#" onclick="showTab('reviews',this)">⭐ Reviews</a>
       <div class="nav-group">Site Editor</div>
       <a href="#" onclick="showTab('edit-property',this)">🏡 Property Info</a>
+      <a href="#" onclick="showTab('edit-story',this)">📖 Story & Highlights</a>
       <a href="#" onclick="showTab('edit-pricing',this)">💰 Pricing</a>
       <a href="#" onclick="showTab('edit-photos',this)">🖼 Photos</a>
       <a href="#" onclick="showTab('edit-amenities',this)">✅ Amenities</a>
+      <a href="#" onclick="showTab('edit-location',this)">📍 Location</a>
+      <a href="#" onclick="showTab('edit-contact',this)">✉️ Contact</a>
+      <a href="#" onclick="showTab('edit-footer',this)">🦶 Footer</a>
       <a href="#" onclick="showTab('edit-design',this)">🎨 Design & Colors</a>
       <div class="nav-group">System</div>
       <a href="#" onclick="showTab('ical',this)">🔄 iCal Sync</a>
@@ -171,9 +175,13 @@
       <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
       <button class="tab-btn" onclick="showTab('reviews',this)">Reviews</button>
       <button class="tab-btn" onclick="showTab('edit-property',this)">Property</button>
+      <button class="tab-btn" onclick="showTab('edit-story',this)">Story</button>
       <button class="tab-btn" onclick="showTab('edit-pricing',this)">Pricing</button>
       <button class="tab-btn" onclick="showTab('edit-photos',this)">Photos</button>
       <button class="tab-btn" onclick="showTab('edit-amenities',this)">Amenities</button>
+      <button class="tab-btn" onclick="showTab('edit-location',this)">Location</button>
+      <button class="tab-btn" onclick="showTab('edit-contact',this)">Contact</button>
+      <button class="tab-btn" onclick="showTab('edit-footer',this)">Footer</button>
       <button class="tab-btn" onclick="showTab('edit-design',this)">Design</button>
       <button class="tab-btn" onclick="showTab('ical',this)">iCal</button>
       <button class="tab-btn" onclick="showTab('checklist',this)">✅ Tests</button>
@@ -249,7 +257,10 @@
           <div class="field-group"><label>Hero Tag (above headline)</label><input type="text" id="eHeroSub" placeholder="Katoomba · Blue Mountains · NSW"/></div>
         </div>
         <div class="field-row single">
-          <div class="field-group"><label>Property Description</label><textarea id="eDescription" rows="4" placeholder="A peaceful 2-storey timber retreat…"></textarea></div>
+          <div class="field-group"><label>Hero Description (below headline)</label><textarea id="eHeroDesc" rows="2" placeholder="A peaceful 2-storey timber retreat minutes from the Three Sisters…"></textarea><div class="field-hint">The subtitle paragraph shown in the hero banner</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Property Description</label><textarea id="eDescription" rows="4" placeholder="A peaceful 2-storey timber retreat…"></textarea><div class="field-hint">Used in the story section on the homepage</div></div>
         </div>
         <div class="field-row three">
           <div class="field-group"><label>Bedrooms</label><input type="number" id="eBedrooms" min="1" placeholder="4"/></div>
@@ -428,6 +439,132 @@
       </div>
     </div>
 
+    <!-- STORY & HIGHLIGHTS -->
+    <div class="tab-pane" id="tab-edit-story">
+      <div class="edit-card">
+        <h3>📖 Story Section</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">The "Our Story" section on the homepage — the blockquote, description, and nearby attractions text.</p>
+        <div class="field-row">
+          <div class="field-group"><label>Eyebrow text</label><input type="text" id="eStoryEyebrow" placeholder="Our Story"/></div>
+          <div class="field-group"><label>Section heading</label><input type="text" id="eStoryHeading" placeholder="A cottage that feels like home"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Blockquote</label><textarea id="eStoryQuote" rows="3" placeholder="The main quote about your property…"></textarea></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Nearby attractions text</label><textarea id="eStoryNearby" rows="2" placeholder="Everything you need is within reach…"></textarea></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Badges (one per line)</label><textarea id="eStoryBadges" rows="3" placeholder="Self check-in&#10;Smart lock&#10;PID-STRA-82540"></textarea><div class="field-hint">Small green badges shown below the story text</div></div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <h3>✨ Property Highlights</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">The 6 feature cards shown on the homepage under "Why guests love it". Edit or reorder below.</p>
+        <div id="highlightList"></div>
+        <div style="border:2px dashed var(--g300);border-radius:var(--r);padding:1rem;margin-top:.75rem;">
+          <p style="font-size:.8rem;font-weight:600;color:var(--g600);margin-bottom:.5rem;">Add a highlight</p>
+          <div class="field-row three">
+            <div class="field-group"><label>Icon (emoji)</label><input type="text" id="hlIcon" placeholder="🔥" style="font-size:1.2rem;"/></div>
+            <div class="field-group"><label>Title</label><input type="text" id="hlTitle" placeholder="Wood Fireplace"/></div>
+            <div class="field-group"><label>Description</label><input type="text" id="hlDesc" placeholder="Cosy up beside a crackling fire…"/></div>
+          </div>
+          <button class="btn btn-sm btn-black" onclick="addHighlight()" style="margin-top:.5rem;">Add Highlight</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="tab-pane" id="tab-edit-location">
+      <div class="edit-card">
+        <h3>📍 Location Page</h3>
+        <div class="field-row">
+          <div class="field-group"><label>Page heading</label><input type="text" id="eLocHeading" placeholder="Heart of the Blue Mountains"/></div>
+          <div class="field-group"><label>Subtitle</label><input type="text" id="eLocSub" placeholder="Katoomba, NSW 2780 · ~1.5 hrs from Sydney"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Description</label><textarea id="eLocDesc" rows="2" placeholder="A quiet residential pocket…"></textarea></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Google Maps embed URL</label><input type="url" id="eLocMapUrl" placeholder="https://www.google.com/maps/embed?pb=…"/><div class="field-hint">Get this from Google Maps → Share → Embed → copy the src URL</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Map caption</label><input type="text" id="eLocMapCaption" placeholder="📍 Katoomba, NSW 2780 · Exact address provided after booking"/></div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <h3>📌 Nearby Places</h3>
+        <div id="locPlacesList"></div>
+        <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;">
+          <input type="text" id="lpIcon" placeholder="🏔️" style="width:50px;padding:.4rem;border:1px solid var(--g200);border-radius:4px;font-size:1.1rem;text-align:center;">
+          <input type="text" id="lpName" placeholder="Place name" style="flex:2;padding:.4rem .6rem;border:1px solid var(--g200);border-radius:4px;font-size:.85rem;">
+          <input type="text" id="lpDist" placeholder="8 min drive" style="flex:1;padding:.4rem .6rem;border:1px solid var(--g200);border-radius:4px;font-size:.85rem;">
+          <button class="btn btn-sm btn-black" onclick="addLocPlace()">Add</button>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <h3>🚗 Getting Here (Transport)</h3>
+        <div id="locTransportList"></div>
+        <div style="border:2px dashed var(--g300);border-radius:var(--r);padding:1rem;margin-top:.5rem;">
+          <div class="field-row three">
+            <div class="field-group"><label>Icon</label><input type="text" id="ltIcon" placeholder="🚗" style="font-size:1.1rem;"/></div>
+            <div class="field-group"><label>Title</label><input type="text" id="ltTitle" placeholder="By car"/></div>
+            <div class="field-group"><label>Description</label><input type="text" id="ltDesc" placeholder="Take the M4 from Sydney…"/></div>
+          </div>
+          <button class="btn btn-sm btn-black" onclick="addLocTransport()" style="margin-top:.5rem;">Add Transport Option</button>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <h3>🗺️ Things to Do</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Categories of local recommendations shown on the location page.</p>
+        <div id="locTTDList"></div>
+        <div style="display:flex;gap:.4rem;margin-top:.75rem;flex-wrap:wrap;">
+          <input type="text" id="ttdCatIcon" placeholder="🥾" style="width:50px;padding:.4rem;border:1px solid var(--g200);border-radius:4px;font-size:1.1rem;text-align:center;">
+          <input type="text" id="ttdCatName" placeholder="Category name (e.g. Walks and hikes)" style="flex:1;padding:.4rem .6rem;border:1px solid var(--g200);border-radius:4px;font-size:.85rem;">
+          <button class="btn btn-sm btn-black" onclick="addTTDCat()">+ Category</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="tab-pane" id="tab-edit-contact">
+      <div class="edit-card">
+        <h3>✉️ Contact Page</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Content shown on your contact page and used across the site for email/location references.</p>
+        <div class="field-row single">
+          <div class="field-group"><label>Page heading</label><input type="text" id="eContactHeading" placeholder="We'd love to hear from you"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Subtitle</label><input type="text" id="eContactSub" placeholder="Questions about the property…"/></div>
+        </div>
+        <div class="field-row">
+          <div class="field-group"><label>Contact email</label><input type="email" id="eContactEmail" placeholder="stay@glenhaven.au"/></div>
+          <div class="field-group"><label>Response time</label><input type="text" id="eContactResponse" placeholder="We typically respond within 2–4 hours…"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Location text</label><textarea id="eContactLocation" rows="2" placeholder="Katoomba, NSW 2780&#10;Blue Mountains, Australia"></textarea><div class="field-hint">Shown in the contact info sidebar</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="tab-pane" id="tab-edit-footer">
+      <div class="edit-card">
+        <h3>🦶 Footer</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">The footer appears on every page. Edit the tagline and copyright line below.</p>
+        <div class="field-row single">
+          <div class="field-group"><label>Footer tagline</label><input type="text" id="eFooterTagline" placeholder="A peaceful timber cottage in Katoomba…"/><div class="field-hint">Short description shown under the logo in the footer</div></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Copyright line</label><input type="text" id="eFooterCopyright" placeholder="© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540"/><div class="field-hint">Bottom line of the footer — include your STRA registration number</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- DESIGN -->
     <div class="tab-pane" id="tab-edit-design">
       <div class="edit-card">
@@ -489,7 +626,7 @@
         <div style="background:var(--g50);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem;">
           <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:.4rem;">Your iCal Export URL</div>
           <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
-            <code style="font-size:.82rem;color:var(--green-d);flex:1;word-break:break-all;">https://glenhaven-book.netlify.app/calendar.ics</code>
+            <code style="font-size:.82rem;color:var(--green-d);flex:1;word-break:break-all;">https://glenhaven.stayops.com.au/calendar.ics</code>
             <button class="btn btn-sm btn-white" onclick="copyIcal()">Copy</button>
           </div>
         </div>
