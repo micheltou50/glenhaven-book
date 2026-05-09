@@ -1082,6 +1082,35 @@ window.rejectReview = async function (id) {
   }
 };
 
+// ── URL-BASED REVIEW SCRAPER ────────────────────────────────
+window.fetchReviewsFromUrl = async function () {
+  const url = document.getElementById('scrapeUrl').value.trim();
+  const status = document.getElementById('scrapeStatus');
+  if (!url) { status.textContent = '⚠️ Paste a listing URL first'; return; }
+
+  status.textContent = '🔄 Fetching reviews…';
+  try {
+    const res = await fetch('/api/scrape-reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+
+    if (!data.reviews || !data.reviews.length) {
+      status.textContent = '⚠️ No reviews found. The platform may be blocking scraping — try the paste method below.';
+      return;
+    }
+
+    _parsedReviews = data.reviews.map(r => ({ ...r, platform: data.platform, include: true }));
+    status.textContent = `✅ Found ${data.count} reviews from ${data.platform}`;
+    renderBulkPreview();
+  } catch (err) {
+    status.textContent = '❌ ' + err.message;
+  }
+};
+
 // ── BULK REVIEW PARSER ──────────────────────────────────────
 let _parsedReviews = [];
 
