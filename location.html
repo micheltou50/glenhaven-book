@@ -50,8 +50,8 @@
 <div class="page-hero">
   <div class="container">
     <span class="eyebrow">Getting around</span>
-    <h1 id="siteLocHeading">Heart of the Blue Mountains</h1>
-    <p style="margin-top:.5rem;color:var(--g500);" id="siteLocSub">Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD</p>
+    <h1 id="siteLocHeading" data-edit-field="location.heading" data-edit-label="Heading">Heart of the Blue Mountains</h1>
+    <p style="margin-top:.5rem;color:var(--g500);" id="siteLocSub" data-edit-field="location.subtitle" data-edit-label="Subtitle">Katoomba, NSW 2780 · ~1.5 hrs from Sydney CBD</p>
   </div>
 </div>
 
@@ -60,7 +60,7 @@
     <div class="loc-layout">
       <div>
         <h2>Nearby attractions</h2>
-        <p style="color:var(--g500);margin-top:.4rem;" id="siteLocDesc">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
+        <p style="color:var(--g500);margin-top:.4rem;" id="siteLocDesc" data-edit-field="location.description" data-edit-label="Description" data-edit-type="textarea">Glenhaven sits in a quiet residential pocket of Katoomba — peaceful enough to fully unwind, close enough to access everything on your list.</p>
         <div class="loc-places" id="siteLocPlaces">
           <div class="loc-place"><span class="loc-name">🏔️ Three Sisters Lookout</span><span class="loc-dist">8 min drive</span></div>
           <div class="loc-place"><span class="loc-name">🌅 Echo Point</span><span class="loc-dist">10 min drive</span></div>
@@ -270,4 +270,5 @@
   </div>
 </footer>
 <script type="module" src="js/pages/simple.js"></script>
+<script type="module" src="js/visual-editor.js"></script>
 </body></html>

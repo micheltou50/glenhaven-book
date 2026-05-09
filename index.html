@@ -95,7 +95,7 @@
 <header>
   <nav class="navbar">
     <div class="container nav-inner">
-      <a href="index.html" class="nav-logo">Glen<em>haven</em></a>
+      <a href="index.html" class="nav-logo" data-edit-field="property.name" data-edit-label="Property Name">Glen<em>haven</em></a>
       <ul class="nav-links" id="navLinks">
         <li><a href="gallery.html">Gallery</a></li>
         <li><a href="amenities.html">Amenities</a></li>
@@ -111,13 +111,13 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg">
-    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven cottage exterior" data-site-photo="0"/>
+    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg" alt="Glenhaven cottage exterior" data-site-photo="0" data-edit-photo="hero.photoUrl" data-edit-label="Hero Photo"/>
   </div>
   <div class="hero-overlay"></div>
   <div class="container hero-content">
-    <div class="hero-tag" id="siteHeroSub">📍 Katoomba · Blue Mountains · NSW Australia</div>
-    <h1 id="siteHeroHeadline">Blue Mountains<br>Cottage Escape</h1>
-    <p class="hero-sub" id="siteHeroDesc">A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden — the perfect mountain getaway.</p>
+    <div class="hero-tag" id="siteHeroSub" data-edit-field="hero.subheadline" data-edit-label="Subheadline">📍 Katoomba · Blue Mountains · NSW Australia</div>
+    <h1 id="siteHeroHeadline" data-edit-field="hero.headline" data-edit-label="Headline" data-edit-type="textarea">Blue Mountains<br>Cottage Escape</h1>
+    <p class="hero-sub" id="siteHeroDesc" data-edit-field="hero.description" data-edit-label="Description" data-edit-type="textarea">A peaceful 2-storey timber retreat minutes from the Three Sisters. Fireplace, conservatory, private garden — the perfect mountain getaway.</p>
     <div class="hero-stats">
       <div class="hero-stat"><strong id="siteMaxGuests">8</strong><span>Guests</span></div>
       <div class="hero-stat"><strong id="siteBeds">4</strong><span>Bedrooms</span></div>
@@ -178,11 +178,11 @@
   <div class="container">
     <div class="story-grid">
       <div class="reveal">
-        <span class="eyebrow" id="siteStoryEyebrow">Our Story</span>
-        <h2 id="siteStoryHeading">A cottage that feels like home</h2>
-        <blockquote id="siteStoryQuote">"Tucked away on a quiet Katoomba street, Glenhaven was lovingly restored to preserve the warmth and character of its original timber bones — while adding every modern comfort a family could wish for."</blockquote>
-        <p id="siteDescription">Two storeys of thoughtfully designed space sleep 8 guests in comfort. Gather around the wood fireplace on cool mountain evenings, take your morning coffee in the sun-drenched conservatory, or let the kids loose in the sprawling private garden.</p>
-        <p style="margin-top:.85rem;" id="siteStoryNearby">Everything you need is within reach — the Three Sisters, Echo Point, Katoomba's cafés and galleries, the Scenic Railway — all just minutes away.</p>
+        <span class="eyebrow" id="siteStoryEyebrow" data-edit-field="story.eyebrow" data-edit-label="Eyebrow">Our Story</span>
+        <h2 id="siteStoryHeading" data-edit-field="story.heading" data-edit-label="Heading">A cottage that feels like home</h2>
+        <blockquote id="siteStoryQuote" data-edit-field="story.blockquote" data-edit-label="Quote" data-edit-type="textarea">"Tucked away on a quiet Katoomba street, Glenhaven was lovingly restored to preserve the warmth and character of its original timber bones — while adding every modern comfort a family could wish for."</blockquote>
+        <p id="siteDescription" data-edit-field="property.description" data-edit-label="Description" data-edit-type="textarea">Two storeys of thoughtfully designed space sleep 8 guests in comfort. Gather around the wood fireplace on cool mountain evenings, take your morning coffee in the sun-drenched conservatory, or let the kids loose in the sprawling private garden.</p>
+        <p style="margin-top:.85rem;" id="siteStoryNearby" data-edit-field="story.nearby" data-edit-label="Nearby" data-edit-type="textarea">Everything you need is within reach — the Three Sisters, Echo Point, Katoomba's cafés and galleries, the Scenic Railway — all just minutes away.</p>
         <div class="story-badges" style="margin-top:1.25rem;" id="siteStoryBadges">
           <span class="badge badge-green">Self check-in</span>
           <span class="badge badge-green">Smart lock</span>
@@ -191,7 +191,7 @@
         <a href="booking.html" class="btn btn-primary btn-lg" style="margin-top:1.5rem;">Book your stay</a>
       </div>
       <div class="story-img reveal">
-        <img id="siteStoryPhoto" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Property" data-site-photo="1"/>
+        <img id="siteStoryPhoto" src="https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg" alt="Property" data-site-photo="1" data-edit-photo="story.photoUrl" data-edit-label="Story Photo"/>
       </div>
     </div>
   </div>
@@ -305,7 +305,7 @@
     <div class="footer-grid">
       <div>
         <div class="footer-logo" id="sitePropertyName">Glen<em>haven</em></div>
-        <p id="siteFooterTagline">A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.</p>
+        <p id="siteFooterTagline" data-edit-field="footer.tagline" data-edit-label="Tagline" data-edit-type="textarea">A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.</p>
         <div class="social-row">
           <a href="#" class="soc-btn">📘</a><a href="#" class="soc-btn">📸</a><a href="#" class="soc-btn">🐦</a>
         </div>
@@ -342,13 +342,14 @@
       </div>
     </div>
     <div class="footer-bot">
-      <p id="siteFooterCopyright">© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
+      <p id="siteFooterCopyright" data-edit-field="footer.copyright" data-edit-label="Copyright">© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540</p>
       <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div>
     </div>
   </div>
 </footer>
 
 <script type="module" src="js/pages/home.js"></script>
+<script type="module" src="js/visual-editor.js"></script>
 
 
 <!-- MOBILE STICKY BOOKING BAR -->

@@ -148,12 +148,14 @@
       <a href="#" onclick="showTab('edit-amenities',this)">✅ Amenities</a>
       <a href="#" onclick="showTab('edit-location',this)">📍 Location</a>
       <a href="#" onclick="showTab('edit-contact',this)">✉️ Contact</a>
+      <a href="#" onclick="showTab('edit-policy',this)">📋 Policy</a>
       <a href="#" onclick="showTab('edit-footer',this)">🦶 Footer</a>
       <a href="#" onclick="showTab('edit-design',this)">🎨 Design & Colors</a>
       <div class="nav-group">System</div>
       <a href="#" onclick="showTab('ical',this)">🔄 iCal Sync</a>
       <a href="#" onclick="showTab('checklist',this)">✅ Deploy Checks</a>
       <a href="index.html" target="_blank">🌐 Live Site ↗</a>
+      <a href="index.html?edit=true" target="_blank" style="color:var(--green);font-weight:600;">✏️ Visual Editor ↗</a>
     </nav>
   </aside>
 
@@ -188,6 +190,7 @@
       <button class="tab-btn" onclick="showTab('edit-amenities',this)">Amenities</button>
       <button class="tab-btn" onclick="showTab('edit-location',this)">Location</button>
       <button class="tab-btn" onclick="showTab('edit-contact',this)">Contact</button>
+      <button class="tab-btn" onclick="showTab('edit-policy',this)">Policy</button>
       <button class="tab-btn" onclick="showTab('edit-footer',this)">Footer</button>
       <button class="tab-btn" onclick="showTab('edit-design',this)">Design</button>
       <button class="tab-btn" onclick="showTab('ical',this)">iCal</button>
@@ -573,6 +576,24 @@
         </div>
         <div class="field-row single">
           <div class="field-group"><label>Location text</label><textarea id="eContactLocation" rows="2" placeholder="Katoomba, NSW 2780&#10;Blue Mountains, Australia"></textarea><div class="field-hint">Shown in the contact info sidebar</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLICY -->
+    <div class="tab-pane" id="tab-edit-policy">
+      <div class="edit-card">
+        <h3>📋 Cancellation Policy</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Configure the cancellation policy page heading and subtitle. For detailed policy rules (cards, timeline, FAQ), use the <strong>live editor</strong> on the policy page itself.</p>
+        <div class="field-row single">
+          <div class="field-group"><label>Page heading</label><input type="text" id="ePolicyHeading" placeholder="Book with confidence"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Subtitle</label><input type="text" id="ePolicySub" placeholder="We understand plans change…"/></div>
+        </div>
+        <div style="margin-top:1rem;padding:1rem;background:var(--g100);border-radius:8px;">
+          <p style="font-size:.82rem;color:var(--g500);margin:0;"><strong>Tip:</strong> To edit policy cards, refund timeline, and FAQ items, open the cancellation policy page and add <code>?edit=true</code> to the URL. You can click on any element to edit it live.</p>
+          <a href="cancellation-policy.html?edit=true" target="_blank" style="display:inline-block;margin-top:.5rem;font-size:.82rem;color:var(--green);font-weight:600;">Open Live Editor →</a>
         </div>
       </div>
     </div>

@@ -318,6 +318,39 @@ export function applySiteConfig(cfg) {
     }
   }
 
+  // ── Cancellation Policy ──
+  if (cfg.policy) {
+    setEl('sitePolicyHeading', cfg.policy.heading);
+    setEl('sitePolicySub', cfg.policy.subtitle);
+
+    // Render policy cards dynamically
+    const cardsEl = document.getElementById('sitePolicyCards');
+    if (cardsEl && cfg.policy.cards && cfg.policy.cards.length) {
+      cardsEl.innerHTML = cfg.policy.cards.map(c =>
+        `<div class="policy-card"><div class="pc-icon">${c.icon}</div><h4>${c.title}</h4><p>${c.description}</p></div>`
+      ).join('');
+    }
+
+    // Render timeline
+    const timelineEl = document.getElementById('sitePolicyTimeline');
+    if (timelineEl && cfg.policy.timeline && cfg.policy.timeline.length) {
+      timelineEl.innerHTML = cfg.policy.timeline.map(t =>
+        `<div class="pt-item"><div class="pt-dot ${t.color}">` +
+        (t.color === 'green' ? '✓' : t.color === 'yellow' ? '⚠' : '✗') +
+        `</div><div class="pt-body"><span class="pt-tag tag-${t.color}">${t.tag}</span><h3>${t.title}</h3><p>${t.description}</p></div></div>`
+      ).join('');
+    }
+
+    // Render FAQ
+    const faqEl = document.getElementById('sitePolicyFaq');
+    if (faqEl && cfg.policy.faq && cfg.policy.faq.length) {
+      faqEl.innerHTML = '<h2 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Common questions</h2>' +
+        cfg.policy.faq.map(f =>
+          `<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">${f.question} <span class="faq-arrow">▾</span></div><div class="faq-a">${f.answer}</div></div>`
+        ).join('');
+    }
+  }
+
   // ── Footer ──
   if (cfg.footer) {
     setEl('siteFooterTagline', cfg.footer.tagline);

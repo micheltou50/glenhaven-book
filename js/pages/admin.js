@@ -62,6 +62,26 @@ const DEFAULT_CONFIG = {
     { icon: '🏔️', title: 'Iconic Views', description: '10 minutes from the Three Sisters, Echo Point and all the best lookouts.' },
     { icon: '🔐', title: 'Smart Lock', description: 'Self check-in any time — a door code is sent before your arrival.' },
   ],
+  policy: {
+    heading: 'Book with confidence',
+    subtitle: 'We understand plans change. Our policy is designed to be fair to both guests and hosts.',
+    cards: [
+      { icon: '✅', title: 'Full refund', description: 'Cancel within 48 hours of booking (if check-in is 14+ days away)' },
+      { icon: '🔒', title: 'No refund', description: 'All other cancellations are non-refundable, including no-shows' },
+      { icon: '🛡️', title: 'Host cancellation', description: 'If the host cancels, you receive a 100% full refund automatically' },
+    ],
+    timeline: [
+      { color: 'green', tag: 'Full refund', title: 'Within 48 hours of booking', description: 'Cancel within 48 hours of making your reservation for a 100% refund, as long as check-in is at least 14 days away. Refund processed within 5–10 business days to your original payment method.' },
+      { color: 'red', tag: 'No refund', title: 'All other cancellations', description: 'Cancellations made after the 48-hour window, or when check-in is less than 14 days away, are non-refundable. This includes no-shows and early departures.' },
+    ],
+    faq: [
+      { question: 'How do I cancel my booking?', answer: 'Email us with your booking reference and we\'ll process the cancellation promptly. You can also use the cancel link in your booking confirmation email.' },
+      { question: 'How long does a refund take?', answer: 'Refunds are processed within 2 business days of your cancellation request. Depending on your bank, funds typically appear within 5–10 business days.' },
+      { question: 'What if I need to change my dates instead of cancelling?', answer: 'Date changes are treated as a cancellation of the original booking and a new booking. If your original booking qualifies for a full refund, we\'ll apply the full amount to your new booking.' },
+      { question: 'What if the host needs to cancel my booking?', answer: 'In the rare event that we need to cancel, you will receive a 100% full refund regardless of how close to your check-in date. We will also do our best to find alternative accommodation.' },
+      { question: 'Is travel insurance recommended?', answer: 'Yes — we always recommend travel insurance for unexpected situations like illness, flight cancellations, or family emergencies. Our cancellation policy is fixed, but travel insurance can cover circumstances outside our policy window.' },
+    ],
+  },
   footer: {
     tagline: 'A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.',
     copyright: '© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540',
@@ -309,6 +329,10 @@ function populateForm(cfg) {
   renderLocPlaces(loc.places || []);
   renderLocTransport(loc.transport || []);
   renderLocThingsToDo(loc.thingsToDo || []);
+  // Policy
+  _policy = cfg.policy || deepClone(DEFAULT_CONFIG.policy);
+  setVal('ePolicyHeading', _policy.heading);
+  setVal('ePolicySub', _policy.subtitle);
   // iCal feeds
   renderIcalFeeds(cfg.icalFeeds || []);
   // Design
@@ -376,6 +400,7 @@ function readForm() {
       thingsToDo: currentLocThingsToDo(),
     },
     icalFeeds: currentIcalFeeds(),
+    policy: currentPolicy(),
     design: {
       fontHeading: gVal('dFontHeading'),
       fontBody: gVal('dFontBody'),
@@ -384,6 +409,18 @@ function readForm() {
       navStyle: gVal('dNavStyle'),
     },
   };
+}
+
+// ── POLICY ──────────────────────────────────────────────────
+let _policy = null;
+function currentPolicy() {
+  if (!_policy) _policy = deepClone(DEFAULT_CONFIG.policy);
+  // Update heading/subtitle from form if fields exist
+  const h = document.getElementById('ePolicyHeading');
+  const s = document.getElementById('ePolicySub');
+  if (h) _policy.heading = h.value;
+  if (s) _policy.subtitle = s.value;
+  return _policy;
 }
 
 // ── PHOTOS ───────────────────────────────────────────────────
