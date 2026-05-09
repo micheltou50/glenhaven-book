@@ -418,10 +418,14 @@
         <h3>🖼 Photos</h3>
         <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Photos appear in the order shown below. The first photo is the hero image.</p>
         <div class="photo-grid" id="photoGrid"></div>
-        <div class="photo-add">
-          <p style="font-size:.8rem;font-weight:600;color:var(--g600);">Add a photo by URL</p>
-          <input type="url" id="photoUrlInput" placeholder="https://… (must end in .jpg, .jpeg, .png or .webp)"/>
-          <button class="btn btn-sm btn-black" onclick="addPhoto()" style="align-self:flex-start;">Add Photo</button>
+        <div class="photo-add" id="photoDropZone" style="text-align:center;cursor:pointer;padding:2rem 1rem;">
+          <p style="font-size:.9rem;font-weight:600;color:var(--g600);margin-bottom:.4rem;">📷 Drop photos here or click to browse</p>
+          <p style="font-size:.78rem;color:var(--g400);margin:0;">JPG, PNG or WebP · Max 10 MB each</p>
+          <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none;"/>
+          <div id="photoUploadProgress" style="margin-top:.75rem;display:none;">
+            <div style="background:var(--g200);border-radius:99px;height:6px;overflow:hidden;"><div id="photoProgressBar" style="height:100%;background:var(--green);width:0%;transition:width .3s;"></div></div>
+            <p id="photoUploadStatus" style="font-size:.75rem;color:var(--g500);margin-top:.4rem;">Uploading…</p>
+          </div>
         </div>
       </div>
     </div>

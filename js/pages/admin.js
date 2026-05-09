@@ -350,13 +350,72 @@ function renderPhotos(photos) {
     `<div class="photo-item"><img src="${url}" onerror="this.parentElement.style.background='var(--g200)'"/><button class="photo-del" onclick="removePhoto(${i})">×</button><div class="photo-idx">${i === 0 ? 'Hero' : '#' + (i + 1)}</div></div>`
   ).join('');
 }
-window.addPhoto = function () {
-  const url = document.getElementById('photoUrlInput').value.trim();
-  if (!url) return;
-  _photos.push(url); renderPhotos(_photos);
-  document.getElementById('photoUrlInput').value = '';
+async function uploadFile(file) {
+  const body = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(file);
+  });
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      'x-admin-password': adminPassword,
+      'x-file-name': file.name,
+      'x-content-type': file.type,
+    },
+    body: body,
+  });
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return data.url;
+}
+
+async function handlePhotoFiles(files) {
+  const valid = [...files].filter(f => ['image/jpeg','image/png','image/webp'].includes(f.type));
+  if (!valid.length) return;
+
+  const prog = document.getElementById('photoUploadProgress');
+  const bar = document.getElementById('photoProgressBar');
+  const status = document.getElementById('photoUploadStatus');
+  prog.style.display = 'block';
+  bar.style.width = '0%';
+
+  for (let i = 0; i < valid.length; i++) {
+    status.textContent = `Uploading ${i + 1} of ${valid.length}…`;
+    bar.style.width = `${((i) / valid.length) * 100}%`;
+    try {
+      const url = await uploadFile(valid[i]);
+      _photos.push(url);
+      renderPhotos(_photos);
+    } catch (e) {
+      status.textContent = `Failed: ${valid[i].name}`;
+      console.error(e);
+    }
+  }
+  bar.style.width = '100%';
+  status.textContent = `${valid.length} photo${valid.length > 1 ? 's' : ''} uploaded`;
   markDirty();
-};
+  setTimeout(() => { prog.style.display = 'none'; }, 2000);
+}
+
+(function initPhotoDrop() {
+  const zone = document.getElementById('photoDropZone');
+  const input = document.getElementById('photoFileInput');
+  if (!zone || !input) return;
+
+  zone.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => { if (input.files.length) handlePhotoFiles(input.files); input.value = ''; });
+
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--green)'; zone.style.background = '#ecf5e0'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; zone.style.background = ''; });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.style.borderColor = ''; zone.style.background = '';
+    if (e.dataTransfer.files.length) handlePhotoFiles(e.dataTransfer.files);
+  });
+})();
+
 window.removePhoto = function (i) { _photos.splice(i, 1); renderPhotos(_photos); markDirty(); };
 
 // ── AMENITIES ────────────────────────────────────────────────
