@@ -1,20 +1,32 @@
 /* ── pages/gallery.js — gallery.html entry module ── */
 
 import { initNavBurger } from '../ui.js';
+import { loadSiteConfig, getSiteConfig } from '../site-config.js';
 
-const LB_IMGS = [
-  'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/b23b9d94-f89b-4e33-8c48-7c955fb81de4.jpeg',
-  'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/ad8fb841-e3b8-4e56-a607-7643edf4f0f2.jpeg',
-  'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/a0769fd7-6ef6-4f85-a370-96ccaf0b05fc.jpeg',
-  'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/6b2084ae-8865-422c-be93-2d5fa06042e6.jpeg',
-  'https://a0.muscache.com/im/pictures/hosting/Hosting-1615699566549279350/original/3e22052f-39b3-4bd4-8541-7651b393f8d0.jpeg',
-];
-
+let galleryPhotos = [];
 let lbIdx = 0;
 
+function buildGallery() {
+  const cfg = getSiteConfig();
+  const photos = (cfg && cfg.photos) || [];
+  if (!photos.length) return;
+
+  galleryPhotos = photos;
+  const grid = document.getElementById('galleryGrid');
+  if (!grid) return;
+
+  grid.innerHTML = photos.map((url, i) => {
+    const isBig = i === 0 || (i > 0 && i % 5 === 0);
+    return `<div class="photo-card${isBig ? ' big' : ''}" onclick="openLightbox(${i})">
+      <img src="${url}" alt="Photo ${i + 1}" loading="lazy"/>
+    </div>`;
+  }).join('');
+}
+
 function openLightbox(i) {
+  if (!galleryPhotos.length) return;
   lbIdx = i;
-  document.getElementById('lbImg').src = LB_IMGS[i];
+  document.getElementById('lbImg').src = galleryPhotos[i];
   document.getElementById('lightbox').classList.add('open');
 }
 
@@ -23,8 +35,9 @@ function closeLightbox() {
 }
 
 function lbShift(d) {
-  lbIdx = (lbIdx + d + LB_IMGS.length) % LB_IMGS.length;
-  document.getElementById('lbImg').src = LB_IMGS[lbIdx];
+  if (!galleryPhotos.length) return;
+  lbIdx = (lbIdx + d + galleryPhotos.length) % galleryPhotos.length;
+  document.getElementById('lbImg').src = galleryPhotos[lbIdx];
 }
 
 // Expose for inline onclick handlers
@@ -41,4 +54,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') lbShift(1);
 });
 
-document.addEventListener('DOMContentLoaded', () => initNavBurger());
+document.addEventListener('DOMContentLoaded', async () => {
+  initNavBurger();
+  await loadSiteConfig();
+  buildGallery();
+});
