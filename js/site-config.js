@@ -351,6 +351,16 @@ export function applySiteConfig(cfg) {
     }
   }
 
+  // ── Booking page policy summary (from policy cards) ──
+  if (cfg.policy && cfg.policy.cards && cfg.policy.cards.length >= 2) {
+    const c = cfg.policy.cards;
+    const p1 = document.getElementById('bkPolicyLine1');
+    const p2 = document.getElementById('bkPolicyLine2');
+    if (p1) p1.innerHTML = '✓ <strong>' + c[0].title + '</strong> — ' + c[0].description;
+    if (p2) p2.innerHTML = '✗ <strong>' + c[1].title + '</strong> — ' + c[1].description;
+    setEl('bkPolicySidebar', '✓ ' + c[0].title.replace(/\+/g, '+') + ' free cancellation');
+  }
+
   // ── Footer ──
   if (cfg.footer) {
     setEl('siteFooterTagline', cfg.footer.tagline);
