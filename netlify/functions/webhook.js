@@ -4,6 +4,7 @@
 // → Sends branded confirmation email via Resend
 
 const { confirmationEmail, hostNotificationEmail } = require('./email-templates');
+const { loadSiteConfig, getPropertyName, getEmailFrom, getRefPrefix, getCleaningFee } = require('./site-config-loader');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, HOST_USER_ID,
         STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, RESEND_FROM, HOST_EMAIL } = process.env;
@@ -75,8 +76,14 @@ exports.handler = async (event) => {
     console.warn('Idempotency check failed:', err.message);
   }
 
+  // ── Load site config for dynamic property info ─────────────
+  const siteConfig = await loadSiteConfig();
+  const propName = getPropertyName(siteConfig);
+  const emailFrom = getEmailFrom(siteConfig);
+
   // ── Generate reference code ────────────────────────────────
-  const refCode = 'GH-' + Date.now().toString(36).toUpperCase().slice(-5);
+  const prefix = getRefPrefix(siteConfig);
+  const refCode = prefix + Date.now().toString(36).toUpperCase().slice(-5);
 
   // ── Fetch property config (mgmt_fee_rate) ──────────────────
   let mgmtFeeRate = 0;
@@ -163,6 +170,7 @@ exports.handler = async (event) => {
       refCode,
       cancellationDate,
       siteUrl: SITE_URL,
+      siteConfig,
     });
 
     try {
@@ -170,9 +178,9 @@ exports.handler = async (event) => {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: RESEND_FROM || 'Glenhaven Bookings <noreply@resend.dev>',
+          from: emailFrom,
           to: meta.email,
-          subject: `Booking confirmed: Glenhaven · ${meta.checkIn} → ${meta.checkOut}`,
+          subject: `Booking confirmed: ${propName} · ${meta.checkIn} → ${meta.checkOut}`,
           html,
         }),
       });
@@ -203,12 +211,13 @@ exports.handler = async (event) => {
           refCode,
           stripeId: session.id,
           siteUrl: SITE_URL,
+          siteConfig,
         });
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from: RESEND_FROM || 'Glenhaven Bookings <noreply@resend.dev>',
+            from: emailFrom,
             to: HOST_EMAIL,
             subject: `New booking: ${meta.guestName} · ${meta.checkIn} → ${meta.checkOut} · ${refCode}`,
             html: hostHtml,

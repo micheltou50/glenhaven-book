@@ -2,6 +2,8 @@
 // 1. Checks availability in Supabase
 // 2. Creates Stripe Checkout session
 
+const { loadSiteConfig, getPropertyName, getCleaningFee } = require('./site-config-loader');
+
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, STRIPE_SECRET_KEY } = process.env;
 const SITE_URL = process.env.URL || 'https://glenhaven-book.netlify.app';
 
@@ -40,11 +42,14 @@ exports.handler = async (event) => {
   }
 
   // ── 2. Create Stripe Checkout session ──────────────────────
+  const siteConfig = await loadSiteConfig();
+  const propName = getPropertyName(siteConfig);
+
   const params = new URLSearchParams({
     'payment_method_types[]'                               : 'card',
     'line_items[0][price_data][currency]'                   : 'aud',
     'line_items[0][price_data][unit_amount]'                : String(Math.round(chargeAmount * 100)),
-    'line_items[0][price_data][product_data][name]'         : 'Glenhaven — Blue Mountains Cottage',
+    'line_items[0][price_data][product_data][name]'         : propName,
     'line_items[0][price_data][product_data][description]'  : `${nights} night${nights > 1 ? 's' : ''} · ${checkIn} → ${checkOut} · ${guests} guest${guests > 1 ? 's' : ''}`,
     'line_items[0][quantity]'                               : '1',
     'mode'                                                  : 'payment',
@@ -59,7 +64,7 @@ exports.handler = async (event) => {
     'metadata[phone]'      : phone || '',
     'metadata[guests]'     : String(guests),
     'metadata[total]'      : String(total),
-    'metadata[cleaningFee]': String(cleaningFee || 150),
+    'metadata[cleaningFee]': String(cleaningFee || getCleaningFee(siteConfig)),
     'metadata[message]'    : (message || '').slice(0, 500),
   });
 

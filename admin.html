@@ -142,6 +142,7 @@
       <a href="#" onclick="showTab('reviews',this)">⭐ Reviews</a>
       <div class="nav-group">Site Editor</div>
       <a href="#" onclick="showTab('edit-property',this)">🏡 Property Info</a>
+      <a href="#" onclick="showTab('edit-rules',this)">📋 House Rules</a>
       <a href="#" onclick="showTab('edit-story',this)">📖 Story & Highlights</a>
       <a href="#" onclick="showTab('edit-pricing',this)">💰 Pricing</a>
       <a href="#" onclick="showTab('edit-photos',this)">🖼 Photos</a>
@@ -184,6 +185,7 @@
       <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
       <button class="tab-btn" onclick="showTab('reviews',this)">Reviews</button>
       <button class="tab-btn" onclick="showTab('edit-property',this)">Property</button>
+      <button class="tab-btn" onclick="showTab('edit-rules',this)">House Rules</button>
       <button class="tab-btn" onclick="showTab('edit-story',this)">Story</button>
       <button class="tab-btn" onclick="showTab('edit-pricing',this)">Pricing</button>
       <button class="tab-btn" onclick="showTab('edit-photos',this)">Photos</button>
@@ -289,7 +291,11 @@
         </div>
       </div>
 
-      <div class="edit-card" style="margin-top:1.5rem;">
+    </div>
+
+    <!-- HOUSE RULES -->
+    <div class="tab-pane" id="tab-edit-rules">
+      <div class="edit-card">
         <h3>📋 House Rules</h3>
         <p style="font-size:.83rem;color:var(--g500);margin-bottom:1rem;">These rules appear on your house-rules.html page. Edit each line — one rule per line.</p>
         <div class="field-row single">
@@ -300,32 +306,53 @@
         </div>
         <div class="field-row single">
           <div class="field-group">
+            <label>Check-in Method</label>
+            <input type="text" id="eCheckinMethod" placeholder="Self check-in with smart lock"/>
+            <div class="field-hint">Shown below the check-in time on the house rules page</div>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
             <label>Check-out Time</label>
             <input type="text" id="eCheckout" placeholder="10:00 AM"/>
           </div>
         </div>
         <div class="field-row single">
           <div class="field-group">
+            <label>Check-out Method</label>
+            <input type="text" id="eCheckoutMethod" placeholder="Lock up"/>
+            <div class="field-hint">Shown below the check-out time on the house rules page</div>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
             <label>General Rules (one per line)</label>
-            <textarea id="eRulesGeneral" rows="5" placeholder="Maximum 8 guests at any time&#10;Self check-in via lockbox&#10;Leave property clean and tidy"></textarea>
+            <textarea id="eRulesGeneral" rows="5" placeholder="Maximum 8 guests at any time&#10;Commercial photography allowed&#10;Please treat the property as your own home"></textarea>
           </div>
         </div>
         <div class="field-row single">
           <div class="field-group">
             <label>Noise Rules (one per line)</label>
-            <textarea id="eRulesNoise" rows="4" placeholder="Quiet hours 10pm – 8am&#10;No parties or large gatherings"></textarea>
+            <textarea id="eRulesNoise" rows="4" placeholder="Quiet hours 11:00 pm – 7:00 am&#10;No parties or events"></textarea>
           </div>
         </div>
         <div class="field-row single">
           <div class="field-group">
             <label>Smoking Rules (one per line)</label>
-            <textarea id="eRulesSmoking" rows="3" placeholder="No smoking inside&#10;Smoking in garden only"></textarea>
+            <textarea id="eRulesSmoking" rows="3" placeholder="No smoking"></textarea>
           </div>
         </div>
         <div class="field-row single">
           <div class="field-group">
             <label>Pet Rules (one per line)</label>
-            <textarea id="eRulesPets" rows="3" placeholder="Pets welcome — please advise in advance&#10;Keep pets off furniture"></textarea>
+            <textarea id="eRulesPets" rows="3" placeholder="No pets"></textarea>
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label>Before You Leave (one per line)</label>
+            <textarea id="eRulesCheckout" rows="5" placeholder="Gather used towels&#10;Throw rubbish away&#10;Turn things off&#10;Lock up&#10;Place used dishes in the dishwasher and turn it on"></textarea>
+            <div class="field-hint">Checkout checklist shown on the house rules page</div>
           </div>
         </div>
       </div>
@@ -627,7 +654,20 @@
           <div class="field-group"><label>Footer tagline</label><input type="text" id="eFooterTagline" placeholder="A peaceful timber cottage in Katoomba…"/><div class="field-hint">Short description shown under the logo in the footer</div></div>
         </div>
         <div class="field-row single">
-          <div class="field-group"><label>Copyright line</label><input type="text" id="eFooterCopyright" placeholder="© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540"/><div class="field-hint">Bottom line of the footer — include your STRA registration number</div></div>
+          <div class="field-group"><label>Copyright line</label><input type="text" id="eFooterCopyright" placeholder="© 2026 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540"/><div class="field-hint">Bottom line of the footer — include your STRA registration number. The year auto-updates on the live site.</div></div>
+        </div>
+      </div>
+      <div class="edit-card">
+        <h3>🔗 Social Media Links</h3>
+        <p style="font-size:.84rem;color:var(--g500);margin-bottom:1rem;">Add your social media profile URLs. Links with no URL will be hidden on the site.</p>
+        <div class="field-row single">
+          <div class="field-group"><label>Facebook URL</label><input type="url" id="eSocialFacebook" placeholder="https://facebook.com/yourpage"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Instagram URL</label><input type="url" id="eSocialInstagram" placeholder="https://instagram.com/yourhandle"/></div>
+        </div>
+        <div class="field-row single">
+          <div class="field-group"><label>Twitter / X URL</label><input type="url" id="eSocialTwitter" placeholder="https://x.com/yourhandle"/></div>
         </div>
       </div>
     </div>

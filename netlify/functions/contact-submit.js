@@ -1,11 +1,14 @@
 // ── /api/contact ──────────────────────────────────────────────
 // POST → sends contact form message via Resend email
 
+const { loadSiteConfig, getEmailFrom } = require('./site-config-loader');
+
 const { RESEND_API_KEY, RESEND_FROM, HOST_EMAIL } = process.env;
+const SITE_URL = process.env.URL || '';
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_URL || '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
@@ -20,12 +23,14 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
+    const siteConfig = await loadSiteConfig();
+    const emailFrom = getEmailFrom(siteConfig);
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: RESEND_FROM || 'Glenhaven <noreply@resend.dev>',
+        from: emailFrom,
         to: HOST_EMAIL,
         reply_to: body.email || undefined,
         subject: `Contact: ${body.topic || 'General'} — ${body.name || 'Guest'}`,

@@ -10,6 +10,7 @@
 //   or POST with x-cron-secret header
 
 const { preArrivalEmail, checkInEmail, postCheckoutEmail } = require('./email-templates');
+const { loadSiteConfig, getPropertyName, getEmailFrom, getRefPrefix } = require('./site-config-loader');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID,
         RESEND_API_KEY, RESEND_FROM } = process.env;
@@ -46,6 +47,11 @@ exports.handler = async (event) => {
   const results = { sent: [], skipped: [], errors: [] };
 
   console.log('[email-sequence] Looking for bookings with:', { in7days, tomorrow, yesterday });
+
+  // ── Load site config for dynamic property info ─────────────
+  const siteConfig = await loadSiteConfig();
+  const propName = getPropertyName(siteConfig);
+  const emailFrom = getEmailFrom(siteConfig);
 
   // ── Fetch property check-in info ───────────────────────────
   let checkInInfo = {};
@@ -87,8 +93,9 @@ exports.handler = async (event) => {
             guestName: firstName,
             checkIn: bk.checkin,
             siteUrl: SITE_URL,
+            siteConfig,
           });
-          await sendEmail(bk.email, `Your Blue Mountains escape is one week away!`, html);
+          await sendEmail(bk.email, `Your ${propName} escape is one week away!`, html);
           await markSent(bk.id, sent, 'pre-arrival');
           results.sent.push({ id: bk.id, type: 'pre-arrival' });
         } catch (err) {
@@ -105,6 +112,7 @@ exports.handler = async (event) => {
             checkOut: bk.checkout,
             checkInInfo,
             siteUrl: SITE_URL,
+            siteConfig,
           });
           await sendEmail(bk.email, `Check-in tomorrow — here's everything you need`, html);
           await markSent(bk.id, sent, 'check-in');
@@ -117,13 +125,14 @@ exports.handler = async (event) => {
       // ── Post-checkout (1 day after) ────────────────────────
       if (bk.checkout === yesterday && !sent.includes('post-checkout')) {
         try {
-          const returnCode = generateReturnCode();
+          const returnCode = generateReturnCode(siteConfig);
           const html = postCheckoutEmail({
             guestName: firstName,
             returnCode,
             siteUrl: SITE_URL,
+            siteConfig,
           });
-          await sendEmail(bk.email, `Thanks for staying at Glenhaven!`, html);
+          await sendEmail(bk.email, `Thanks for staying at ${propName}!`, html);
           await markSent(bk.id, sent, 'post-checkout');
           await storeReturnCode(bk.id, returnCode);
           results.sent.push({ id: bk.id, type: 'post-checkout', returnCode });
@@ -151,7 +160,7 @@ async function sendEmail(to, subject, html) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: RESEND_FROM || 'Glenhaven Bookings <noreply@resend.dev>',
+      from: emailFrom,
       to,
       subject,
       html,
@@ -178,9 +187,10 @@ async function markSent(bookingId, existingSent, emailType) {
   }
 }
 
-function generateReturnCode() {
+function generateReturnCode(cfg) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'GH-R';
+  const prefix = getRefPrefix(cfg).replace(/-$/, '') + '-R';
+  let code = prefix;
   for (let i = 0; i < 5; i++) {
     code += chars[Math.floor(Math.random() * chars.length)];
   }

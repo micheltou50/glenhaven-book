@@ -10,16 +10,27 @@ function renderHouseRules(cfg) {
   if (ci && hr.checkin)  ci.textContent = hr.checkin;
   if (co && hr.checkout) co.textContent = hr.checkout;
 
+  const ciSub = ci && ci.parentElement && ci.parentElement.querySelector('.time-sub');
+  const coSub = co && co.parentElement && co.parentElement.querySelector('.time-sub');
+  if (ciSub && hr.checkinMethod)  ciSub.textContent = hr.checkinMethod;
+  if (coSub && hr.checkoutMethod) coSub.textContent = hr.checkoutMethod;
+
   const cats = [
-    { id: 'rulesGeneral', key: 'general' },
-    { id: 'rulesNoise',   key: 'noise' },
-    { id: 'rulesSmoking', key: 'smoking' },
-    { id: 'rulesPets',    key: 'pets' },
+    { id: 'rulesGeneral',  key: 'general' },
+    { id: 'rulesNoise',    key: 'noise' },
+    { id: 'rulesSmoking',  key: 'smoking' },
+    { id: 'rulesPets',     key: 'pets' },
+    { id: 'rulesCheckout', key: 'checkoutRules' },
   ];
   cats.forEach(c => {
     const el = document.getElementById(c.id);
     if (!el || !hr[c.key] || !hr[c.key].length) return;
-    el.innerHTML = hr[c.key].map(r => '<li><span class="ri">✓</span>' + r + '</li>').join('');
+    el.innerHTML = hr[c.key].map(r => {
+      const text = typeof r === 'string' ? r : r.text || '';
+      const prohibited = (typeof r === 'object' && r.type === 'prohibited') || /^no\s/i.test(text);
+      const icon = prohibited ? '✗' : '✓';
+      return '<li><span class="ri">' + icon + '</span>' + text + '</li>';
+    }).join('');
   });
 }
 

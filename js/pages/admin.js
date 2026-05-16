@@ -34,10 +34,12 @@ const DEFAULT_CONFIG = {
   ],
   houseRules: {
     checkin: '3:00 PM', checkout: '10:00 AM',
-    general: ['Maximum 8 guests at any time','Self check-in via key lockbox','Please treat the property as your own home','Report any damage or breakages promptly','Leave the property in a clean and tidy condition'],
-    noise: ['Quiet hours: 10pm – 8am','No parties or large gatherings','Music and outdoor entertaining welcome until 10pm'],
-    smoking: ['No smoking inside the property','Smoking permitted in the garden only','Please dispose of cigarette butts responsibly'],
-    pets: ['Well-behaved pets welcome — please advise in advance','Pets must not be left alone in the property','Please keep pets off the furniture'],
+    checkinMethod: 'Self check-in with smart lock', checkoutMethod: 'Lock up',
+    general: ['Maximum 8 guests at any time','Commercial photography allowed','Please treat the property as your own home','Report any damage or breakages promptly'],
+    noise: ['Quiet hours 11:00 pm – 7:00 am','No parties or events'],
+    smoking: ['No smoking'],
+    pets: ['No pets'],
+    checkoutRules: ['Gather used towels','Throw rubbish away','Turn things off','Lock up','Place used dishes in the dishwasher and turn it on','If the BBQ has been used during your stay, please clean it before checking out — if left unclean, an additional cleaning fee will apply'],
   },
   amenities:[
     { category:'🏡 Living Spaces', items:['🔥 Wood fireplace','🌿 Glass conservatory','📺 Smart TV (55")','📻 Bluetooth speaker','🎲 Board games','📚 Book library','🪑 Dining table (seats 10)','🛋️ Large sofa'] },
@@ -82,8 +84,9 @@ const DEFAULT_CONFIG = {
   },
   footer: {
     tagline: 'A peaceful timber cottage in Katoomba, Blue Mountains. Book direct and save on platform fees.',
-    copyright: '© 2025 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540',
+    copyright: '© 2026 Glenhaven · Katoomba, NSW, Australia · PID-STRA-82540',
   },
+  social: { facebook: '', instagram: '', twitter: '' },
   contact: {
     heading: "We'd love to hear from you",
     subtitle: 'Questions about the property, a booking, or just want to say hello — we usually respond within a few hours.',
@@ -286,10 +289,12 @@ function populateForm(cfg) {
   if (h.photoUrl) setVal('eHeroPhoto', h.photoUrl);
   const hr = cfg.houseRules || {};
   setVal('eCheckin', hr.checkin || ''); setVal('eCheckout', hr.checkout || '');
+  setVal('eCheckinMethod', hr.checkinMethod || ''); setVal('eCheckoutMethod', hr.checkoutMethod || '');
   setVal('eRulesGeneral', (hr.general || []).join('\n'));
   setVal('eRulesNoise',   (hr.noise   || []).join('\n'));
   setVal('eRulesSmoking', (hr.smoking || []).join('\n'));
   setVal('eRulesPets',    (hr.pets    || []).join('\n'));
+  setVal('eRulesCheckout', (hr.checkoutRules || []).join('\n'));
   setVal('pBaseRate', pr.baseRate); setVal('pFriSurcharge', pr.friSurcharge); setVal('pSatSurcharge', pr.satSurcharge);
   setVal('pCleaningFee', pr.cleaningFee); setVal('pExtraGuest', pr.extraGuest); setVal('pBaseGuests', pr.baseGuests);
   setVal('pPeakPct', pr.peakPct); setVal('pLowPct', pr.lowPct);
@@ -314,6 +319,9 @@ function populateForm(cfg) {
   // Footer
   const ft = cfg.footer || {};
   setVal('eFooterTagline', ft.tagline); setVal('eFooterCopyright', ft.copyright);
+  // Social
+  const soc = cfg.social || {};
+  setVal('eSocialFacebook', soc.facebook || ''); setVal('eSocialInstagram', soc.instagram || ''); setVal('eSocialTwitter', soc.twitter || '');
   // Contact
   const ct = cfg.contact || {};
   setVal('eContactHeading', ct.heading); setVal('eContactSub', ct.subtitle);
@@ -350,6 +358,8 @@ function populateForm(cfg) {
    'pXmas','pBoxing','pNYE','pNYD','pGoodFri','pEasterSun','pMinWeekday','pMinWeekend','pMinPeak',
    'eHeroDesc','eStoryEyebrow','eStoryHeading','eStoryQuote','eStoryNearby','eStoryBadges',
    'eFooterTagline','eFooterCopyright',
+   'eSocialFacebook','eSocialInstagram','eSocialTwitter',
+   'eCheckinMethod','eCheckoutMethod',
    'eContactHeading','eContactSub','eContactEmail','eContactLocation','eContactResponse',
    'eLocHeading','eLocSub','eLocDesc','eLocMapUrl','eLocMapCaption'].forEach(id => {
     const el = document.getElementById(id);
@@ -362,10 +372,12 @@ function readForm() {
     property: { name: gVal('eName') || 'Property', tagline: gVal('eTagline'), description: gVal('eDescription'), bedrooms: nVal('eBedrooms'), bathrooms: nVal('eBathrooms'), guests: nVal('eMaxGuests'), rating: nVal('eRating') },
     houseRules: {
       checkin: gVal('eCheckin'), checkout: gVal('eCheckout'),
+      checkinMethod: gVal('eCheckinMethod'), checkoutMethod: gVal('eCheckoutMethod'),
       general: gVal('eRulesGeneral').split('\n').map(s => s.trim()).filter(Boolean),
       noise:   gVal('eRulesNoise').split('\n').map(s => s.trim()).filter(Boolean),
       smoking: gVal('eRulesSmoking').split('\n').map(s => s.trim()).filter(Boolean),
       pets:    gVal('eRulesPets').split('\n').map(s => s.trim()).filter(Boolean),
+      checkoutRules: gVal('eRulesCheckout').split('\n').map(s => s.trim()).filter(Boolean),
     },
     hero: { headline: gVal('eHeroHeadline'), subheadline: gVal('eHeroSub'), description: gVal('eHeroDesc'), photoUrl: gVal('eHeroPhoto') || null },
     pricing: {
@@ -387,6 +399,7 @@ function readForm() {
     },
     highlights: currentHighlights(),
     footer: { tagline: gVal('eFooterTagline'), copyright: gVal('eFooterCopyright') },
+    social: { facebook: gVal('eSocialFacebook'), instagram: gVal('eSocialInstagram'), twitter: gVal('eSocialTwitter') },
     contact: {
       heading: gVal('eContactHeading'), subtitle: gVal('eContactSub'),
       email: gVal('eContactEmail'), location: gVal('eContactLocation'),

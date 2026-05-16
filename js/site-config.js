@@ -354,7 +354,22 @@ export function applySiteConfig(cfg) {
   // ── Footer ──
   if (cfg.footer) {
     setEl('siteFooterTagline', cfg.footer.tagline);
-    setEl('siteFooterCopyright', cfg.footer.copyright);
+    let copyright = cfg.footer.copyright || '';
+    if (copyright) {
+      copyright = copyright.replace(/\b20\d{2}\b/, new Date().getFullYear());
+    }
+    setEl('siteFooterCopyright', copyright);
+  }
+
+  // ── Social media links ──
+  if (cfg.social) {
+    const links = document.querySelectorAll('.soc-btn');
+    const platforms = ['facebook', 'instagram', 'twitter'];
+    links.forEach((el, i) => {
+      const url = cfg.social[platforms[i]];
+      if (url && url !== '#') { el.href = url; el.style.display = ''; }
+      else { el.style.display = 'none'; }
+    });
   }
 
   // ── Contact page ──

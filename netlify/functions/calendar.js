@@ -3,10 +3,14 @@
 // Import into Airbnb to block direct-booking dates.
 // Exports dates only — no guest names/emails/phones.
 
+const { loadSiteConfig, getPropertyName } = require('./site-config-loader');
+
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID } = process.env;
 
 exports.handler = async () => {
   try {
+    const siteConfig = await loadSiteConfig();
+    const propName = getPropertyName(siteConfig);
     const url = `${SUPABASE_URL}/rest/v1/bookings?property_id=eq.${PROPERTY_ID}&platform=eq.Direct&status=neq.cancelled&select=checkin,checkout`;
     const res = await fetch(url, {
       headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` },
@@ -17,12 +21,13 @@ exports.handler = async () => {
     const events = ranges.map((r, i) => {
       const dtStart = r.checkin.replace(/-/g, '');
       const dtEnd   = r.checkout.replace(/-/g, '');
-      const uid     = `${r.checkin}-${r.checkout}-${i}@glenhaven-book.netlify.app`;
+      const domain = (process.env.URL || 'glenhaven-book.netlify.app').replace(/^https?:\/\//, '');
+      const uid     = `${r.checkin}-${r.checkout}-${i}@${domain}`;
       return [
         'BEGIN:VEVENT',
         `DTSTART;VALUE=DATE:${dtStart}`,
         `DTEND;VALUE=DATE:${dtEnd}`,
-        'SUMMARY:Glenhaven Direct Booking',
+        `SUMMARY:${propName} Direct Booking`,
         `UID:${uid}`,
         'END:VEVENT',
       ].join('\r\n');
@@ -31,8 +36,8 @@ exports.handler = async () => {
     const ical = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Glenhaven//Direct Bookings//EN',
-      'X-WR-CALNAME:Glenhaven Direct Bookings',
+      `PRODID:-//${propName}//Direct Bookings//EN`,
+      `X-WR-CALNAME:${propName} Direct Bookings`,
       'X-WR-TIMEZONE:Australia/Sydney',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
@@ -44,7 +49,7 @@ exports.handler = async () => {
       statusCode: 200,
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'inline; filename="glenhaven.ics"',
+        'Content-Disposition': `inline; filename="${propName.toLowerCase().replace(/\s+/g, '-')}.ics"`,
         'Cache-Control': 'no-cache, no-store',
       },
       body: ical,
