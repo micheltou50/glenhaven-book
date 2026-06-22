@@ -56,7 +56,7 @@ exports.handler = async (event) => {
     }
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${id}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ status }),
@@ -119,7 +119,7 @@ exports.handler = async (event) => {
     if (!id) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'id required' }) };
 
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${id}`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
       });

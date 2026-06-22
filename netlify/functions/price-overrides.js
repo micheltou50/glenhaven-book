@@ -48,13 +48,18 @@ exports.handler = async (event) => {
     if (!Array.isArray(overrides)) {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'overrides array required' }) };
     }
+    if (overrides.length > 1000) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Too many overrides in one request (max 1000).' }) };
+    }
+
+    const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
     try {
       const toUpsert = [];
       const toDelete = [];
 
       for (const o of overrides) {
-        if (!o.date) continue;
+        if (!o.date || !ISO_DATE.test(o.date)) continue;   // ignore malformed dates
         if (o.price === null || o.price === undefined || o.price === '') {
           toDelete.push(o.date);
         } else {
@@ -65,7 +70,7 @@ exports.handler = async (event) => {
       // Delete cleared overrides
       if (toDelete.length) {
         for (const d of toDelete) {
-          await fetch(`${SUPABASE_URL}/rest/v1/price_overrides?property_id=eq.${PROPERTY_ID}&date=eq.${d}`, {
+          await fetch(`${SUPABASE_URL}/rest/v1/price_overrides?property_id=eq.${PROPERTY_ID}&date=eq.${encodeURIComponent(d)}`, {
             method: 'DELETE',
             headers: sbHeaders,
           });

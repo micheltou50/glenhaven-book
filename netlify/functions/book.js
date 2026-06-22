@@ -2,7 +2,8 @@
 // 1. Checks availability in Supabase
 // 2. Creates Stripe Checkout session
 
-const { loadSiteConfig, getPropertyName, getCleaningFee } = require('./site-config-loader');
+const { loadSiteConfig, getPropertyName } = require('./site-config-loader');
+const { calcServerPrice } = require('./pricing');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, STRIPE_SECRET_KEY } = process.env;
 const SITE_URL = process.env.URL || 'https://glenhaven-book.netlify.app';
@@ -20,7 +21,7 @@ exports.handler = async (event) => {
   catch { return respond(400, { success: false, error: 'Invalid request body.' }); }
 
   const { checkIn, checkOut, nights, guestName, email, phone, guests, message, total, totalAmount, cleaningFee } = payload;
-  const chargeAmount = totalAmount || total;
+  const clientTotal = totalAmount || total;
   if (!checkIn || !checkOut || !nights || !guestName || !email || !guests || (!total && !totalAmount)) {
     return respond(200, { success: false, error: 'Missing required booking fields.' });
   }
@@ -41,9 +42,37 @@ exports.handler = async (event) => {
     return respond(200, { success: false, error: 'Could not verify availability. Please try again in a moment.' });
   }
 
-  // ── 2. Create Stripe Checkout session ──────────────────────
+  // ── 2. Recompute the price on the server ───────────────────
+  // The browser is never trusted for the amount. We recompute from the same
+  // config + price overrides the front-end uses, and reject if it disagrees.
   const siteConfig = await loadSiteConfig();
   const propName = getPropertyName(siteConfig);
+
+  let overrides = {};
+  try {
+    const ovUrl = `${SUPABASE_URL}/rest/v1/price_overrides?property_id=eq.${PROPERTY_ID}&select=date,price`;
+    const ovRes = await fetch(ovUrl, { headers: sbHeaders });
+    const ovRows = await ovRes.json();
+    if (Array.isArray(ovRows)) ovRows.forEach(r => { overrides[r.date] = parseFloat(r.price); });
+  } catch (err) {
+    console.warn('Price overrides fetch failed:', err.message);
+  }
+
+  const priced = calcServerPrice({ checkIn, checkOut, guests, cfg: siteConfig, overrides });
+  if (!priced) {
+    return respond(200, { success: false, error: 'Could not calculate a price for those dates. Please try again.' });
+  }
+  if (parseInt(guests) > priced.maxGuests) {
+    return respond(200, { success: false, error: `This property accommodates a maximum of ${priced.maxGuests} guests.` });
+  }
+
+  // Authoritative total. Reject if the browser's figure doesn't match (tampering,
+  // or the price changed since the page was loaded).
+  const chargeAmount = priced.total;
+  if (Math.abs(chargeAmount - Number(clientTotal)) > 1) {
+    console.warn(`Price mismatch — client=${clientTotal} server=${chargeAmount} (${checkIn}→${checkOut}, ${guests} guests)`);
+    return respond(200, { success: false, error: 'The price for these dates has changed. Please refresh the page and try again.' });
+  }
 
   const params = new URLSearchParams({
     'payment_method_types[]'                               : 'card',
@@ -63,8 +92,8 @@ exports.handler = async (event) => {
     'metadata[email]'      : email,
     'metadata[phone]'      : phone || '',
     'metadata[guests]'     : String(guests),
-    'metadata[total]'      : String(total),
-    'metadata[cleaningFee]': String(cleaningFee || getCleaningFee(siteConfig)),
+    'metadata[total]'      : String(chargeAmount),
+    'metadata[cleaningFee]': String(priced.cleaningFee),
     'metadata[message]'    : (message || '').slice(0, 500),
   });
 

@@ -13,7 +13,7 @@ const { preArrivalEmail, checkInEmail, postCheckoutEmail } = require('./email-te
 const { loadSiteConfig, getPropertyName, getEmailFrom, getRefPrefix } = require('./site-config-loader');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID,
-        RESEND_API_KEY, RESEND_FROM } = process.env;
+        RESEND_API_KEY, RESEND_FROM, CRON_SECRET } = process.env;
 const SITE_URL = process.env.URL || 'https://glenhaven-book.netlify.app';
 
 const sbHeaders = {
@@ -25,6 +25,21 @@ const sbHeaders = {
 exports.handler = async (event) => {
   if (!RESEND_API_KEY) {
     return { statusCode: 500, body: 'RESEND_API_KEY not set' };
+  }
+
+  // ── Auth ───────────────────────────────────────────────────
+  // Netlify's scheduled invocation carries a { next_run } body and is allowed.
+  // Any other (anonymous HTTP) caller must supply ?secret=CRON_SECRET or an
+  // x-cron-secret header, so this send routine can't be triggered by just
+  // anyone hitting the URL.
+  let isScheduled = false;
+  try { isScheduled = !!(event && event.body && JSON.parse(event.body).next_run); } catch (e) { /* not a scheduled body */ }
+  if (!isScheduled) {
+    const provided = (event.headers && (event.headers['x-cron-secret'] || event.headers['X-Cron-Secret']))
+      || (event.queryStringParameters && event.queryStringParameters.secret) || '';
+    if (!CRON_SECRET || provided !== CRON_SECRET) {
+      return { statusCode: 401, body: 'Unauthorized' };
+    }
   }
 
   // ── Date helpers ───────────────────────────────────────────
@@ -52,6 +67,8 @@ exports.handler = async (event) => {
   const siteConfig = await loadSiteConfig();
   const propName = getPropertyName(siteConfig);
   const emailFrom = getEmailFrom(siteConfig);
+  const contactEmail = (siteConfig && siteConfig.contact && siteConfig.contact.email) || 'info@stayops.com.au';
+  const unsubMailto = 'mailto:' + contactEmail + '?subject=' + encodeURIComponent('Unsubscribe');
 
   // ── Fetch property check-in info ───────────────────────────
   let checkInInfo = {};
@@ -95,7 +112,7 @@ exports.handler = async (event) => {
             siteUrl: SITE_URL,
             siteConfig,
           });
-          await sendEmail(bk.email, `Your ${propName} escape is one week away!`, html);
+          await sendEmail(emailFrom, bk.email, `Your ${propName} escape is one week away!`, html);
           await markSent(bk.id, sent, 'pre-arrival');
           results.sent.push({ id: bk.id, type: 'pre-arrival' });
         } catch (err) {
@@ -114,7 +131,7 @@ exports.handler = async (event) => {
             siteUrl: SITE_URL,
             siteConfig,
           });
-          await sendEmail(bk.email, `Check-in tomorrow — here's everything you need`, html);
+          await sendEmail(emailFrom, bk.email, `Check-in tomorrow — here's everything you need`, html);
           await markSent(bk.id, sent, 'check-in');
           results.sent.push({ id: bk.id, type: 'check-in' });
         } catch (err) {
@@ -132,7 +149,7 @@ exports.handler = async (event) => {
             siteUrl: SITE_URL,
             siteConfig,
           });
-          await sendEmail(bk.email, `Thanks for staying at ${propName}!`, html);
+          await sendEmail(emailFrom, bk.email, `Thanks for staying at ${propName}!`, html, { 'List-Unsubscribe': '<' + unsubMailto + '>' });
           await markSent(bk.id, sent, 'post-checkout');
           await storeReturnCode(bk.id, returnCode);
           results.sent.push({ id: bk.id, type: 'post-checkout', returnCode });
@@ -152,7 +169,7 @@ exports.handler = async (event) => {
 
 // ── Helpers ──────────────────────────────────────────────────
 
-async function sendEmail(to, subject, html) {
+async function sendEmail(from, to, subject, html, extraHeaders) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -160,10 +177,11 @@ async function sendEmail(to, subject, html) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: emailFrom,
+      from,
       to,
       subject,
       html,
+      ...(extraHeaders ? { headers: extraHeaders } : {}),
     }),
   });
   if (!res.ok) {

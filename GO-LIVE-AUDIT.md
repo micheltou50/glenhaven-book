@@ -8,10 +8,11 @@ Australian‑law compliance**. Items marked ✅ were fixed in this change set;
 items marked ⬜ are actions for you (some need decisions or external accounts I
 can't touch).
 
-> **Verdict:** Not safe to flip to "live" yet. There is **1 critical data leak
-> now fixed**, **1 high‑risk payment‑integrity bug still open**, and a handful
-> of Stripe/legal items below. Work the **🚦 Final checklist** at the bottom in
-> order.
+> **Verdict:** Close now. The critical data leak **and** the payment‑integrity
+> bug are fixed in code, along with the email‑trigger auth, Spam Act unsubscribe
+> and several hardening items. What remains is mostly **Stripe live‑mode setup**
+> (yours to do) plus filling the legal placeholders. Work the **🚦 Final
+> checklist** at the bottom in order.
 
 ---
 
@@ -41,26 +42,19 @@ in Stripe Checkout branding settings.
 
 ---
 
-## 2. 🔴 HIGH — Payment amount is trusted from the browser (open)
+## 2. ✅ FIXED — Payment amount is now computed server‑side
 
-`book.js` charges whatever total the browser sends:
-
-```
-const chargeAmount = totalAmount || total;          // book.js:23
-... 'unit_amount': String(Math.round(chargeAmount * 100))  // book.js:51
-```
-
-The price is computed client‑side (`js/pricing.js`) and POSTed to `/api/book`.
-A user can edit that request and **pay $1 for any stay** — the server never
-recomputes the price. Availability is checked server‑side (good), but the
-amount is not.
-
-**Recommended fix:** recompute the price on the server from `checkIn`,
-`checkOut`, guest count, your `site_config` pricing rules and `price_overrides`,
-and charge that — ignore any client‑supplied total (or reject if they disagree
-beyond rounding). This needs the pricing logic mirrored in the function. I can
-implement this next if you want; I left it out of this pass because it must be
-done carefully and tested against your real pricing rules.
+Previously `book.js` charged whatever total the browser sent, so a tampered
+request could **pay $1 for any stay**. Now a new `netlify/functions/pricing.js`
+mirrors the front‑end engine **exactly** (base/seasonal/weekend rates, holiday
+prices, per‑date overrides, length‑of‑stay discounts, extra‑guest fees) using
+UTC date math to avoid timezone drift. `book.js` recomputes the authoritative
+total from your `site_config` + `price_overrides`, validates the guest count
+against the maximum, and **rejects the booking if the browser's figure doesn't
+match** (tampering, or pricing that changed since the page loaded). Both the
+Stripe charge and the recorded booking use the server total. (Verified against
+hand‑calculated cases incl. weekend surcharges, low season, LOS discounts,
+overrides and holidays.)
 
 ---
 
@@ -83,7 +77,7 @@ Consolidated from every function. Make sure all of these are set for
 | `ADMIN_PASSWORD` | config, bookings, price‑overrides, reviews, upload, scrape‑reviews | Admin auth. Use a long, random value. |
 | `URL` | book, webhook, calendar, email‑sequence | Netlify usually sets this; verify it's your real domain. |
 | `AIRBNB_ICAL_URL` | availability.js | Optional/legacy; iCal feeds can also live in site config. |
-| `CRON_SECRET` | _referenced but not implemented_ | See §4.3. |
+| `CRON_SECRET` | email-sequence.js | Optional. Lets you manually trigger the email cron via `?secret=…`. Scheduled runs work without it. |
 
 > `js/pages/admin.js` also references `APPS_SCRIPT_URL` in its built‑in checklist
 > — that looks like a leftover from an older Google‑Apps‑Script backend and is
@@ -102,28 +96,27 @@ Consolidated from every function. Make sure all of these are set for
   guest list as potentially already exposed (see §5.5 on the Notifiable Data
   Breaches scheme) and rotate `ADMIN_PASSWORD`.
 
-### 4.2 🔴/🟠 Still open — recommended before go‑live
-- **🔴 HIGH — Client‑trusted payment amount.** See §2.
-- **🟠 HIGH — `/api/email-sequence` has no auth.** The header comment claims a
-  `CRON_SECRET` check but none is implemented, so anyone can trigger your email
-  routine. _Caveat:_ it's also your scheduled (cron) function, so the fix must
-  allow Netlify's scheduled invocation while rejecting anonymous HTTP calls —
-  don't just bolt on a required secret or you'll break the daily send. Happy to
-  implement this safely.
-- **🟠 HIGH — `/api/scrape-reviews` SSRF.** Fetches an admin‑supplied URL
-  server‑side with no host/scheme allow‑list. Admin‑gated, so lower urgency, but
-  add an allow‑list (airbnb/booking/vrbo hosts, `https` only) — or drop the
-  feature for launch.
-- **🟠 MEDIUM — Public review enumeration.** `/api/submit-review?ref=…` returns a
-  guest's name + stay dates for any return code; codes are short, `Math.random`‑
-  based and unthrottled, so they're brute‑forceable. Add rate limiting and/or
-  longer, crypto‑random codes.
+### 4.2 Security fixes — this round
+- **✅ Client‑trusted payment amount** — fixed (see §2).
+- **✅ `/api/email-sequence` open trigger** — now runs only for Netlify's
+  scheduled invocation (detected via the `next_run` body) or when a correct
+  `?secret=CRON_SECRET` / `x-cron-secret` is supplied. The scheduled daily send
+  keeps working untouched. _Also_ fixed a latent bug where the entire sequence
+  threw `emailFrom is not defined` and silently sent **nothing** — your
+  pre‑arrival / check‑in / post‑checkout emails weren't actually going out.
+- **✅ `/api/scrape-reviews` SSRF** — now parses the URL, requires `https`, and
+  only fetches allow‑listed Airbnb / Booking.com / VRBO hostnames (so e.g.
+  `https://169.254.169.254/?x=airbnb.` and `airbnb.evil.com` are rejected).
+- **🟠 MEDIUM — Public review enumeration (still open).** `/api/submit-review?ref=…`
+  returns a guest name + stay dates for any return code; codes are short and
+  unthrottled, so brute‑forceable. Add rate limiting and/or longer, crypto‑random
+  codes. Lower priority — happy to do it.
 
 ### 4.3 🟡 Medium / Low
-- **PostgREST filter injection** via un‑encoded interpolation in
-  `price-overrides.js` (`date`) and `reviews.js` (`id`) — admin‑gated, but wrap
-  values in `encodeURIComponent`.
-- **Unbounded loop** in `price-overrides.js` (one DELETE per array item, no cap).
+- **✅ PostgREST filter injection** — `price-overrides.js` (`date`) and
+  `reviews.js` (`id`) now validate / `encodeURIComponent` their filter values.
+- **✅ Unbounded loop** — `price-overrides.js` now caps a request at 1000 items
+  and ignores malformed dates.
 - **PII in logs** — `email-sequence.js` logs full booking objects (names/emails).
 - **Internal error messages** (`err.message`, raw Supabase text) are returned to
   clients on 5xx across several functions — fine to tidy.
@@ -164,13 +157,12 @@ The footer "Privacy"/"Terms" links were dead (`href="#"`). Now every page links
 to the new pages, and the **booking page requires agreement** to Terms / House
 Rules / Cancellation / Privacy at checkout (improves enforceability).
 
-### 5.4 🟠 Spam Act 2003 — unsubscribe still required
-Your post‑checkout email includes a **"come back for 10% off" marketing offer**
-(`email-templates.js`) but **no unsubscribe**. The Spam Act requires a functional
-unsubscribe on commercial/marketing email. **Action:** add a `List-Unsubscribe`
-header + a visible unsubscribe link (even a `mailto:` opt‑out is acceptable if
-you honour it within 5 business days). Transactional emails (confirmation,
-access code) are fine as‑is. I can add this.
+### 5.4 ✅ Spam Act 2003 — unsubscribe added
+The post‑checkout marketing email ("come back for 10% off") now includes a
+visible **Unsubscribe** link plus a `List-Unsubscribe` header (a `mailto:`
+opt‑out to your contact address). Transactional emails (confirmation, access
+code) are unaffected. **Action:** honour any opt‑out within 5 business days. If
+your volume grows, consider a one‑click HTTP unsubscribe + suppression list.
 
 ### 5.5 🟠 Privacy Act — breach‑readiness
 Because `/api/bookings` was world‑readable (now fixed), be aware of the
@@ -206,10 +198,10 @@ document the fix date and rotate `ADMIN_PASSWORD`.
 1. ⬜ Activate Stripe; set **live** `STRIPE_SECRET_KEY`.
 2. ⬜ Create live webhook → set `STRIPE_WEBHOOK_SECRET`.
 3. ⬜ Set/verify **all** env vars in §3 (esp. `RESEND_FROM` verified domain, `URL`).
-4. ⬜ **Fix the client‑trusted price** (§2) — or accept the risk knowingly.
-5. ⬜ Decide on `/api/email-sequence` auth + Spam Act unsubscribe (§4.2, §5.4).
-6. ⬜ Fill legal placeholders in `terms.html` + `privacy.html`; lawyer review.
-7. ⬜ Rotate `ADMIN_PASSWORD` (was effectively exposed via the bookings leak).
-8. ⬜ Do one **real end‑to‑end paid booking test** and verify DB + emails + calendar.
-9. ⬜ Confirm STRA registration, insurance, GST status.
-10. ✅ Critical PII leak closed · Terms + Privacy live · legal links wired · checkout consent added.
+4. ✅ Client‑trusted price fixed (§2); email‑sequence auth + Spam Act unsubscribe done (§4.2, §5.4); SSRF + filter hardening done.
+5. ⬜ Fill legal placeholders in `terms.html` + `privacy.html`; lawyer review.
+6. ⬜ Rotate `ADMIN_PASSWORD` (was effectively exposed via the bookings leak).
+7. ⬜ Do one **real end‑to‑end paid booking test** and verify DB + emails + calendar.
+8. ⬜ Confirm STRA registration, insurance, GST status.
+9. ⬜ (Optional) set `CRON_SECRET` for manual email triggering; add review‑endpoint rate limiting later.
+10. ✅ Critical PII leak closed · price tampering closed · Terms + Privacy live · legal links wired · checkout consent · email auth + unsubscribe.

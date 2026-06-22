@@ -440,6 +440,8 @@ function postCheckoutEmail({ guestName, returnCode, siteUrl, siteConfig }) {
   const cfg = siteConfig || {};
   const BRAND = buildBrand(cfg);
   const propName = getPropertyName(cfg);
+  const contactEmail = (cfg.contact && cfg.contact.email) || 'info@stayops.com.au';
+  const unsubUrl = 'mailto:' + contactEmail + '?subject=' + encodeURIComponent('Unsubscribe from ' + propName + ' offers');
 
   return `
 <!DOCTYPE html>
@@ -470,6 +472,11 @@ ${header(cfg)}
       <p style="margin:10px 0 0;font-size:12px;color:${BRAND.light};">at ${siteUrl || ''}</p>
     </td></tr>
   </table>
+</td></tr>
+
+<tr><td style="padding:0 32px 18px;text-align:center;font-size:11px;color:${BRAND.light};line-height:1.6;">
+  You're receiving this offer because you recently stayed at ${propName}.<br/>
+  <a href="${unsubUrl}" style="color:${BRAND.light};text-decoration:underline;">Unsubscribe from marketing emails</a>
 </td></tr>
 
 ${footer(siteUrl, cfg)}

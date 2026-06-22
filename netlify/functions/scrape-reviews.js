@@ -26,12 +26,24 @@ exports.handler = async (event) => {
   const { url } = body;
   if (!url) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'url required' }) };
 
-  try {
-    let platform = 'unknown';
-    if (/airbnb\./i.test(url)) platform = 'airbnb';
-    else if (/booking\.com/i.test(url)) platform = 'booking';
-    else if (/vrbo\.|homeaway\./i.test(url)) platform = 'vrbo';
+  // ── Validate URL & restrict to allow-listed OTA hosts (SSRF guard) ──
+  // Match on the parsed hostname, not a substring, so URLs like
+  // https://169.254.169.254/?x=airbnb. can't reach internal/metadata endpoints.
+  let parsedUrl;
+  try { parsedUrl = new URL(url); } catch { return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid URL.' }) }; }
+  if (parsedUrl.protocol !== 'https:') {
+    return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Only https URLs are allowed.' }) };
+  }
+  const host = parsedUrl.hostname.toLowerCase();
+  // Brand must be the registrable domain (optionally with a 2-level ccTLD like
+  // com.au / co.uk), so airbnb.evil.com is rejected.
+  let platform = 'unknown';
+  if (/(^|\.)airbnb\.((com|co|net|org)\.)?[a-z]{2,}$/.test(host)) platform = 'airbnb';
+  else if (/(^|\.)booking\.com$/.test(host)) platform = 'booking';
+  else if (/(^|\.)(vrbo|homeaway)\.((com|co|net|org)\.)?[a-z]{2,}$/.test(host)) platform = 'vrbo';
+  else return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Only Airbnb, Booking.com or VRBO listing URLs are allowed.' }) };
 
+  try {
     let reviews = [];
 
     if (platform === 'airbnb') {
