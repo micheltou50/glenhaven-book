@@ -152,7 +152,8 @@ let sortCol = 'checkIn', sortAsc = false;
 
 async function loadAdminBookings() {
   try {
-    const res  = await fetch('/api/bookings');
+    const res  = await fetch('/api/bookings', { headers: { 'x-admin-password': adminPassword } });
+    if (res.status === 401) { console.warn('loadAdminBookings: unauthorized'); allBK = []; return; }
     const data = await res.json();
     if (data.success && Array.isArray(data.bookings)) {
       allBK = data.bookings;
