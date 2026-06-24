@@ -23,9 +23,9 @@
   to     = "/.netlify/functions/contact-submit"
   status = 200
 
-# /guest-offer → hidden returning-guest discount page (reachable by URL/QR only,
-# not linked anywhere in the site nav)
+# /welcome-back → hidden returning-guest discount page (reachable by URL/QR only,
+# not linked anywhere in the site nav). Internal file stays guest-offer.html.
 [[redirects]]
-  from   = "/guest-offer"
+  from   = "/welcome-back"
   to     = "/guest-offer.html"
   status = 200

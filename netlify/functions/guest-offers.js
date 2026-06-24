@@ -1,5 +1,5 @@
 // ── /api/guest-offers ────────────────────────────────────────
-// Returning-guest 5%-off signups (hidden /guest-offer page).
+// Returning-guest 5%-off signups (hidden /welcome-back page).
 //   POST  (public) → store a signup and auto-verify against real bookings.
 //                    Match    → approve, email the code, FYI the owner.
 //                    No match → pending, email "we're confirming your stay",
