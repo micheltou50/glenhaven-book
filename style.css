@@ -44,7 +44,9 @@ p { line-height: 1.65; color: var(--g600); }
 .eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--green); display: block; margin-bottom: .55rem; }
 
 /* NAV */
-.navbar { position: sticky; top: 0; z-index: 500; height: 70px; background: rgba(255,255,255,.97); backdrop-filter: blur(16px); border-bottom: 1px solid var(--g200); display: flex; align-items: center; }
+/* NB: no backdrop-filter here — it makes .navbar the containing block for the
+   position:fixed mobile menu (.nav-links.open), collapsing it to 0 height. */
+.navbar { position: sticky; top: 0; z-index: 500; height: 70px; background: rgba(255,255,255,.97); border-bottom: 1px solid var(--g200); display: flex; align-items: center; }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .nav-logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -.04em; }
 .nav-logo em { font-style: normal; color: var(--green); }
