@@ -140,10 +140,19 @@ exports.handler = async (event) => {
       headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
       body: JSON.stringify(booking),
     });
-    if (!res.ok) throw new Error('Supabase returned ' + res.status);
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('Supabase write failed:', res.status, errBody);
+      // Return non-2xx so Stripe marks the delivery failed, retries (~3 days)
+      // and surfaces it in the dashboard — instead of silently losing a PAID
+      // booking and telling the guest "confirmed". The idempotency check above
+      // makes retries safe (no duplicate row).
+      return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'booking_write_failed', status: res.status }) };
+    }
     console.log('Booking confirmed:', meta.checkIn, '→', meta.checkOut, 'for', meta.guestName);
   } catch (err) {
     console.error('Supabase write failed:', err.message);
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'booking_write_exception' }) };
   }
 
   // ── Calculate cancellation deadline (48 hours from now, only if check-in is 14+ days away) ───
