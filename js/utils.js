@@ -22,7 +22,13 @@ export function hexToRgba(hex, alpha) {
 export function toISO(date) {
   if (!date) return '';
   const d = new Date(date);
-  return d.toISOString().split('T')[0];
+  // Use LOCAL date parts — NOT toISOString(), which is UTC. A locally-built date
+  // like new Date(2026,5,26) is "2026-06-25" in UTC+ zones (e.g. AEST), which
+  // shifted the calendar's availability by a day and exposed booked check-in nights.
+  const y   = d.getFullYear();
+  const m   = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 export function todayISO() {
