@@ -76,9 +76,9 @@
 
   <!-- Success state -->
   <div class="of-success" id="offerSuccess">
-    <div style="font-size:2.5rem;margin-bottom:.75rem;">🎉</div>
-    <h2>You're in!</h2>
-    <p>Thanks! We'll confirm your stay and email your unique 5% discount code to the address you provided — usually within a day.</p>
+    <div style="font-size:2.5rem;margin-bottom:.75rem;" id="ofEmoji">🎉</div>
+    <h2 id="ofSuccessTitle">You're in!</h2>
+    <p id="ofSuccessMsg">Thanks! We'll confirm your stay and email your unique 5% discount code to the address you provided — usually within a day.</p>
     <a href="index.html" class="btn btn-white" style="margin-top:1.5rem;display:inline-block;" id="ofBackLink">Back to Glenhaven</a>
   </div>
 </div>
@@ -125,6 +125,12 @@
         btn.disabled = false; btn.textContent = 'Get my 5% code';
         return;
       }
+      const verified = data.verified;
+      document.getElementById('ofEmoji').textContent = verified ? '🎉' : '✅';
+      document.getElementById('ofSuccessTitle').textContent = verified ? 'Your code is on its way!' : "Thanks — we've got your request!";
+      document.getElementById('ofSuccessMsg').textContent = verified
+        ? 'We matched your stay and just emailed your unique 5% discount code — check your inbox!'
+        : "We're just confirming the details of your stay. Your unique 5% code will arrive by email shortly — usually within a day.";
       document.getElementById('offerForm').style.display = 'none';
       document.getElementById('offerSuccess').classList.add('show');
       window.scrollTo({ top: 0, behavior: 'smooth' });

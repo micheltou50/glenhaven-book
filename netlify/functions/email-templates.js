@@ -580,10 +580,189 @@ ${footer(siteUrl, cfg)}
 </body></html>`;
 }
 
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GUEST OFFER 1 — Returning-guest reward (the 5% code)
+// Sent on auto-verify, or when the host approves a signup in admin.
+// ═══════════════════════════════════════════════════════════════
+function guestOfferCodeEmail({ guestName, promoCode, discountPct, expiresAt, siteUrl, siteConfig }) {
+  const cfg = siteConfig || {};
+  const BRAND = buildBrand(cfg);
+  const propName = getPropertyName(cfg);
+  const pct = discountPct || 5;
+  const bookUrl = (siteUrl || '') + '/booking.html';
+  const expiryNice = expiresAt ? fmtDate(expiresAt) : '';
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/></head>
+<body style="margin:0;padding:0;background:${BRAND.linen};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};">
+<tr><td align="center" style="padding:24px 16px;">
+<table width="520" cellpadding="0" cellspacing="0" style="background:${BRAND.cream};border-radius:8px;overflow:hidden;border:1px solid ${BRAND.border};max-width:100%;">
+
+${header(cfg)}
+
+<tr><td style="background:${BRAND.green};padding:14px 32px;">
+  <p style="margin:0;font-size:14px;color:#fff;font-weight:bold;">&#10003; Your returning-guest reward</p>
+</td></tr>
+
+<tr><td style="padding:28px 32px 8px;">
+  <p style="margin:0 0 6px;font-size:22px;color:${BRAND.bark};font-family:Georgia,serif;">Thank you, ${esc(guestName)}!</p>
+  <p style="margin:0;font-size:14px;color:${BRAND.text};line-height:1.65;">It was a pleasure hosting you at ${propName}. As a thank-you, here's <strong>${pct}% off</strong> your next stay when you book directly with us.</p>
+</td></tr>
+
+<tr><td style="padding:22px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};border:1px dashed ${BRAND.green};border-radius:10px;">
+    <tr><td style="padding:24px;text-align:center;">
+      <p style="margin:0 0 10px;font-size:10px;color:${BRAND.faint};letter-spacing:2px;">YOUR ${pct}% CODE</p>
+      <div style="display:inline-block;background:${BRAND.bark};color:#fff;border-radius:8px;padding:12px 28px;font-family:monospace;font-size:20px;font-weight:bold;letter-spacing:4px;">${esc(promoCode)}</div>
+      ${expiryNice ? `<p style="margin:14px 0 0;font-size:12px;color:${BRAND.muted};">Valid until <strong style="color:${BRAND.bark};">${expiryNice}</strong> &middot; one use</p>` : ''}
+    </td></tr>
+  </table>
+</td></tr>
+
+<tr><td style="padding:0 32px 8px;">
+  <p style="margin:0 0 12px;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">HOW TO USE IT</p>
+  <p style="margin:0 0 7px;font-size:13px;color:${BRAND.text};line-height:1.6;">1. Head to our booking page and choose your dates.</p>
+  <p style="margin:0 0 7px;font-size:13px;color:${BRAND.text};line-height:1.6;">2. Enter <strong>${esc(promoCode)}</strong> in the discount field at checkout.</p>
+  <p style="margin:0;font-size:13px;color:${BRAND.text};line-height:1.6;">3. ${pct}% comes off your total automatically.</p>
+</td></tr>
+
+<tr><td style="padding:22px 32px 24px;text-align:center;">
+  ${btn('Book your next stay', bookUrl, true, cfg)}
+</td></tr>
+
+<tr><td style="padding:16px 32px;background:${BRAND.linen};font-size:13px;color:${BRAND.muted};line-height:1.6;">
+  Booking direct means no platform fees &mdash; always the best rate, straight with us. We'd love to have you back.
+</td></tr>
+
+${footer(siteUrl, cfg)}
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GUEST OFFER 2 — Request received / under review (no auto-match)
+// ═══════════════════════════════════════════════════════════════
+function guestOfferPendingEmail({ guestName, siteUrl, siteConfig }) {
+  const cfg = siteConfig || {};
+  const BRAND = buildBrand(cfg);
+  const propName = getPropertyName(cfg);
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/></head>
+<body style="margin:0;padding:0;background:${BRAND.linen};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};">
+<tr><td align="center" style="padding:24px 16px;">
+<table width="520" cellpadding="0" cellspacing="0" style="background:${BRAND.cream};border-radius:8px;overflow:hidden;border:1px solid ${BRAND.border};max-width:100%;">
+
+${header(cfg)}
+
+<tr><td style="padding:28px 32px 8px;">
+  <p style="margin:0 0 4px;font-size:12px;color:${BRAND.green};font-weight:bold;letter-spacing:1px;">REQUEST RECEIVED</p>
+  <p style="margin:0 0 16px;font-size:22px;color:${BRAND.bark};font-family:Georgia,serif;">Thank you, ${esc(guestName)}!</p>
+  <p style="margin:0 0 16px;font-size:14px;color:${BRAND.text};line-height:1.65;">Thanks for requesting your returning-guest discount. We're just confirming the details of your stay &mdash; once that's done, your unique discount code will land in your inbox.</p>
+  <p style="margin:0;font-size:14px;color:${BRAND.text};line-height:1.65;">This usually takes less than a day. We appreciate your patience, and we can't wait to welcome you back to ${propName}.</p>
+</td></tr>
+
+<tr><td style="padding:20px 32px 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};border-radius:8px;">
+    <tr><td style="padding:18px 22px;font-size:13px;color:${BRAND.muted};line-height:1.6;">
+      Made a typo, or have a question about your stay? Just reply to this email and we'll sort it out.
+    </td></tr>
+  </table>
+</td></tr>
+
+${footer(siteUrl, cfg)}
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GUEST OFFER 3 — Host notification (auto-sent FYI, or needs review)
+// ═══════════════════════════════════════════════════════════════
+function guestOfferHostEmail({ guestName, email, phone, checkinDate, newsletter, autoApproved, promoCode, siteUrl, siteConfig }) {
+  const cfg = siteConfig || {};
+  const BRAND = buildBrand(cfg);
+  const adminUrl = (siteUrl || '') + '/admin.html';
+  const barColor = autoApproved ? BRAND.green : '#b45309';
+  const barText = autoApproved ? '&#10003; Verified &middot; code auto-sent' : '&#9888; Needs your review';
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/></head>
+<body style="margin:0;padding:0;background:${BRAND.linen};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};">
+<tr><td align="center" style="padding:24px 16px;">
+<table width="520" cellpadding="0" cellspacing="0" style="background:${BRAND.cream};border-radius:8px;overflow:hidden;border:1px solid ${BRAND.border};max-width:100%;">
+
+${header(cfg)}
+
+<tr><td style="background:${barColor};padding:14px 32px;">
+  <p style="margin:0;font-size:14px;color:#fff;font-weight:bold;">${barText}</p>
+</td></tr>
+
+<tr><td style="padding:28px 32px 8px;">
+  <p style="margin:0 0 6px;font-size:22px;color:${BRAND.bark};font-family:Georgia,serif;">${esc(guestName)} requested a code</p>
+  <p style="margin:0;font-size:14px;color:${BRAND.text};line-height:1.65;">${autoApproved
+    ? `We matched this to a real stay and automatically emailed them code <strong>${esc(promoCode)}</strong>. No action needed.`
+    : `We couldn't automatically match this to a booking. Review the details and approve in the admin panel if it's legitimate.`}</p>
+</td></tr>
+
+<tr><td style="padding:20px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.linen};border-radius:8px;">
+    <tr>
+      <td style="padding:16px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">NAME</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${esc(guestName)}</p>
+      </td>
+      <td style="padding:16px 24px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">CHECK-IN GIVEN</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${esc(checkinDate || '—')}</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 24px 16px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">EMAIL</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${esc(email || '—')}</p>
+      </td>
+      <td style="padding:0 24px 16px;" width="50%">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">PHONE</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${esc(phone || '—')}</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 24px 16px;">
+        <p style="margin:0;font-size:10px;color:${BRAND.faint};letter-spacing:1px;">NEWSLETTER OPT-IN</p>
+        <p style="margin:4px 0 0;font-size:13px;color:${BRAND.bark};font-weight:bold;">${newsletter ? 'Yes' : 'No'}</p>
+      </td>
+      <td style="padding:0 24px 16px;"></td>
+    </tr>
+  </table>
+</td></tr>
+
+${autoApproved ? '' : `<tr><td style="padding:0 32px 24px;text-align:center;">${btn('Review in admin', adminUrl, true, cfg)}</td></tr>`}
+
+${footer(siteUrl, cfg)}
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
 module.exports = {
   confirmationEmail,
   hostNotificationEmail,
   preArrivalEmail,
   checkInEmail,
   postCheckoutEmail,
+  guestOfferCodeEmail,
+  guestOfferPendingEmail,
+  guestOfferHostEmail,
 };

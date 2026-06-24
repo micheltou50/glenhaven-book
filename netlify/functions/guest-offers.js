@@ -1,12 +1,16 @@
 // ── /api/guest-offers ────────────────────────────────────────
 // Returning-guest 5%-off signups (hidden /guest-offer page).
-//   POST  (public) → store a signup as 'pending' + notify the owner by email
+//   POST  (public) → store a signup and auto-verify against real bookings.
+//                    Match    → approve, email the code, FYI the owner.
+//                    No match → pending, email "we're confirming your stay",
+//                               and ask the owner to review in admin.
 //   GET   (admin)  → list all signups
-//   PATCH (admin)  → approve (generate + email a unique promo code) or reject
+//   PATCH (admin)  → approve (generate + email a unique code) or reject
 //
 // Admin calls carry an x-admin-password header (same scheme as /api/reviews).
 
 const { loadSiteConfig, getEmailFrom, getRefPrefix, getPropertyName } = require('./site-config-loader');
+const { guestOfferCodeEmail, guestOfferPendingEmail, guestOfferHostEmail } = require('./email-templates');
 const crypto = require('crypto');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, ADMIN_PASSWORD,
@@ -29,14 +33,14 @@ const corsHeaders = {
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: corsHeaders, body: '' };
 
-  // ── POST — public signup ───────────────────────────────────
+  // ── POST — public signup (with auto-verification) ──────────
   if (event.httpMethod === 'POST') {
     let body;
     try { body = JSON.parse(event.body); }
     catch { return respond(400, { success: false, error: 'Invalid request.' }); }
 
     // Honeypot: real guests never fill this; bots that do get a silent OK.
-    if ((body.company || '').trim()) return respond(200, { success: true });
+    if ((body.company || '').trim()) return respond(200, { success: true, verified: false });
 
     const name        = (body.name || '').trim();
     const email       = (body.email || '').trim();
@@ -51,6 +55,17 @@ exports.handler = async (event) => {
       return respond(200, { success: false, error: 'Please enter a valid email address.' });
     }
 
+    // Auto-verify: does this match a real, non-cancelled stay?
+    const verified = await verifyAgainstBookings({ name, email, checkinDate });
+
+    const cfg = await loadSiteConfig();
+    let code = null, expires = null, status = 'pending';
+    if (verified) {
+      code = generatePromoCode(cfg);
+      expires = isoDatePlusMonths(12);
+      status = 'approved';
+    }
+
     const row = {
       property_id: PROPERTY_ID,
       guest_name: name,
@@ -58,9 +73,14 @@ exports.handler = async (event) => {
       phone,
       checkin_date: checkinDate,
       newsletter_opt_in: newsletter,
-      status: 'pending',
+      status,
+      promo_code: code,
+      discount_pct: 5,
+      expires_at: expires,
+      approved_at: verified ? new Date().toISOString() : null,
     };
 
+    let offer;
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/guest_offers`, {
         method: 'POST',
@@ -72,16 +92,21 @@ exports.handler = async (event) => {
         return respond(200, { success: false, error: 'Could not save your details. Please try again.' });
       }
       const created = await res.json();
-      const offer = Array.isArray(created) ? created[0] : created;
-
-      // Notify the owner — best effort; never fail the signup over a mail hiccup.
-      await notifyOwner(offer).catch(e => console.error('[guest-offers] owner email failed:', e.message));
-
-      return respond(200, { success: true });
+      offer = Array.isArray(created) ? created[0] : created;
     } catch (err) {
       console.error('[guest-offers] POST', err.message);
       return respond(200, { success: false, error: 'Could not save your details. Please try again.' });
     }
+
+    // Emails are best effort — never fail the signup over a mail hiccup.
+    if (verified) {
+      await emailGuestCode(offer, cfg).catch(e => console.error('[guest-offers] guest code email failed:', e.message));
+    } else {
+      await emailGuestPending(offer, cfg).catch(e => console.error('[guest-offers] guest pending email failed:', e.message));
+    }
+    await notifyOwner(offer, cfg, verified).catch(e => console.error('[guest-offers] owner email failed:', e.message));
+
+    return respond(200, { success: true, verified });
   }
 
   // ── GET — admin list ───────────────────────────────────────
@@ -112,7 +137,6 @@ exports.handler = async (event) => {
       return respond(400, { error: 'id and action (approve/reject) required' });
     }
 
-    // Load the target signup (scoped to this property).
     let offer;
     try {
       const res = await fetch(
@@ -132,8 +156,7 @@ exports.handler = async (event) => {
       return respond(200, { success: true, status: 'rejected' });
     }
 
-    // ── approve ──
-    // Already has a code → just (re)send it, don't mint a new one.
+    // approve — mint a code if needed, then email it
     const cfg = await loadSiteConfig();
     let code = offer.promo_code;
     let expires = offer.expires_at;
@@ -156,7 +179,6 @@ exports.handler = async (event) => {
       await patchOffer(id, { status: 'approved' });
     }
 
-    // Email the guest their code.
     try {
       await emailGuestCode({ ...offer, promo_code: code, expires_at: expires }, cfg);
     } catch (err) {
@@ -186,6 +208,37 @@ function patchOffer(id, fields) {
   });
 }
 
+// Auto-verify a signup against real stays. A match is either an exact email
+// match, or the same check-in date with a compatible name. Fails closed (returns
+// false → manual review) on any error, so a DB blip never auto-issues a code.
+async function verifyAgainstBookings({ name, email, checkinDate }) {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/bookings?property_id=eq.${PROPERTY_ID}&status=neq.cancelled&select=guest_name,checkin,email`;
+    const res = await fetch(url, { headers: sbHeaders });
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return false;
+
+    const em = (email || '').trim().toLowerCase();
+    const nm = normalizeName(name);
+
+    return rows.some(b => {
+      if (em && (b.email || '').trim().toLowerCase() === em) return true;
+      if (checkinDate && b.checkin && String(b.checkin).slice(0, 10) === checkinDate) {
+        const bn = normalizeName(b.guest_name);
+        if (bn && nm && (bn === nm || bn.includes(nm) || nm.includes(bn))) return true;
+      }
+      return false;
+    });
+  } catch (err) {
+    console.error('[guest-offers] verify failed:', err.message);
+    return false;
+  }
+}
+
+function normalizeName(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function generatePromoCode(cfg) {
   // Crypto-random, unambiguous alphabet (no 0/O/1/I). 8 chars ≈ 10^12 space.
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -213,50 +266,48 @@ async function sendEmail(from, to, subject, html, replyTo) {
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
 }
 
-async function notifyOwner(offer) {
-  if (!RESEND_API_KEY || !HOST_EMAIL) { console.warn('[guest-offers] owner notify skipped — email not configured'); return; }
-  const cfg = await loadSiteConfig();
-  const from = getEmailFrom(cfg);
-  const adminUrl = `${SITE_URL}/admin.html`;
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;">
-    <h2 style="color:#14532d;">New returning-guest discount signup</h2>
-    <p>A guest requested their 5% returning-guest code. Review and approve in the admin panel to send it.</p>
-    <table cellpadding="6" style="border-collapse:collapse;">
-      <tr><td><strong>Name</strong></td><td>${esc(offer.guest_name)}</td></tr>
-      <tr><td><strong>Email</strong></td><td>${esc(offer.email)}</td></tr>
-      <tr><td><strong>Phone</strong></td><td>${esc(offer.phone || '—')}</td></tr>
-      <tr><td><strong>Check-in date given</strong></td><td>${esc(offer.checkin_date || '—')}</td></tr>
-      <tr><td><strong>Newsletter opt-in</strong></td><td>${offer.newsletter_opt_in ? 'Yes' : 'No'}</td></tr>
-    </table>
-    <p style="margin-top:16px;"><a href="${adminUrl}" style="background:#16a34a;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;display:inline-block;">Open admin → Guest offers</a></p>
-    <p style="color:#888;font-size:12px;">Approve to generate a unique code and email it to the guest. Reject to discard.</p>
-  </div>`;
-  await sendEmail(from, HOST_EMAIL, `New guest discount signup — ${offer.guest_name}`, html, offer.email);
-}
-
 async function emailGuestCode(offer, cfg) {
   if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY not set');
-  const from = getEmailFrom(cfg);
   const propName = getPropertyName(cfg);
-  const bookUrl = `${SITE_URL}/booking.html`;
-  const expiryNice = offer.expires_at
-    ? new Date(offer.expires_at + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '';
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#222;">
-    <h2 style="color:#14532d;">Thanks for staying at ${esc(propName)}! 🌿</h2>
-    <p>Here's your <strong>5% off</strong> code for your next direct booking with us:</p>
-    <div style="background:#f0fdf4;border:1px dashed #16a34a;border-radius:10px;padding:18px;text-align:center;margin:18px 0;">
-      <div style="font-size:24px;font-weight:800;letter-spacing:2px;color:#14532d;">${esc(offer.promo_code)}</div>
-    </div>
-    <p>To use it, book directly at <a href="${bookUrl}">${esc(propName)}</a> and enter this code at checkout — 5% comes off your total automatically.</p>
-    ${expiryNice ? `<p style="color:#555;">Valid until <strong>${expiryNice}</strong>. One use per code.</p>` : ''}
-    <p style="color:#888;font-size:12px;margin-top:24px;">Booking direct means no platform fees — the best rate you'll find. See you again soon!</p>
-  </div>`;
-  await sendEmail(from, offer.email, `Your 5% off code for ${propName}`, html);
+  const html = guestOfferCodeEmail({
+    guestName: offer.guest_name,
+    promoCode: offer.promo_code,
+    discountPct: offer.discount_pct || 5,
+    expiresAt: offer.expires_at,
+    siteUrl: SITE_URL,
+    siteConfig: cfg,
+  });
+  await sendEmail(getEmailFrom(cfg), offer.email, `Your ${offer.discount_pct || 5}% off code for ${propName}`, html);
 }
 
-function esc(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+async function emailGuestPending(offer, cfg) {
+  if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY not set');
+  const propName = getPropertyName(cfg);
+  const html = guestOfferPendingEmail({
+    guestName: offer.guest_name,
+    siteUrl: SITE_URL,
+    siteConfig: cfg,
+  });
+  await sendEmail(getEmailFrom(cfg), offer.email, `We've received your request — ${propName}`, html);
+}
+
+async function notifyOwner(offer, cfg, autoApproved) {
+  if (!RESEND_API_KEY || !HOST_EMAIL) { console.warn('[guest-offers] owner notify skipped — email not configured'); return; }
+  const html = guestOfferHostEmail({
+    guestName: offer.guest_name,
+    email: offer.email,
+    phone: offer.phone,
+    checkinDate: offer.checkin_date,
+    newsletter: offer.newsletter_opt_in,
+    autoApproved,
+    promoCode: offer.promo_code,
+    siteUrl: SITE_URL,
+    siteConfig: cfg,
+  });
+  const subject = autoApproved
+    ? `Guest code auto-sent — ${offer.guest_name}`
+    : `New guest discount signup (review) — ${offer.guest_name}`;
+  await sendEmail(getEmailFrom(cfg), HOST_EMAIL, subject, html, offer.email);
 }
 
 function respond(status, body) {
