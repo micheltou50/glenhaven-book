@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title id="siteOfferTitle">Returning Guest Offer</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .offer-page { max-width: 540px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    .offer-header { text-align: center; margin-bottom: 1.5rem; }
+    .offer-header .logo { font-family: var(--heading); font-size: 1.6rem; font-weight: 800; color: var(--black); }
+    .offer-header .logo em { font-style: normal; font-weight: 400; }
+    .offer-badge { display:inline-block; background: var(--green-p); color: var(--green-d); font-weight: 800; font-size: .75rem; letter-spacing:.05em; padding: .35rem .85rem; border-radius: 100px; margin-bottom: 1rem; }
+    .offer-card { background: #fff; border: 1px solid var(--g200); border-radius: var(--r); padding: 2rem; }
+    .offer-card h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: .4rem; text-align:center; }
+    .offer-card .lead { font-size: .9rem; color: var(--g500); margin-bottom: 1.5rem; line-height:1.6; text-align:center; }
+    .of-group { margin-bottom: 1.1rem; }
+    .of-group label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .4rem; color: #444; }
+    .of-group input { width: 100%; border: 1.5px solid var(--g200); border-radius: var(--r-sm); padding: .75rem 1rem; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .15s; box-sizing: border-box; background:#fff; }
+    .of-group input:focus { border-color: var(--green); }
+    .of-check { display:flex; gap:.6rem; align-items:flex-start; background:var(--g50); border-radius: var(--r-sm); padding:.85rem 1rem; margin-bottom:1.25rem; }
+    .of-check input { margin-top:.15rem; width:16px; height:16px; flex-shrink:0; }
+    .of-check label { font-size:.8rem; color:var(--g600); line-height:1.5; }
+    .of-error { display:none; background:#fef2f2; border:1px solid #fca5a5; border-radius: var(--r-sm); padding:.75rem 1rem; color:#991b1b; font-size:.85rem; margin-bottom:1rem; }
+    .of-error.show { display:block; }
+    .of-success { display:none; text-align:center; padding: 2rem 1rem; }
+    .of-success.show { display:block; }
+    .of-success h2 { font-size:1.4rem; font-weight:800; margin-bottom:.5rem; color: var(--green-d); }
+    .of-success p { font-size:.9rem; color: var(--g500); line-height:1.6; }
+    .of-fine { font-size:.72rem; color: var(--g400); margin-top: 1rem; line-height:1.5; text-align:center; }
+    .of-hp { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+  </style>
+</head>
+<body>
+
+<div class="offer-page">
+  <div class="offer-header">
+    <div class="logo" id="siteOfferLogo">Glen<em>haven</em></div>
+  </div>
+
+  <!-- Signup form -->
+  <div class="offer-card" id="offerForm">
+    <div style="text-align:center;"><span class="offer-badge">RETURNING GUEST · 5% OFF</span></div>
+    <h1>Enjoyed your stay?</h1>
+    <p class="lead">Leave your details and we'll email you a unique <strong>5% discount code</strong> for your next direct booking — no platform fees, best rate guaranteed.</p>
+
+    <div class="of-group">
+      <label>Full name</label>
+      <input type="text" id="ofName" placeholder="Jane Smith" autocomplete="name"/>
+    </div>
+    <div class="of-group">
+      <label>Email address</label>
+      <input type="email" id="ofEmail" placeholder="jane@example.com" autocomplete="email"/>
+    </div>
+    <div class="of-group">
+      <label>Phone number</label>
+      <input type="tel" id="ofPhone" placeholder="+61 4XX XXX XXX" autocomplete="tel"/>
+    </div>
+    <div class="of-group">
+      <label>Check-in date of your stay</label>
+      <input type="date" id="ofCheckin"/>
+    </div>
+
+    <!-- Honeypot — hidden from humans; bots that fill it are silently dropped -->
+    <input type="text" id="ofCompany" name="company" class="of-hp" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+
+    <div class="of-check">
+      <input type="checkbox" id="ofNewsletter" checked/>
+      <label for="ofNewsletter">Yes, send me news, updates and the occasional promotion from Glenhaven. You can unsubscribe anytime.</label>
+    </div>
+
+    <div class="of-error" id="ofError"></div>
+    <button class="btn btn-primary btn-full" id="ofSubmit" onclick="submitOffer()">Get my 5% code</button>
+    <p class="of-fine">We'll confirm your stay and email your unique code shortly. One code per guest.</p>
+  </div>
+
+  <!-- Success state -->
+  <div class="of-success" id="offerSuccess">
+    <div style="font-size:2.5rem;margin-bottom:.75rem;">🎉</div>
+    <h2>You're in!</h2>
+    <p>Thanks! We'll confirm your stay and email your unique 5% discount code to the address you provided — usually within a day.</p>
+    <a href="index.html" class="btn btn-white" style="margin-top:1.5rem;display:inline-block;" id="ofBackLink">Back to Glenhaven</a>
+  </div>
+</div>
+
+<script type="module">
+  // Branding from site config (falls back to Glenhaven)
+  try {
+    const r = await fetch('/api/config');
+    if (r.ok) {
+      const cfg = await r.json();
+      const name = (cfg.property && cfg.property.name) || 'Glenhaven';
+      document.getElementById('siteOfferLogo').textContent = name;
+      document.getElementById('siteOfferTitle').textContent = name + ' — Returning Guest Offer';
+      document.getElementById('ofBackLink').textContent = 'Back to ' + name;
+    }
+  } catch (e) { /* keep defaults */ }
+
+  window.submitOffer = async function () {
+    const name        = document.getElementById('ofName').value.trim();
+    const email       = document.getElementById('ofEmail').value.trim();
+    const phone       = document.getElementById('ofPhone').value.trim();
+    const checkinDate = document.getElementById('ofCheckin').value;
+    const newsletter  = document.getElementById('ofNewsletter').checked;
+    const company     = document.getElementById('ofCompany').value; // honeypot
+    const err = document.getElementById('ofError');
+    err.classList.remove('show');
+
+    if (!name || !email || !phone) { err.textContent = 'Please fill in your name, email, and phone number.'; err.classList.add('show'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; err.classList.add('show'); return; }
+
+    const btn = document.getElementById('ofSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch('/api/guest-offers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, checkinDate, newsletter, company }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        err.textContent = (data && data.error) || 'Something went wrong. Please try again.';
+        err.classList.add('show');
+        btn.disabled = false; btn.textContent = 'Get my 5% code';
+        return;
+      }
+      document.getElementById('offerForm').style.display = 'none';
+      document.getElementById('offerSuccess').classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      err.textContent = 'Network error — please try again.';
+      err.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Get my 5% code';
+    }
+  };
+</script>
+</body>
+</html>

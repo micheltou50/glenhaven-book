@@ -140,6 +140,7 @@
       <a href="#" onclick="showTab('calendar',this)">📅 Calendar</a>
       <a href="#" onclick="showTab('block',this)">🚫 Block Dates</a>
       <a href="#" onclick="showTab('reviews',this)">⭐ Reviews</a>
+      <a href="#" onclick="showTab('offers',this)">🎁 Guest Offers</a>
       <div class="nav-group">Site Editor</div>
       <a href="#" onclick="showTab('edit-property',this)">🏡 Property Info</a>
       <a href="#" onclick="showTab('edit-rules',this)">📋 House Rules</a>
@@ -184,6 +185,7 @@
       <button class="tab-btn" onclick="showTab('calendar',this)">Calendar</button>
       <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
       <button class="tab-btn" onclick="showTab('reviews',this)">Reviews</button>
+      <button class="tab-btn" onclick="showTab('offers',this)">Guest Offers</button>
       <button class="tab-btn" onclick="showTab('edit-property',this)">Property</button>
       <button class="tab-btn" onclick="showTab('edit-rules',this)">House Rules</button>
       <button class="tab-btn" onclick="showTab('edit-story',this)">Story</button>
@@ -958,6 +960,26 @@
         </div>
         <div id="reviewsList"></div>
         <div id="reviewsEmpty" style="display:none;text-align:center;padding:2rem;color:var(--g400);font-size:.9rem;">No reviews yet.</div>
+      </div>
+    </div>
+
+    <!-- GUEST OFFERS (returning-guest 5% codes) -->
+    <div class="tab-pane" id="tab-offers">
+      <div class="edit-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem;">
+          <div>
+            <h3 style="margin:0;">🎁 Returning-Guest Offers</h3>
+            <p style="font-size:.82rem;color:var(--g500);margin:.3rem 0 0;">Signups from the hidden <code>/guest-offer</code> page. Approve to email the guest a unique 5% code.</p>
+          </div>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+            <button class="tab-btn on" onclick="filterOffers('all',this)">All</button>
+            <button class="tab-btn" onclick="filterOffers('pending',this)">Pending</button>
+            <button class="tab-btn" onclick="filterOffers('approved',this)">Approved</button>
+            <button class="tab-btn" onclick="filterOffers('rejected',this)">Rejected</button>
+          </div>
+        </div>
+        <div id="offersList"></div>
+        <div id="offersEmpty" style="display:none;text-align:center;padding:2rem;color:var(--g400);font-size:.9rem;">No signups yet.</div>
       </div>
     </div>
 

@@ -1074,6 +1074,7 @@ window.showTab = function (name, el) {
   if (name === 'block') renderBlockList();
   if (name === 'checklist') renderChecklist();
   if (name === 'reviews') loadReviews();
+  if (name === 'offers') loadGuestOffers();
   if (name === 'edit-pricing') renderPricingCal();
 };
 
@@ -1380,6 +1381,118 @@ window.rejectReview = async function (id) {
   } catch (err) {
     alert('Failed to reject: ' + err.message);
   }
+};
+
+// ── GUEST OFFERS (returning-guest 5% codes) ─────────────────
+let allOffers = [];
+let offerFilter = 'all';
+
+function escGO(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function loadGuestOffers() {
+  try {
+    const res = await fetch('/api/guest-offers', { headers: { 'x-admin-password': adminPassword } });
+    const data = await res.json();
+    allOffers = data.offers || [];
+  } catch (err) {
+    console.warn('Failed to load guest offers:', err.message);
+    allOffers = [];
+  }
+  renderGuestOffers();
+}
+
+// Cross-check the check-in date the guest entered against real stays.
+function offerBookingMatch(o) {
+  if (!o.checkin_date || !Array.isArray(allBK) || !allBK.length) return '';
+  const hit = allBK.find(b => { const ci = b.checkIn || b.checkin; return ci && String(ci).slice(0, 10) === o.checkin_date; });
+  return hit
+    ? `<span style="color:var(--green-d);font-weight:600;">✓ matches a stay</span>`
+    : `<span style="color:#d97706;font-weight:600;">⚠ no stay checks in ${escGO(o.checkin_date)}</span>`;
+}
+
+function renderGuestOffers() {
+  const el = document.getElementById('offersList');
+  const empty = document.getElementById('offersEmpty');
+  if (!el || !empty) return;
+  const filtered = offerFilter === 'all' ? allOffers : allOffers.filter(o => o.status === offerFilter);
+
+  if (!filtered.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  el.innerHTML = filtered.map(o => {
+    const sColor = o.status === 'approved' ? 'var(--green)' : o.status === 'rejected' ? '#dc2626' : o.status === 'redeemed' ? '#2563eb' : '#d97706';
+    const sBg = o.status === 'approved' ? 'var(--green-p)' : o.status === 'rejected' ? '#fef2f2' : o.status === 'redeemed' ? '#eff6ff' : '#fef9ec';
+    const created = o.created_at ? new Date(o.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    return `<div style="border:1px solid var(--g100);border-radius:var(--r);padding:1.25rem;margin-bottom:.75rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;">
+          <div style="font-weight:700;font-size:.9rem;">${escGO(o.guest_name || '—')}</div>
+          <div style="font-size:.76rem;color:var(--g500);">${escGO(o.email || '')}${o.phone ? ' · ' + escGO(o.phone) : ''}</div>
+        </div>
+        <span style="font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-full);background:${sBg};color:${sColor};text-transform:uppercase;letter-spacing:.04em;">${escGO(o.status)}</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--g600);margin-bottom:.6rem;display:flex;flex-wrap:wrap;gap:.35rem 1.25rem;">
+        <span>Checked in: <strong>${escGO(o.checkin_date || '—')}</strong></span>
+        <span>Signed up: ${created}</span>
+        <span>Newsletter: ${o.newsletter_opt_in ? '✅' : '—'}</span>
+        ${offerBookingMatch(o)}
+      </div>
+      ${o.promo_code ? `<div style="font-size:.8rem;margin-bottom:.6rem;">Code: <code style="background:var(--green-p);color:var(--green-d);padding:2px 8px;border-radius:6px;font-weight:700;">${escGO(o.promo_code)}</code>${o.expires_at ? ` <span style="color:var(--g400);">· expires ${escGO(o.expires_at)}</span>` : ''}${o.status === 'redeemed' ? ' <span style="color:#2563eb;font-weight:600;">· used</span>' : ''}</div>` : ''}
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        ${o.status === 'pending' ? `
+          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="approveGuestOffer('${o.id}',this)">Approve &amp; send code</button>
+          <button class="btn btn-sm btn-white" onclick="rejectGuestOffer('${o.id}')">Reject</button>` : o.status === 'rejected' ? `
+          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="approveGuestOffer('${o.id}',this)">Approve &amp; send code</button>` : o.status === 'approved' ? `
+          <button class="btn btn-sm btn-white" onclick="approveGuestOffer('${o.id}',this)">Resend code</button>
+          <button class="btn btn-sm btn-white" onclick="rejectGuestOffer('${o.id}')">Reject</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filterOffers = function (status, el) {
+  offerFilter = status;
+  if (el) { el.closest('.edit-card').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on')); el.classList.add('on'); }
+  renderGuestOffers();
+};
+
+window.approveGuestOffer = async function (id, btn) {
+  const orig = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  try {
+    const res = await fetch('/api/guest-offers', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify({ id, action: 'approve' }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Failed');
+    alert(data.emailed === false
+      ? (data.warning || 'Approved, but the email could not be sent.')
+      : 'Approved — code ' + (data.promo_code || '') + ' emailed to the guest. ✅');
+  } catch (err) {
+    alert('Failed to approve: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
+  }
+  await loadGuestOffers();
+};
+
+window.rejectGuestOffer = async function (id) {
+  if (!confirm('Reject this signup? No code will be sent.')) return;
+  try {
+    const res = await fetch('/api/guest-offers', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify({ id, action: 'reject' }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Failed');
+  } catch (err) {
+    alert('Failed to reject: ' + err.message);
+  }
+  await loadGuestOffers();
 };
 
 // ── URL-BASED REVIEW SCRAPER ────────────────────────────────
