@@ -50,7 +50,8 @@ exports.handler = async (event) => {
         bookingId: bk.id,
       });
     } catch (err) {
-      return respond(500, { error: err.message });
+      console.error('[submit-review]', err.message);
+      return respond(500, { error: 'Something went wrong. Please try again.' });
     }
   }
 
@@ -108,7 +109,8 @@ exports.handler = async (event) => {
 
       return respond(200, { success: true });
     } catch (err) {
-      return respond(500, { error: err.message });
+      console.error('[submit-review]', err.message);
+      return respond(500, { error: 'Something went wrong. Please try again.' });
     }
   }
 

@@ -11,6 +11,7 @@
 
 const { preArrivalEmail, checkInEmail, postCheckoutEmail } = require('./email-templates');
 const { loadSiteConfig, getPropertyName, getEmailFrom, getRefPrefix } = require('./site-config-loader');
+const crypto = require('crypto');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID,
         RESEND_API_KEY, RESEND_FROM, CRON_SECRET } = process.env;
@@ -92,7 +93,8 @@ exports.handler = async (event) => {
     const res = await fetch(url, { headers: sbHeaders });
     const bookings = await res.json();
 
-    console.log('[email-sequence] Found', Array.isArray(bookings) ? bookings.length : 0, 'matching bookings:', JSON.stringify(bookings));
+    // Log counts/ids only — never guest names/emails (PII) to the function logs.
+    console.log('[email-sequence] Found', Array.isArray(bookings) ? bookings.length : 0, 'matching booking(s):', Array.isArray(bookings) ? bookings.map(b => b.id) : []);
 
     if (!Array.isArray(bookings)) {
       console.warn('No bookings array returned');
@@ -206,11 +208,14 @@ async function markSent(bookingId, existingSent, emailType) {
 }
 
 function generateReturnCode(cfg) {
+  // Crypto-random, 16 chars from a 31-char alphabet (~10^24 space) so the review
+  // link can't be brute-force enumerated to harvest guest PII. Math.random() is
+  // NOT cryptographically secure, so use crypto.randomInt (unbiased).
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const prefix = getRefPrefix(cfg).replace(/-$/, '') + '-R';
   let code = prefix;
-  for (let i = 0; i < 5; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 16; i++) {
+    code += chars[crypto.randomInt(chars.length)];
   }
   return code;
 }
