@@ -25,7 +25,7 @@ export class MiniCal {
             <div class="cal-nav">
               <button class="cal-nb" id="${this.el.id}-prev">&#8249;</button>
               <div class="cal-title" id="${this.el.id}-title0"></div>
-              <button class="cal-nb" style="visibility:hidden;">&#8250;</button>
+              <button class="cal-nb cal-nb-m-next" id="${this.el.id}-next-m">&#8250;</button>
             </div>
             <div class="cal-dow">${dow}</div>
             <div class="cal-grid" id="${this.el.id}-grid0"></div>
@@ -43,6 +43,7 @@ export class MiniCal {
       </div>`;
     this.el.querySelector(`#${this.el.id}-prev`).onclick = () => { this.cur.setMonth(this.cur.getMonth() - 1); this.renderDays(); };
     this.el.querySelector(`#${this.el.id}-next`).onclick = () => { this.cur.setMonth(this.cur.getMonth() + 1); this.renderDays(); };
+    this.el.querySelector(`#${this.el.id}-next-m`).onclick = () => { this.cur.setMonth(this.cur.getMonth() + 1); this.renderDays(); };
     this.renderDays();
   }
 
