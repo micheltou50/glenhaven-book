@@ -155,6 +155,24 @@ exports.handler = async (event) => {
     return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'booking_write_exception' }) };
   }
 
+  // ── Mark a returning-guest promo code as redeemed (single-use) ──
+  // Only after the booking row is safely written. Guarded on status='approved'
+  // so webhook retries stay idempotent and can't double-redeem a code.
+  if (meta.promoCode) {
+    try {
+      const purl = `${SUPABASE_URL}/rest/v1/guest_offers?promo_code=eq.${encodeURIComponent(meta.promoCode)}&property_id=eq.${PROPERTY_ID}&status=eq.approved`;
+      const pres = await fetch(purl, {
+        method: 'PATCH',
+        headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ status: 'redeemed', redeemed_at: new Date().toISOString() }),
+      });
+      if (!pres.ok) console.warn('[webhook] promo redeem patch failed:', pres.status, await pres.text());
+      else console.log('Promo code redeemed:', meta.promoCode);
+    } catch (err) {
+      console.warn('[webhook] promo redeem failed:', err.message);
+    }
+  }
+
   // ── Calculate cancellation deadline (48 hours from now, only if check-in is 14+ days away) ───
   const now = new Date();
   const ciDate = new Date(meta.checkIn + 'T00:00:00');

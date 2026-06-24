@@ -136,6 +136,14 @@
           <h4 style="margin:0 0 .5rem;font-size:.9rem;">Total: <span id="payFullAmt" style="color:var(--green-d);">$0</span></h4>
           <p style="margin:0;font-size:.82rem;color:var(--g500);">Full payment required. Fully confirmed immediately.</p>
         </div>
+        <div style="background:#fff;border:1px solid var(--g200);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1rem;">
+          <label style="display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#444;margin-bottom:.45rem;">Returning-guest discount code</label>
+          <div style="display:flex;gap:.5rem;">
+            <input type="text" id="promoInput" placeholder="e.g. GH-SAVE-XXXXXXXX" autocomplete="off" style="flex:1;border:1.5px solid var(--g200);border-radius:var(--r-sm);padding:.6rem .85rem;font-size:.85rem;text-transform:uppercase;outline:none;box-sizing:border-box;"/>
+            <button class="btn btn-white btn-sm" id="promoBtn" type="button" onclick="applyPromo()">Apply</button>
+          </div>
+          <div id="promoMsg" style="font-size:.78rem;margin-top:.5rem;display:none;"></div>
+        </div>
         <div id="bkCancelSummary" style="background:#fefce8;border:1px solid #fde68a;border-radius:var(--r);padding:1rem;margin-bottom:1rem;font-size:.8rem;color:#92400e;">
           <p style="margin:0 0 .4rem;font-weight:700;font-size:.85rem;">Cancellation Policy</p>
           <p style="margin:0 0 .25rem;" id="bkPolicyLine1">✓ <strong>14+ days before check-in</strong> — full refund</p>

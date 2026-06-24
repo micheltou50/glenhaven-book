@@ -66,9 +66,23 @@ exports.handler = async (event) => {
     return respond(200, { success: false, error: `This property accommodates a maximum of ${priced.maxGuests} guests.` });
   }
 
+  // ── Returning-guest promo code (validated server-side; authoritative) ──
+  // The browser may apply a 5% code for display, but the discount is only ever
+  // honoured if the code is real, approved, unused and unexpired here.
+  let chargeAmount = priced.total;
+  let appliedPromo = null;
+  if (payload.promoCode) {
+    const promo = await validatePromo(payload.promoCode);
+    if (!promo.valid) {
+      return respond(200, { success: false, error: 'That discount code is no longer valid. Please remove it and try again.' });
+    }
+    const discount = Math.round(priced.total * (promo.discountPct / 100));
+    chargeAmount = priced.total - discount;   // computed exactly as the client does
+    appliedPromo = payload.promoCode;
+  }
+
   // Authoritative total. Reject if the browser's figure doesn't match (tampering,
   // or the price changed since the page was loaded).
-  const chargeAmount = priced.total;
   if (Math.abs(chargeAmount - Number(clientTotal)) > 1) {
     console.warn(`Price mismatch — client=${clientTotal} server=${chargeAmount} (${checkIn}→${checkOut}, ${guests} guests)`);
     return respond(200, { success: false, error: 'The price for these dates has changed. Please refresh the page and try again.' });
@@ -95,6 +109,7 @@ exports.handler = async (event) => {
     'metadata[total]'      : String(chargeAmount),
     'metadata[cleaningFee]': String(priced.cleaningFee),
     'metadata[message]'    : (message || '').slice(0, 500),
+    'metadata[promoCode]'  : appliedPromo || '',
   });
 
   let session;
@@ -115,6 +130,28 @@ exports.handler = async (event) => {
 
   return respond(200, { success: true, paymentLink: session.url });
 };
+
+// Re-validate a returning-guest promo code at charge time (authoritative).
+async function validatePromo(code) {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/guest_offers?promo_code=eq.${encodeURIComponent(code)}`
+      + `&property_id=eq.${PROPERTY_ID}&select=status,discount_pct,expires_at,redeemed_at&limit=1`;
+    const res = await fetch(url, { headers: sbHeaders });
+    const rows = await res.json();
+    const o = Array.isArray(rows) ? rows[0] : null;
+    if (!o || o.status !== 'approved' || o.redeemed_at) return { valid: false };
+    if (o.expires_at && o.expires_at < todayISO()) return { valid: false };
+    return { valid: true, discountPct: o.discount_pct || 5 };
+  } catch (err) {
+    console.error('[book] promo validation failed:', err.message);
+    return { valid: false };
+  }
+}
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 function respond(status, body) {
   return { statusCode: status, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };

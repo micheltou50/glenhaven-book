@@ -11,6 +11,7 @@ import { initNavBurger, initScrollReveal, getUrgencyMsg, sendBooking, storePendi
 // ── State ────────────────────────────────────────────────────
 let bkCI = null, bkCO = null;
 let adults = 2, children = 0, infants = 0;
+let promoCode = null, promoPct = 0;
 
 // URL pre-fill
 const urlCI = getParam('ci'), urlCO = getParam('co'), urlG = getParam('g');
@@ -50,11 +51,14 @@ function updateSidebar() {
   if (p.extraGuests > 0) html += `<div class="price-row"><span>Extra guest fee (×${p.extraGuests})</span><span>included</span></div>`;
   if (p.discountAmt > 0) html += `<div class="price-row dep"><span>Stay discount (${Math.round(p.losDiscount * 100)}%)</span><span>−${fmtAUD(p.discountAmt)}</span></div>`;
   html += `<div class="price-row"><span>Cleaning fee</span><span>${fmtAUD(p.cleaningFee)}</span></div>`;
-  html += `<div class="price-row tot"><span>Total AUD</span><span>${fmtAUD(p.total)}</span></div>`;
+  const promoDisc = promoPct > 0 ? Math.round(p.total * (promoPct / 100)) : 0;
+  if (promoDisc > 0) html += `<div class="price-row dep"><span>Returning-guest discount (${promoPct}%)</span><span>−${fmtAUD(promoDisc)}</span></div>`;
+  const finalTotal = p.total - promoDisc;
+  html += `<div class="price-row tot"><span>Total AUD</span><span>${fmtAUD(finalTotal)}</span></div>`;
   document.getElementById('sdBK').innerHTML = html;
   document.getElementById('sdUrgency').innerHTML = `<div class="urgency-dot"></div><span>${getUrgencyMsg(bkCI, bkCO)}</span>`;
 
-  document.getElementById('payFullAmt').textContent = fmtAUD(p.total);
+  document.getElementById('payFullAmt').textContent = fmtAUD(finalTotal);
 }
 
 // Guest counter
@@ -133,6 +137,9 @@ window.submitBooking = async function () {
   const p = calcPrice(bkCI, bkCO, adults + children);
   if (!p) { alert('Please go back and select valid dates.'); return; }
 
+  const promoDisc  = promoPct > 0 ? Math.round(p.total * (promoPct / 100)) : 0;
+  const finalTotal = p.total - promoDisc;
+
   const btn = document.getElementById('payBtn');
   const txt = document.getElementById('payBtnText');
   btn.disabled = true;
@@ -147,15 +154,16 @@ window.submitBooking = async function () {
     phone      : document.getElementById('fPhone').value.trim(),
     guests     : adults + children,
     message    : document.getElementById('fNotes').value.trim(),
-    total      : p.total,
-    totalAmount: p.total,
+    total      : finalTotal,
+    totalAmount: finalTotal,
     cleaningFee: p.cleaningFee,
+    promoCode  : promoCode || undefined,
   };
 
   try {
     const result = await sendBooking(payload);
     if (result.success && result.paymentLink) {
-      storePendingBooking(payload, p.total);
+      storePendingBooking(payload, finalTotal);
       window.location.href = result.paymentLink;
     } else {
       throw new Error(result.error || 'Something went wrong. Please try again.');
@@ -167,6 +175,40 @@ window.submitBooking = async function () {
     btn.disabled = false;
     txt.textContent = 'Confirm & Pay Securely';
   }
+};
+
+// ── Returning-guest promo code ───────────────────────────────
+window.applyPromo = async function () {
+  const input = document.getElementById('promoInput');
+  const msg   = document.getElementById('promoMsg');
+  const btn   = document.getElementById('promoBtn');
+  const code  = (input.value || '').trim().toUpperCase();
+  msg.style.display = 'none';
+  if (!code) return;
+
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res  = await fetch('/api/validate-promo?code=' + encodeURIComponent(code));
+    const data = await res.json();
+    if (data.valid) {
+      promoCode = code; promoPct = data.discountPct || 5;
+      input.disabled = true; btn.textContent = 'Applied ✓';
+      msg.style.display = 'block'; msg.style.color = 'var(--green-d)';
+      msg.textContent = `Returning-guest ${promoPct}% discount applied.`;
+    } else {
+      promoCode = null; promoPct = 0;
+      btn.disabled = false; btn.textContent = 'Apply';
+      msg.style.display = 'block'; msg.style.color = '#dc2626';
+      msg.textContent = data.reason === 'used'    ? 'This code has already been used.'
+                      : data.reason === 'expired' ? 'This code has expired.'
+                      : "That code isn't valid.";
+    }
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Apply';
+    msg.style.display = 'block'; msg.style.color = '#dc2626';
+    msg.textContent = 'Could not check that code — please try again.';
+  }
+  updateSidebar();
 };
 
 // ── Init ─────────────────────────────────────────────────────
