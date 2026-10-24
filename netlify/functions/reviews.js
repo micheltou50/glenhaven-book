@@ -1,6 +1,14 @@
 // ── /api/reviews ─────────────────────────────────────────────
-// GET → returns approved reviews for the public reviews page
-// Used by admin too — pass ?status=all with admin password to see everything
+// GET    → approved reviews for the public reviews page
+//          (admin: ?status=all with x-admin-password to see everything)
+// PATCH  → admin: approve / reject, and/or edit guest_name, rating, stay_date,
+//          review_text (used to complete reviews Airbnb's email cut short)
+// POST   → admin: add a review (imported ones are approved immediately)
+// DELETE → admin: remove a review
+//
+// Rows also arrive from StayOps: its email scanner parses Airbnb's
+// "<Name> left a 5-star review!" emails and inserts them here as
+// status='pending', platform='airbnb'. Only approved rows are ever public.
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID, ADMIN_PASSWORD } = process.env;
 
@@ -50,16 +58,44 @@ exports.handler = async (event) => {
     try { body = JSON.parse(event.body); }
     catch { return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
-    const { id, status } = body;
-    if (!id || !['approved', 'rejected'].includes(status)) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'id and status (approved/rejected) required' }) };
+    const { id, status, guest_name, rating, review_text, stay_date } = body;
+    if (!id) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'id required' }) };
+    }
+    const patch = {};
+    if (status != null) {
+      if (!['approved', 'rejected', 'pending'].includes(status)) {
+        return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'status must be approved, rejected or pending' }) };
+      }
+      patch.status = status;
+    }
+    if (guest_name != null) {
+      const g = String(guest_name).trim().slice(0, 80);
+      if (!g) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'guest_name cannot be empty' }) };
+      patch.guest_name = g;
+    }
+    if (rating != null) {
+      const n = parseInt(rating);
+      if (!(n >= 1 && n <= 5)) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'rating must be 1-5' }) };
+      patch.rating = n;
+    }
+    if (review_text != null) {
+      const t = String(review_text).trim();
+      if (t.length < 5) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'review_text is too short' }) };
+      patch.review_text = t.slice(0, 4000);
+    }
+    if (stay_date != null) {
+      patch.stay_date = String(stay_date).trim().slice(0, 60) || null;
+    }
+    if (!Object.keys(patch).length) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'nothing to update' }) };
     }
 
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/reviews?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(patch),
       });
       if (!res.ok) throw new Error('Supabase returned ' + res.status);
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };

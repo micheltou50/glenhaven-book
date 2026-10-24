@@ -23,6 +23,7 @@ export function getSiteConfig() {
 }
 
 export async function loadSiteConfig() {
+  loadReviewStats(); // in parallel; applies itself when it lands
   try {
     const cached = JSON.parse(localStorage.getItem(CONFIG_CACHE_KEY) || 'null');
     if (cached && cached.ts && (Date.now() - cached.ts) < CONFIG_CACHE_TTL && cached.config) {
@@ -179,6 +180,8 @@ export function applySiteConfig(cfg) {
       const bookRating = document.getElementById('siteBookRating');
       if (bookRating) bookRating.textContent = stars.slice(0,5);
     }
+    // A rating computed from approved guest reviews wins over the manual one.
+    applyReviewStats();
   }
   if (cfg.hero) {
     setEl('siteHeroHeadline', cfg.hero.headline);
@@ -451,4 +454,74 @@ export function applySiteConfig(cfg) {
       }
     });
   }
+}
+
+// ── Review stats — rating derived from approved guest reviews ──
+// The hero "5.0★", the sticky-card stars and the booking sidebar stars used to
+// be hard-coded. Once approved reviews exist they drive those numbers (average
+// to one decimal plus the count); the manual property.rating is the fallback.
+
+const REVIEWS_URL = '/api/reviews';
+const REVIEW_STATS_CACHE_KEY = 'gh_review_stats';
+const REVIEW_STATS_TTL = 30 * 60 * 1000; // 30 min
+let REVIEW_STATS = null;
+
+export function getReviewStats() {
+  return REVIEW_STATS;
+}
+
+export function computeReviewStats(reviews) {
+  const rows = (Array.isArray(reviews) ? reviews : []).filter(r => {
+    const n = Number(r && r.rating);
+    return n >= 1 && n <= 5;
+  });
+  if (!rows.length) return { count: 0, avg: null };
+  const sum = rows.reduce((s, r) => s + Number(r.rating), 0);
+  return { count: rows.length, avg: Math.round((sum / rows.length) * 10) / 10 };
+}
+
+function starsFor(avg) {
+  const full = Math.floor(avg);
+  const half = avg - full >= 0.5 ? 1 : 0;
+  return ('★'.repeat(full + half) + '☆'.repeat(Math.max(0, 5 - full - half))).slice(0, 5);
+}
+
+export function applyReviewStats(stats) {
+  const s = stats || REVIEW_STATS;
+  if (!s || !s.count || s.avg == null) return;
+  const avgStr = s.avg.toFixed(1);
+  const countStr = s.count + (s.count === 1 ? ' review' : ' reviews');
+  const stars = starsFor(s.avg);
+  setEl('siteRating', avgStr + '★');
+  setEl('siteRatingLabel', countStr);
+  const starsEl = document.getElementById('siteStarsDisplay');
+  if (starsEl) {
+    starsEl.innerHTML = stars + ' <span style="font-size:.8rem;font-weight:500;color:var(--g500);">' + avgStr + ' · ' + countStr + '</span>';
+  }
+  const bookRating = document.getElementById('siteBookRating');
+  if (bookRating) {
+    bookRating.textContent = stars;
+    bookRating.title = avgStr + ' from ' + countStr;
+  }
+}
+
+export async function loadReviewStats() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(REVIEW_STATS_CACHE_KEY) || 'null');
+    if (cached && cached.ts && (Date.now() - cached.ts) < REVIEW_STATS_TTL && cached.stats) {
+      REVIEW_STATS = cached.stats;
+      applyReviewStats(REVIEW_STATS);
+    }
+  } catch (e) { /* ignore */ }
+  try {
+    const res = await fetch(REVIEWS_URL);
+    if (!res.ok) return REVIEW_STATS;
+    const data = await res.json();
+    REVIEW_STATS = computeReviewStats(data && data.reviews);
+    try { localStorage.setItem(REVIEW_STATS_CACHE_KEY, JSON.stringify({ stats: REVIEW_STATS, ts: Date.now() })); } catch (e) { /* ignore */ }
+    applyReviewStats(REVIEW_STATS);
+  } catch (err) {
+    console.warn('[loadReviewStats]', err.message);
+  }
+  return REVIEW_STATS;
 }

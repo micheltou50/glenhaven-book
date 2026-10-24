@@ -2,6 +2,7 @@
 
 import { initNavBurger } from '../ui.js';
 import { loadSiteConfig } from '../site-config.js';
+import { escapeHtml } from '../utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNavBurger();
@@ -43,21 +44,22 @@ async function loadPublicReviews() {
 
     // Render cards
     grid.innerHTML = reviews.map(r => {
-      const initials = (r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-      const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-      const date = r.stay_date || '';
+      const rating = Math.min(5, Math.max(1, parseInt(r.rating) || 5));
+      const initials = escapeHtml((r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
+      const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+      const date = escapeHtml(r.stay_date || '');
       const pm = pmeta[r.platform] || pmeta.direct;
 
       return `<div class="rv-card">
         <div class="rv-top">
           <div class="rv-av">${initials}</div>
           <div>
-            <div class="rv-name">${r.guest_name}</div>
+            <div class="rv-name">${escapeHtml(r.guest_name)}</div>
             <div class="rv-date">${date}</div>
           </div>
           <div class="rv-stars">${stars}</div>
         </div>
-        <p class="rv-text">"${r.review_text}"</p>
+        <p class="rv-text">"${escapeHtml(r.review_text)}"</p>
         <div class="rv-platform">${pm.icon} ✓ ${pm.verified}</div>
       </div>`;
     }).join('');

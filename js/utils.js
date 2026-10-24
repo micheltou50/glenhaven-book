@@ -52,3 +52,14 @@ export function fmtAUD(n) {
 export function getParam(k) {
   return new URLSearchParams(window.location.search).get(k);
 }
+
+/** Escape text for safe insertion into innerHTML. Guest-written review text
+ *  now arrives automatically (from Airbnb emails), so it is untrusted. */
+export function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

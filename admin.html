@@ -139,7 +139,7 @@
       <a href="#" class="on" onclick="showTab('bookings',this)">📋 All Bookings</a>
       <a href="#" onclick="showTab('calendar',this)">📅 Calendar</a>
       <a href="#" onclick="showTab('block',this)">🚫 Block Dates</a>
-      <a href="#" onclick="showTab('reviews',this)">⭐ Reviews</a>
+      <a href="#" onclick="showTab('reviews',this)">⭐ Reviews <span data-pending-reviews class="preview-badge" style="display:none;margin-left:.3rem;padding:.1rem .5rem;"></span></a>
       <a href="#" onclick="showTab('offers',this)">🎁 Guest Offers</a>
       <div class="nav-group">Site Editor</div>
       <a href="#" onclick="showTab('edit-property',this)">🏡 Property Info</a>
@@ -184,7 +184,7 @@
       <button class="tab-btn on" onclick="showTab('bookings',this)">Bookings</button>
       <button class="tab-btn" onclick="showTab('calendar',this)">Calendar</button>
       <button class="tab-btn" onclick="showTab('block',this)">Block Dates</button>
-      <button class="tab-btn" onclick="showTab('reviews',this)">Reviews</button>
+      <button class="tab-btn" onclick="showTab('reviews',this)">Reviews <span data-pending-reviews class="preview-badge" style="display:none;margin-left:.2rem;padding:.05rem .4rem;"></span></button>
       <button class="tab-btn" onclick="showTab('offers',this)">Guest Offers</button>
       <button class="tab-btn" onclick="showTab('edit-property',this)">Property</button>
       <button class="tab-btn" onclick="showTab('edit-rules',this)">House Rules</button>
@@ -958,6 +958,7 @@
             <button class="tab-btn" onclick="filterReviews('rejected',this)">Rejected</button>
           </div>
         </div>
+        <p style="font-size:.84rem;color:var(--g500);margin:-.5rem 0 1.1rem;line-height:1.55;">New Airbnb reviews are captured automatically from your Airbnb <em>“… left a 5-star review!”</em> emails (via StayOps) and appear here as <strong>Pending</strong> — nothing is published until you approve it. Airbnb’s email cuts long reviews short: use <strong>Edit</strong> to paste the full text first.</p>
         <div id="reviewsList"></div>
         <div id="reviewsEmpty" style="display:none;text-align:center;padding:2rem;color:var(--g400);font-size:.9rem;">No reviews yet.</div>
       </div>

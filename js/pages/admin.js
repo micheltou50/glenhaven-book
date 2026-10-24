@@ -1,6 +1,6 @@
 /* ── pages/admin.js — admin.html entry module ── */
 
-import { todayISO, fmtDate, fmtAUD, shadeColor, hexToRgba } from '../utils.js';
+import { todayISO, fmtDate, fmtAUD, shadeColor, hexToRgba, escapeHtml } from '../utils.js';
 import { loadAvailability, deleteBooking, getBookings, getBlocks, saveBlock, deleteBlock, isDateBlocked } from '../availability.js';
 import { applySiteConfig } from '../site-config.js';
 import { MiniCal } from '../calendar.js';
@@ -215,6 +215,7 @@ async function init() {
   renderStats();
   renderTable();
   renderBlockList();
+  loadReviews(); // populates the "pending reviews" badge; not awaited
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1303,9 +1304,28 @@ const platformMeta = {
   direct:  { label: 'Direct',      icon: '✉️', color: 'var(--green)', bg: 'var(--green-p)' },
 };
 
+// Review currently open in the inline editor (pending reviews captured from
+// Airbnb emails may be truncated and need the full text pasted in).
+let editingReviewId = null;
+const AIRBNB_HOST_REVIEWS_URL = 'https://www.airbnb.com.au/users/reviews';
+
+function isTruncatedReview(text) {
+  return /(…|\.\.\.)\s*$/.test(String(text || '').trim());
+}
+
+function updatePendingReviewBadge() {
+  const pending = allReviews.filter(r => r.status === 'pending').length;
+  document.querySelectorAll('[data-pending-reviews]').forEach(el => {
+    el.textContent = pending ? String(pending) : '';
+    el.style.display = pending ? '' : 'none';
+  });
+}
+
 function renderReviews() {
   const el = document.getElementById('reviewsList');
   const empty = document.getElementById('reviewsEmpty');
+  updatePendingReviewBadge();
+  if (!el || !empty) return;
   const filtered = reviewFilter === 'all' ? allReviews : allReviews.filter(r => r.status === reviewFilter);
 
   if (!filtered.length) {
@@ -1316,36 +1336,99 @@ function renderReviews() {
   empty.style.display = 'none';
 
   el.innerHTML = filtered.map(r => {
-    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const id = escapeHtml(String(r.id));
+    const rating = Math.min(5, Math.max(1, parseInt(r.rating) || 5));
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
     const statusColor = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? '#dc2626' : '#d97706';
     const statusBg = r.status === 'approved' ? 'var(--green-p)' : r.status === 'rejected' ? '#fef2f2' : '#fef9ec';
-    const initials = (r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const name = r.guest_name || '—';
+    const initials = escapeHtml((r.guest_name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
     const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
     const pm = platformMeta[r.platform] || platformMeta.direct;
+    const text = r.review_text || '';
+    const truncated = isTruncatedReview(text);
+    const truncHint = truncated && r.status !== 'rejected'
+      ? `<div style="background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:var(--r-sm);padding:.6rem .8rem;font-size:.78rem;line-height:1.5;margin:0 0 .75rem;">✂️ This review was cut short in Airbnb's email. <a href="${AIRBNB_HOST_REVIEWS_URL}" target="_blank" rel="noopener" style="color:#92400e;font-weight:700;">Open your Airbnb reviews ↗</a>, copy the full text and paste it in with <strong>Edit</strong> before approving.</div>`
+      : '';
+
+    if (editingReviewId === r.id) {
+      const ratingOpts = [5, 4, 3, 2, 1].map(n =>
+        `<option value="${n}"${n === rating ? ' selected' : ''}>${'★'.repeat(n)}${'☆'.repeat(5 - n)} (${n})</option>`
+      ).join('');
+      return `<div style="border:1px solid var(--green);border-radius:var(--r);padding:1.25rem;margin-bottom:.75rem;background:#fff;">
+        <div style="font-weight:700;font-size:.88rem;margin-bottom:.75rem;">✏️ Edit review</div>
+        <div class="field-row three">
+          <div class="field-group"><label>Guest name</label><input type="text" id="rvEditName-${id}" value="${escapeHtml(name)}"/></div>
+          <div class="field-group"><label>Rating</label><select id="rvEditRating-${id}" style="padding:.55rem .75rem;border:1.5px solid var(--g200);border-radius:var(--r-sm);font-size:.85rem;width:100%;box-sizing:border-box;">${ratingOpts}</select></div>
+          <div class="field-group"><label>Stay</label><input type="text" id="rvEditStay-${id}" value="${escapeHtml(r.stay_date || '')}" placeholder="e.g. October 2026"/></div>
+        </div>
+        <div class="field-group"><label>Review text (public)</label><textarea id="rvEditText-${id}" rows="5" style="font-size:.85rem;line-height:1.55;">${escapeHtml(text)}</textarea></div>
+        ${truncHint}
+        <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="saveReviewEdit('${id}')">Save</button>
+          <button class="btn btn-sm btn-white" onclick="cancelReviewEdit()">Cancel</button>
+        </div>
+      </div>`;
+    }
 
     return `<div style="border:1px solid var(--g100);border-radius:var(--r);padding:1.25rem;margin-bottom:.75rem;">
-      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap;">
         <div style="width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex-shrink:0;">${initials}</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:.88rem;">${r.guest_name || '—'}</div>
-          <div style="font-size:.75rem;color:var(--g400);">${r.stay_date || ''} · ${date}</div>
+        <div style="flex:1;min-width:140px;">
+          <div style="font-weight:700;font-size:.88rem;">${escapeHtml(name)}</div>
+          <div style="font-size:.75rem;color:var(--g400);">${escapeHtml(r.stay_date || '')}${r.stay_date ? ' · ' : ''}${escapeHtml(date)}</div>
         </div>
         <span style="font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:100px;background:${pm.bg};color:${pm.color};">${pm.icon} ${pm.label}</span>
         <div style="color:var(--green);font-size:.85rem;">${stars}</div>
-        <span style="font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-full);background:${statusBg};color:${statusColor};text-transform:uppercase;letter-spacing:.04em;">${r.status}</span>
+        <span style="font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--r-full);background:${statusBg};color:${statusColor};text-transform:uppercase;letter-spacing:.04em;">${escapeHtml(r.status)}</span>
       </div>
-      <p style="font-size:.85rem;color:var(--g600);line-height:1.6;margin:0 0 .75rem;">"${r.review_text}"</p>
-      <div style="display:flex;gap:.5rem;">
+      <p style="font-size:.85rem;color:var(--g600);line-height:1.6;margin:0 0 .75rem;white-space:pre-line;">"${escapeHtml(text)}"</p>
+      ${truncHint}
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
         ${r.status === 'pending' ? `
-          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="approveReview('${r.id}')">Approve</button>
-          <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>` : r.status === 'rejected' ? `
-          <button class="btn btn-sm btn-white" onclick="approveReview('${r.id}')">Approve</button>` : `
-          <button class="btn btn-sm btn-white" onclick="rejectReview('${r.id}')">Reject</button>`}
-        <button class="btn btn-sm btn-white" style="color:#dc2626;border-color:#fca5a5;" onclick="deleteReview('${r.id}')">Delete</button>
+          <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="approveReview('${id}')">Approve</button>
+          <button class="btn btn-sm btn-white" onclick="rejectReview('${id}')">Reject</button>` : r.status === 'rejected' ? `
+          <button class="btn btn-sm btn-white" onclick="approveReview('${id}')">Approve</button>` : `
+          <button class="btn btn-sm btn-white" onclick="rejectReview('${id}')">Reject</button>`}
+        <button class="btn btn-sm btn-white" onclick="editReview('${id}')">Edit</button>
+        <button class="btn btn-sm btn-white" style="color:#dc2626;border-color:#fca5a5;" onclick="deleteReview('${id}')">Delete</button>
       </div>
     </div>`;
   }).join('');
 }
+
+window.editReview = function (id) {
+  editingReviewId = id;
+  renderReviews();
+};
+
+window.cancelReviewEdit = function () {
+  editingReviewId = null;
+  renderReviews();
+};
+
+window.saveReviewEdit = async function (id) {
+  const field = (prefix) => document.getElementById(prefix + '-' + id);
+  const guest_name  = (field('rvEditName').value || '').trim();
+  const rating      = parseInt(field('rvEditRating').value) || 5;
+  const stay_date   = (field('rvEditStay').value || '').trim();
+  const review_text = (field('rvEditText').value || '').trim();
+  if (!guest_name) { alert('Guest name is required.'); return; }
+  if (review_text.length < 5) { alert('The review text is too short.'); return; }
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+      body: JSON.stringify({ id, guest_name, rating, stay_date, review_text }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    editingReviewId = null;
+    await loadReviews();
+  } catch (err) {
+    alert('Failed to save: ' + err.message);
+  }
+};
 
 window.filterReviews = function (status, el) {
   reviewFilter = status;
