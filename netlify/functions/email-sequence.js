@@ -4,6 +4,8 @@
 //   - 7 days before check-in  → pre-arrival tips
 //   - 1 day before check-in   → check-in details (keypad, WiFi, map)
 //   - 1 day after checkout    → thank you + review request
+//   - host nudge: Airbnb reviews captured as pending in the last ~25h
+//     (StayOps drops them into `reviews`; they are approved in /admin.html)
 //
 // Uses emails_sent jsonb column on bookings to prevent duplicates.
 // Trigger: GET /api/email-sequence?secret=CRON_SECRET
@@ -14,7 +16,7 @@ const { loadSiteConfig, getPropertyName, getEmailFrom, getRefPrefix } = require(
 const crypto = require('crypto');
 
 const { SUPABASE_URL, SUPABASE_SERVICE_KEY, PROPERTY_ID,
-        RESEND_API_KEY, RESEND_FROM, CRON_SECRET } = process.env;
+        RESEND_API_KEY, RESEND_FROM, CRON_SECRET, HOST_EMAIL } = process.env;
 const SITE_URL = process.env.URL || 'https://glenhaven-book.netlify.app';
 
 const sbHeaders = {
@@ -165,6 +167,18 @@ exports.handler = async (event) => {
     results.errors.push({ error: err.message });
   }
 
+  // ── Host nudge: new Airbnb reviews awaiting approval ──────────
+  // StayOps' hourly scan inserts newly published Airbnb reviews into
+  // `reviews` as status='pending'. Once a day, tell the host about the ones
+  // that arrived since the previous run so they get approved in the admin.
+  // Goes to HOST_EMAIL only — never to guests.
+  try {
+    await nudgePendingReviews(results, { propName, emailFrom });
+  } catch (err) {
+    console.error('[email-sequence] review nudge failed:', err.message);
+    results.errors.push({ type: 'review-nudge', error: err.message });
+  }
+
   console.log('Email sequence results:', JSON.stringify(results));
   return respond(200, results);
 };
@@ -232,6 +246,43 @@ async function storeReturnCode(bookingId, returnCode) {
   if (!res.ok) {
     console.warn(`Failed to store return code for ${bookingId}`);
   }
+}
+
+async function nudgePendingReviews(results, { propName, emailFrom }) {
+  if (!HOST_EMAIL) { results.skipped.push({ type: 'review-nudge', reason: 'HOST_EMAIL not set' }); return; }
+  // 25h, not 24h, so a review that lands right at the cron boundary is never
+  // missed; the admin badge covers the rare double mention.
+  const since = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+  const url = `${SUPABASE_URL}/rest/v1/reviews?property_id=eq.${PROPERTY_ID}&status=eq.pending`
+    + `&created_at=gte.${encodeURIComponent(since)}&select=id,guest_name,rating,review_text,stay_date,platform`
+    + `&order=created_at.desc&limit=20`;
+  const res = await fetch(url, { headers: sbHeaders });
+  const rows = await res.json();
+  if (!Array.isArray(rows) || !rows.length) { results.skipped.push({ type: 'review-nudge', reason: 'no new pending reviews' }); return; }
+
+  const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const n = rows.length;
+  const items = rows.map(r => {
+    const rating = Math.min(5, Math.max(1, parseInt(r.rating) || 5));
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const text = String(r.review_text || '');
+    const snippet = text.length > 180 ? text.slice(0, 180).trim() + '…' : text;
+    const cut = /(…|\.\.\.)\s*$/.test(text.trim()) ? ' <span style="color:#92400e;font-size:12px;">(cut short in Airbnb\'s email — paste the full text via Edit)</span>' : '';
+    return `<li style="margin:0 0 14px;"><strong>${esc(r.guest_name || 'Guest')}</strong> <span style="color:#1a6640;">${stars}</span>`
+      + (r.stay_date ? ` <span style="color:#6b7280;font-size:12px;">· ${esc(r.stay_date)}</span>` : '')
+      + `<br><span style="color:#374151;">“${esc(snippet)}”</span>${cut}</li>`;
+  }).join('');
+  const adminUrl = `${SITE_URL}/admin.html`;
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;line-height:1.5;">
+    <h2 style="margin:0 0 8px;font-size:20px;">${n === 1 ? 'A new Airbnb review is' : n + ' new Airbnb reviews are'} waiting for your approval</h2>
+    <p style="margin:0 0 18px;color:#374151;">Captured from your Airbnb emails for <strong>${esc(propName)}</strong>. Nothing is published until you approve it in the website admin.</p>
+    <ul style="padding-left:18px;margin:0 0 22px;">${items}</ul>
+    <p style="margin:0 0 24px;"><a href="${adminUrl}" style="display:inline-block;background:#1a6640;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;">Review &amp; approve</a></p>
+    <p style="margin:0;color:#6b7280;font-size:12px;">Open the <strong>Reviews</strong> tab, then Approve, Edit or Reject each one.</p>
+  </div>`;
+
+  await sendEmail(emailFrom, HOST_EMAIL, `${n === 1 ? '1 Airbnb review' : n + ' Airbnb reviews'} awaiting approval — ${propName}`, html);
+  results.sent.push({ type: 'review-nudge', count: n, ids: rows.map(r => r.id) });
 }
 
 function respond(status, body) {
