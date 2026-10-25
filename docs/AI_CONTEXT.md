@@ -32,7 +32,7 @@ The site is config-driven. Property name, copy, prices, photos, colours, policie
 ## 2. Technology stack
 
 - **Front end:** static HTML pages and one shared `style.css`. Plain browser ES modules in `js/`, with no framework, bundler or `package.json`.
-- **Back end:** 21 Netlify Functions (Node.js, CommonJS) in `netlify/functions/`. `_auth.js`, `site-config-loader.js`, `pricing.js` and `email-templates.js` are shared modules, not endpoints. The functions use only Node built-ins (`crypto`) and the global `fetch`. There are no npm dependencies, and the Stripe, Resend and Supabase calls are raw REST.
+- **Back end:** 22 Netlify Functions (Node.js, CommonJS) in `netlify/functions/`. `_auth.js`, `site-config-loader.js`, `pricing.js` and `email-templates.js` are shared modules, not endpoints. The functions use only Node built-ins (`crypto`) and the global `fetch`. There are no npm dependencies, and the Stripe, Resend and Supabase calls are raw REST.
 - **Database:** Supabase Postgres (project `stayops`, ref `nbeuyypgiipptxlqnhel`, named in `GO-LIVE-AUDIT.md`). It is reached only from the functions, over PostgREST, with the service-role key. Photos go to the Supabase Storage bucket `photos`.
 - **Payments:** Stripe Checkout (AUD, card only) plus a signed webhook.
 - **Email:** Resend.
@@ -67,7 +67,7 @@ The browser never talks to Supabase directly. The one exception is the admin pho
 | `confirmation.html` + `js/pages/confirmation.js` | Landing page after Stripe (`?booking=success` or `?booking=cancelled`). Reads the pending booking from `sessionStorage`. |
 | `submit-review.html` | Guest review form, reached from the post-checkout email via `?ref=<return code>`. Has `noindex`. |
 | `guest-offer.html` | Hidden returning-guest 5% signup page, served at `/welcome-back` through a rewrite. Has `noindex`. |
-| `Welcome-book.html` | Self-contained guest welcome book (about 5 MB, because 12 images are embedded as base64). It is not linked from the site nav and has no `noindex`. It contains sensitive house details; see AI_HANDOFF "Outstanding bugs". |
+| `Welcome-book.html` | Self-contained guest welcome book (about 5 MB, because 12 images are embedded as base64), also printed for the house with a QR code to this page. It is not linked from the site nav and is `noindex`. It holds no Wi-Fi details or street address; a booked guest unlocks them (§5.11). |
 | `admin.html` + `js/pages/admin.js` | Owner admin panel (about 2,000 lines of JS). See §5.8. |
 | `js/config.js` | Client defaults: pricing constants, minimum nights, holiday prices, API URLs. `site_config` overrides them at runtime. |
 | `js/site-config.js` | Fetches `/api/config` and applies it to the DOM: text, pricing, colours, fonts, photos, amenities, policy and social links. Caches in `localStorage` for 1 h. Also derives the site rating from approved reviews (cached 30 min). |
@@ -195,6 +195,14 @@ Endpoints:
 ### 5.10 Contact form
 `contact.html` → `/api/contact` → Resend email to `HOST_EMAIL`, with `reply_to` set to the guest. See AI_HANDOFF for a likely redirect-order bug.
 
+### 5.11 Guest welcome book (`Welcome-book.html`, `welcome-details.js`)
+- The public page shows the house guide but **not** the Wi-Fi network/password or the street address (only the suburb). It carries `noindex, nofollow`.
+- A screen-only card at the top asks for the name on the booking and the check-in date, and POSTs them to `/api/welcome-details`.
+- `welcome-details.js` looks up non-cancelled `bookings` for `PROPERTY_ID` with that exact `checkin`. The name must match the booking's surname; if the booking has only a first name (or a one-letter surname initial), the first name is accepted. It works for every channel (Airbnb, VRBO, direct) because it doesn't need a guest email, which OTA bookings don't store.
+- A match only counts from 14 days before check-in until the day after check-out (Australia/Sydney date). Failed attempts get a generic 404 after an 800 ms delay. The guest's name is never sent to Supabase in the query.
+- On success it returns only `wifi_network`, `wifi_password` and `address` from `properties.check_in_info` — the same record the day-before check-in email uses, edited in StayOps. The door access code is never returned by this endpoint.
+- The page fills the Wi-Fi line and the street part of the address (text before the first comma) into four spots. It remembers what the guest typed (not the details) in `localStorage`, so a return visit re-checks the booking automatically. The card is hidden when printing.
+
 ## 6. Data model and Supabase integration
 
 Project `stayops` (ref `nbeuyypgiipptxlqnhel`, region ap-southeast-2) is shared with StayOps. Every query filters on the `PROPERTY_ID` env var and uses `SUPABASE_SERVICE_KEY`, which bypasses RLS. Access control is enforced in the functions, not by RLS. All of these tables exist in the live `stayops` table list.
@@ -246,6 +254,7 @@ API routes (`/api/<name>` → `netlify/functions/<name>.js`):
 | `upload` | POST | admin |
 | `guest-offers` | POST public; GET, PATCH admin | admin |
 | `validate-promo` | GET | public |
+| `welcome-details` | POST | name on booking + check-in date (§5.11) |
 | `email-sequence` | scheduled, or GET/POST with secret | `CRON_SECRET` |
 | `reservations`, `refund` | POST | `_auth.js` (`STAYOPS_API_KEY` or `ADMIN_PASSWORD`) |
 | `contact` | POST | public |
@@ -267,6 +276,7 @@ Extra rewrites:
 - **Returning-guest code:** 5%, single-use, valid 12 months, applied to the full total including cleaning.
 - **Reviews:** only `approved` reviews are public. Reviews from guests and from StayOps start as `pending`.
 - **Emails:** the sequence only covers direct bookings (`platform='Direct'`). OTA guests get nothing from this site. The post-checkout email is marketing, so it carries an unsubscribe link (Spam Act 2003). Opt-outs are handled manually by `mailto:`.
+- **House details:** the Wi-Fi details and street address are never in public HTML. Only a guest with a current booking (14 days before check-in to the day after check-out) can see them, via `/api/welcome-details`. The door access code is only ever sent by email.
 - **Legal:** the Terms and Privacy pages state NSW law, Australian Consumer Law guarantees and the Privacy Act. The footer shows the NSW STRA registration. The booking step requires agreement to the Terms, House Rules, Cancellation Policy and Privacy Policy.
 
 ## 9. Deployment architecture

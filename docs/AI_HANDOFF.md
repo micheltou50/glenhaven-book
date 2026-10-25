@@ -2,7 +2,7 @@
 
 **Date of last update:** 2026-10-25
 **Based on:** `main` @ `6fd73c0` (2026-10-24)
-**Updated by:** Claude (initial documentation audit)
+**Updated by:** Claude (initial documentation audit; welcome-book privacy change on branch `feat/welcome-book-private-details`)
 
 ## Latest known development status
 
@@ -16,6 +16,11 @@
 ## Recently completed features
 
 Newest first, from `git log origin/main`.
+
+- **2026-10-25 — Welcome book no longer publishes the Wi-Fi details or street address** (branch `feat/welcome-book-private-details`, PR pending owner approval).
+  - The values were removed from `Welcome-book.html`; the page now has `noindex, nofollow`.
+  - A booked guest unlocks them with the name on the booking and the check-in date, via the new `netlify/functions/welcome-details.js`, which reads `properties.check_in_info`. See AI_CONTEXT §5.11.
+  - Tested: 17 unit cases against a mock Supabase, plus a headless-browser check of the locked, wrong-name, unlocked, reload and print states.
 
 - **2026-10-24 — Email-captured Airbnb reviews** (`6fd73c0`).
   - Admin: pending-count badge, edit-before-approve (name, rating, stay, text) and a hint when a review looks truncated.
@@ -67,12 +72,7 @@ There are no open PRs (GitHub API, 2026-10-25).
 
 ## Outstanding bugs
 
-1. **Security / privacy: sensitive house details are published.** `Welcome-book.html` is served publicly at `/Welcome-book.html`, has no `noindex`, and is committed to this public repo. It contains:
-   - the property's wifi network name and password;
-   - the street address;
-   - a host phone number.
-   
-   These details should be removed or put behind access control, and the wifi password should be changed, because it stays in git history (`054b6f7`).
+1. **Security / privacy: old house details remain in git history.** Once `feat/welcome-book-private-details` is merged, the live page no longer shows the Wi-Fi details or street address. But both are still in this public repo's history (from `054b6f7`), so the Wi-Fi password should be changed on the router and then updated in StayOps (`properties.check_in_info.wifi_password`). The host phone number is still shown on the page; it was outside the scope of this change.
 2. **Security (low): retired backend file in history.** The deleted `Code.gs`, still in git history before `699dda7`, contains a Google Sheet ID and a personal contact email. Neither is a credential. Just be aware they are there.
 3. **The contact form probably never sends.** In `netlify.toml` the `/api/*` → `/.netlify/functions/:splat` rule comes before `/api/contact` → `contact-submit`. Netlify applies the first match, so `/api/contact` resolves to a function named `contact`, which does not exist. On top of that, `js/pages/contact.js` shows "success" on any response because it never checks `res.ok`. **Unverified:** not tested against the live site.
 4. **The "Come back for 10% off" code in the post-checkout email cannot be redeemed.** `email-templates.js` `postCheckoutEmail` shows the review return code (`<XX>-R…`) as a 10% booking code. But `validate-promo.js` and `book.js` only accept `guest_offers` promo codes (5%), so that code is rejected at checkout.
@@ -134,11 +134,12 @@ The repo has no roadmap, PLAN docs or TODO/FIXME comments. Evidence of planned w
   4. Returning-guest signup: both the auto-verified and the manual-review paths, then redeeming the code at checkout and confirming it is marked redeemed.
   5. Review flow: a guest submission through the post-checkout link, a StayOps-captured Airbnb review, editing and approving it in the admin, and the public rating updating.
   6. `/api/reservations` (cancel, modify, block) and `/api/refund` (partial, then full; a second refund is rejected) using `STAYOPS_API_KEY`.
+- **Welcome book unlock (after deploy):** on the deploy preview or live site, unlock with a real upcoming booking's name and check-in date, check that a wrong name is refused, and that the page shows only the suburb before unlocking.
 - **Pricing parity:** `js/pricing.js` and `netlify/functions/pricing.js` must give the same result. A small fixture test covering weekends, seasons, holidays, overrides, length-of-stay discounts and extra guests would catch drift.
 
 ## Recommended next development tasks
 
-1. **Remove the sensitive house details from `Welcome-book.html`.** Take out the wifi credentials, street address and phone, or serve the page only to booked guests (for example with a token link from the check-in email). Add `noindex`, and change the wifi password.
+1. **Change the Wi-Fi password** (the old one is in git history), then update it in StayOps check-in info. The welcome book will pick up the new one automatically.
 2. **Fix the contact form.** Put the `/api/contact` redirect above `/api/*`, or rename `contact-submit.js` to `contact.js`. Make `contact.js` check `res.ok`.
 3. **Fix the post-checkout "10% off" offer.** Either let `validate-promo.js` and `book.js` accept `bookings.return_code` at a configured percentage, or change the email to point guests to `/welcome-back`.
 4. **Align the confirmation email's cancellation text** with the 14-day policy. Better still, read it from `site_config.policy`.
@@ -161,3 +162,4 @@ The repo has no roadmap, PLAN docs or TODO/FIXME comments. Evidence of planned w
 
 ## Update log
 - 2026-10-25 — Initial AI_CONTEXT/AI_HANDOFF created from codebase audit.
+- 2026-10-25 — Welcome book: Wi-Fi details and street address moved behind a booking check (`welcome-details.js`).
